@@ -11,7 +11,7 @@ DEBUG = True
 # but always use decouple for production.
 SECRET_KEY = config('SECRET_KEY', default='your-insecure-dev-secret-key-please-change')
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.vercel.app']
 
 # Database for development (SQLite is fine for local dev)
 DATABASES = {
