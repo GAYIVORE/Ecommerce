@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - E-commerce Shop{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
+    <!-- Main Product Presentation Card -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 p-4 sm:p-8 items-start mb-8">
+        
+        <!-- Media Column -->
+        <div class="w-full lg:col-span-5 bg-slate-50 rounded-xl p-4 flex justify-center items-center aspect-square lg:sticky lg:top-24 max-h-[320px] sm:max-h-[450px] lg:max-h-none">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="max-h-full max-w-full object-contain mix-blend-multiply transition-transform duration-300 hover:scale-105">
+            {% else %}
+                <img src="https://placehold.co/600x600/F1F5F9/475569?text={{ product.name|urlencode }}" alt="No snapshot available" class="max-h-full max-w-full object-contain mix-blend-multiply">
+            {% endif %}
+        </div>
+
+        <!-- Meta Information Frame Column -->
+        <div class="w-full lg:col-span-7 flex flex-col justify-between">
+            <div>
+                <!-- Breadcrumbs -->
+                <nav class="flex items-center space-x-2 text-xs text-slate-400 font-semibold uppercase tracking-wider mb-3">
+                    <a href="{% url 'products:product_list' %}" class="hover:text-amber-600 transition-colors">Catalog</a>
+                    <span>/</span>
+                    {% if product.category %}
+                        <a href="{% url 'products:product_list_by_category' category_slug=product.category.slug %}" class="hover:text-amber-600 transition-colors truncate max-w-[120px] sm:max-w-none">{{ product.category.name }}</a>
+                    {% else %}
+                        <span>General</span>
+                    {% endif %}
+                </nav>
+
+                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight mb-3">
+                    {{ product.name }}
+                </h1>
+                
+                <p class="text-2xl sm:text-3xl font-black text-slate-900 mb-6">
+                    GHS {{ product.price|floatformat:2 }}
+                </p>
+
+                <hr class="border-slate-100 mb-6">
+
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Product Description</h3>
+                <p class="text-slate-600 leading-relaxed text-sm sm:text-base mb-6">
+                    {{ product.description }}
+                </p>
+
+                <!-- Data Table Block -->
+                <div class="bg-slate-50/80 rounded-xl border border-slate-100 p-4 mb-6 text-xs sm:text-sm text-slate-600 space-y-3">
+                    <div class="flex items-center justify-between py-1 border-b border-slate-200/50 last:border-0">
+                        <span class="font-medium text-slate-400">Category</span>
+                        <span>
+                            {% if product.category %}
+                                <a href="{% url 'products:product_list_by_category' category_slug=product.category.slug %}" class="text-amber-600 hover:text-amber-700 font-bold transition-colors">
+                                    {{ product.category.name }}
+                                </a>
+                            {% else %}
+                                <span class="text-slate-400">N/A</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between py-1 border-b border-slate-200/50 last:border-0">
+                        <span class="font-medium text-slate-400">Availability</span>
+                        <span>
+                            {% if product.stock > 0 and product.available %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> {{ product.stock }} Available
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                    <span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span> Sold Out
+                                </span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between py-1 last:border-0">
+                        <span class="font-medium text-slate-400">Last Modified</span>
+                        <span class="text-slate-700 font-semibold">{{ product.updated_at|date:"F j, Y" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Call to Action System (Add to Cart Showcase) -->
+            <div class="flex flex-col sm:flex-row gap-3 mt-4">
+                {% if product.stock > 0 and product.available %}
+                    <form action="{% url 'cart:add_to_cart' product.id %}" method="post" class="flex-1 flex items-stretch gap-3 m-0">
+                        {% csrf_token %}
+                        <div class="flex items-center justify-center border border-slate-200 rounded-xl bg-white px-3 shrink-0">
+                            <label for="quantity" class="text-[10px] font-black text-slate-400 tracking-wider mr-2 uppercase">QTY</label>
+                            <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock }}"
+                                   class="w-10 text-center font-bold text-slate-800 bg-transparent focus:outline-none focus:ring-0 border-none p-0">
+                        </div>
+                        <!-- High Converting Amber Button -->
+                        <button type="submit" class="flex-1 inline-flex justify-center items-center px-6 py-4 text-sm font-bold uppercase tracking-wider text-white bg-amber-600 hover:bg-amber-500 active:bg-amber-700 rounded-xl transition-all shadow-md shadow-amber-600/10 hover:shadow-lg active:scale-[0.99] cursor-pointer">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1,0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0,1-1.12-1.243l1.264-12A1.125 1.125 0 0,1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1,1-.75 0 .375.375 0 0,1 .75 0Zm7.5 0a.375.375 0 1,1-.75 0 .375.375 0 0,1 .75 0Z"/></svg>
+                            Add to Cart
+                        </button>
+                    </form>
+                {% else %}
+                    <button class="flex-1 inline-flex justify-center items-center px-6 py-4 text-sm font-bold uppercase tracking-wider text-slate-400 bg-slate-100 rounded-xl border border-slate-200 cursor-not-allowed" disabled>
+                        Out of Stock
+                    </button>
+                {% endif %}
+
+                {% if user.is_authenticated %}
+                    <form action="{% url 'wishlist:add_to_wishlist' product.id %}" method="post" class="w-full sm:w-auto m-0">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full inline-flex justify-center items-center px-5 py-4 border border-slate-200 text-sm font-semibold rounded-xl text-slate-700 bg-white hover:bg-slate-50 active:bg-slate-100 transition-colors cursor-pointer shadow-xs">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                            <span class="inline sm:hidden lg:inline ml-2">Wishlist</span>
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Block Frame -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-8">
+        <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight mb-6">Customer Reviews</h3>
+
+        <!-- Review Input Interface -->
+        {% if user.is_authenticated %}
+            <div class="mb-8 p-4 sm:p-6 rounded-xl bg-slate-50 border border-slate-200/60">
+                <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4">
+                    {% if user_review %}Modify Existing Review{% else %}Write an Item Evaluation{% endif %}
+                </h4>
+                <form action="{% url 'reviews:add_review' product.slug %}" method="post" class="space-y-4 m-0">
+                    {% csrf_token %}
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Score Rating</label>
+                        <div class="flex flex-wrap items-center gap-3 bg-white px-3 py-2 rounded-xl border border-slate-200 w-fit">
+                            {% for radio in review_form.rating %}
+                                <label class="inline-flex items-center cursor-pointer group">
+                                    <input type="radio" name="{{ review_form.rating.name }}" value="{{ radio.data.value }}" id="{{ radio.id_for_label }}" {% if radio.data.selected %}checked{% endif %} class="w-4 h-4 text-amber-600 border-slate-300 focus:ring-amber-500 cursor-pointer">
+                                    <span class="ml-1.5 text-xs font-bold text-slate-600 group-hover:text-slate-900 transition-colors flex items-center">
+                                        {{ radio.choice_label }} <svg class="w-3.5 h-3.5 ml-0.5 text-amber-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.683-1.539 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.565-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.929 8.72c-.783-.57-.381-1.81.588-1.81h3.462a1 1 0 00.95-.69l1.07-3.292z"/></svg>
+                                    </span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                        {% for error in review_form.rating.errors %}
+                            <p class="text-xs font-bold text-rose-600 mt-1.5">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        <label for="{{ review_form.comment.id_for_label }}" class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Commentary</label>
+                        <textarea name="{{ review_form.comment.name }}" id="{{ review_form.comment.id_for_label }}" rows="4" class="block w-full rounded-xl border-slate-200 bg-white shadow-xs focus:border-amber-500 focus:ring focus:ring-amber-500/10 p-3 text-sm text-slate-800 placeholder:text-slate-400" placeholder="Share your specific experience with this item..."></textarea>
+                        {% for error in review_form.comment.errors %}
+                            <p class="text-xs font-bold text-rose-600 mt-1.5">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="inline-flex justify-center items-center px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer">
+                        {% if user_review %}Update Evaluation{% else %}Submit Evaluation{% endif %}
+                    </button>
+                </form>
+            </div>
+        {% else %}
+            <div class="text-center py-6 px-4 bg-slate-50 rounded-xl border border-dashed border-slate-200 mb-6">
+                <p class="text-xs sm:text-sm text-slate-500">
+                    Purchased this item? <a href="{% url 'users:login' %}" class="text-amber-600 hover:text-amber-700 font-bold transition-colors">Log in</a> to publish public verification evaluations.
+                </p>
+            </div>
+        {% endif %}
+
+        <!-- Active User Reviews Output Grid -->
+        {% if product.reviews.all %}
+            <div class="divide-y divide-slate-100">
+                {% for review in product.reviews.all %}
+                    <div class="py-6 first:pt-0 last:pb-0">
+                        <div class="flex items-start sm:items-center justify-between gap-4 mb-2">
+                            <div class="flex items-center gap-3">
+                                <div class="h-9 w-9 rounded-full bg-slate-100 text-xs font-bold flex items-center justify-center text-slate-600 tracking-wide border border-slate-200 uppercase shrink-0">
+                                    {{ review.user.username|slice:":2" }}
+                                </div>
+                                <div>
+                                    <p class="font-extrabold text-sm text-slate-800 leading-tight">{{ review.user.username }}</p>
+                                    <p class="text-[11px] text-slate-400 font-medium mt-0.5">{{ review.created_at|date:"F j, Y" }}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center text-amber-500 gap-0.5 shrink-0">
+                                {% for i in "12345" %}
+                                    <svg class="w-3.5 h-3.5 {% if forloop.counter <= review.rating %}text-amber-500{% else %}text-slate-200{% endif %}" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.683-1.539 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.565-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.929 8.72c-.783-.57-.381-1.81.588-1.81h3.462a1 1 0 00.95-.69l1.07-3.292z"/>
+                                    </svg>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <p class="text-slate-600 text-sm leading-relaxed pl-12">
+                            {{ review.comment }}
+                        </p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-12 text-slate-400 bg-slate-50/40 rounded-xl border border-dashed border-slate-200/60">
+                <p class="text-xs sm:text-sm font-medium">No system evaluation entries recorded yet for this reference product listing.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

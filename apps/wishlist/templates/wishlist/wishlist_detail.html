@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Your Wishlist - E-commerce Shop{% endblock %}
+
+{% block content %}
+<div class="min-h-full-content flex-col items-start">
+    <h1 class="text-4xl font-bold text-gray-900 mb-8 w-full text-center">Your Wishlist</h1>
+
+    {% if wishlist.items.all %}
+        <div class="w-full max-w-4xl card p-8">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Added On</th>
+                            <th scope="col" class="relative px-6 py-3">
+                                <span class="sr-only">Actions</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for item in wishlist.items.all %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-16 w-16 mr-4">
+                                            {% if item.product.image %}
+                                                <img class="h-16 w-16 rounded-lg object-cover" src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                                            {% else %}
+                                                <img class="h-16 w-16 rounded-lg object-cover" src="https://placehold.co/64x64/E2E8F0/4A5568?text=No+Image" alt="No image">
+                                            {% endif %}
+                                        </div>
+                                        <div class="text-sm font-medium text-gray-900">
+                                            <a href="{{ item.product.get_absolute_url }}" class="hover:underline text-primary-color">{{ item.product.name }}</a>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                    GHS {{ item.product.price|floatformat:2 }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                    {{ item.added_at|date:"F j, Y" }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex items-center justify-end space-x-3">
+                                    <form action="{% url 'wishlist:move_to_cart' item.id %}" method="post" class="inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-primary py-2 px-4 text-sm" {% if not item.product.available or item.product.stock <= 0 %}disabled title="Out of Stock"{% endif %}>
+                                            Move to Cart
+                                        </button>
+                                    </form>
+                                    <form action="{% url 'wishlist:remove_from_wishlist' item.id %}" method="post" class="inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="text-red-600 hover:text-red-900 font-semibold">Remove</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-8 flex justify-end space-x-4">
+                <a href="{% url 'products:product_list' %}" class="btn-primary bg-gray-600 hover:bg-gray-700">Continue Shopping</a>
+            </div>
+        </div>
+    {% else %}
+        <div class="w-full max-w-2xl card p-8 text-center">
+            <p class="text-xl text-gray-600 mb-6">Your wishlist is empty.</p>
+            <a href="{% url 'products:product_list' %}" class="btn-primary">Start Browsing Products</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

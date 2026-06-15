@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Write a Review - {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-full-content flex-col items-start w-full max-w-2xl">
+    <h1 class="text-4xl font-bold text-gray-900 mb-8 w-full text-center">
+        {% if existing_review %}Edit Your Review{% else %}Write a Review{% endif %} for <span class="text-primary-color">{{ product.name }}</span>
+    </h1>
+
+    <div class="w-full card p-8">
+        <form action="{% url 'reviews:add_review' product.slug %}" method="post" class="space-y-6">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label mb-2">Your Rating (1-5 Stars):</label>
+                <div class="flex items-center space-x-4">
+                    {# CORRECTED: Changed 'form. Rating' to 'form.rating' #}
+                    {% for radio in form.rating %}
+                        <div class="flex items-center">
+                            {{ radio.tag }}
+                            <label for="{{ radio.id_for_label }}" class="ml-2 text-lg text-gray-700 cursor-pointer">
+                                {{ radio.choice_label }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% for error in form.rating.errors %}
+                    <p class="form-error mt-2">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.comment.id_for_label }}" class="form-label">Your Comment:</label>
+                {{ form.comment }}
+                {% for error in form.comment.errors %}
+                    <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="btn-primary w-full">
+                {% if existing_review %}Update Review{% else %}Submit Review{% endif %}
+            </button>
+        </form>
+
+        <div class="mt-6 text-center">
+            <a href="{% url 'products:product_detail' product.slug %}" class="text-blue-600 hover:underline font-semibold">Back to Product Details</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

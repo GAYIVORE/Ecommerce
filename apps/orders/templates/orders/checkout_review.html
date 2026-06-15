@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout: Review Order - E-commerce Shop{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-5xl mx-auto px-4 py-8 sm:py-12 flex flex-col items-center min-h-full-content">
+    
+    <h1 style="color: #0f172a;" class="text-2xl sm:text-4xl font-black tracking-tight mb-8 text-center w-full">
+        Checkout: Review Your Order
+    </h1>
+
+    <div class="w-full max-w-3xl mb-10 px-2 sm:px-6">
+        <div class="flex justify-between items-center text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-4 relative z-10">
+            <span style="color: #0f172a;" class="flex flex-col items-center gap-1.5">
+                <span style="background-color: #0f172a;" class="w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-[10px]">✓</span>
+                <span>Delivery</span>
+            </span>
+            <span style="color: #0f172a;" class="flex flex-col items-center gap-1.5">
+                <span style="background-color: #0f172a;" class="w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-[10px]">✓</span>
+                <span>Payment</span>
+            </span>
+            <span style="color: #0f172a;" class="flex flex-col items-center gap-1.5">
+                <span style="background-color: #0f172a;" class="w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-[10px] ring-4 ring-slate-900/10">3</span>
+                <span>Review</span>
+            </span>
+            <span style="color: #94a3b8;" class="flex flex-col items-center gap-1.5">
+                <span style="background-color: #e2e8f0;" class="w-5 h-5 rounded-full flex items-center justify-center text-slate-400 font-bold text-[10px]">4</span>
+                <span>Complete</span>
+            </span>
+        </div>
+        <div class="w-full h-1 bg-slate-100 rounded-full -mt-[34px] relative z-0">
+            <div style="width: 75%" class="h-full bg-slate-900 rounded-full transition-all duration-500"></div>
+        </div>
+    </div>
+
+    <div style="background-color: #ffffff; border-color: #e2e8f0;" class="w-full rounded-2xl border shadow-xs p-5 sm:p-8">
+        
+        <h2 style="color: #0f172a;" class="text-lg font-black uppercase tracking-tight mb-8 flex items-center gap-2">
+            <span style="background-color: #0f172a; color: #ffffff;" class="w-5 h-5 rounded-md flex items-center justify-center text-[11px]">3</span>
+            <span>Confirm Order Details</span>
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {# Delivery Info Block Card #}
+            <div style="background-color: #f8fafc; border-color: #e2e8f0;" class="border rounded-xl p-5 flex flex-col justify-between">
+                <div>
+                    <h3 style="color: #475569;" class="text-xs font-bold uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                        </svg>
+                        <span>Delivery Destination</span>
+                    </h3>
+                    <div class="text-xs font-medium text-slate-600 space-y-1">
+                        <p style="color: #0f172a;" class="font-extrabold text-sm tracking-tight mb-1">{{ shipping_address.full_name }}</p>
+                        <p>{{ shipping_address.address_line1 }}</p>
+                        {% if shipping_address.address_line2 %}<p>{{ shipping_address.address_line2 }}</p>{% endif %}
+                        <p>{{ shipping_address.city }}{% if shipping_address.state %}, {{ shipping_address.state }}{% endif %}</p>
+                        <p>{{ shipping_address.country }} {% if shipping_address.postal_code %}({{ shipping_address.postal_code }}){% endif %}</p>
+                        <p style="color: #64748b;" class="pt-1 font-semibold">Phone: {{ shipping_address.phone_number }}</p>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-200/60">
+                    <a href="{% url 'orders:checkout_shipping' %}" style="color: #0f172a;" class="text-xs font-bold uppercase tracking-wide hover:opacity-70 transition-opacity inline-flex items-center gap-1">
+                        Modify Address →
+                    </a>
+                </div>
+            </div>
+
+            {# Payment Method Block Card #}
+            <div style="background-color: #f8fafc; border-color: #e2e8f0;" class="border rounded-xl p-5 flex flex-col justify-between">
+                <div>
+                    <h3 style="color: #475569;" class="text-xs font-bold uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
+                        </svg>
+                        <span>Selected Payment Method</span>
+                    </h3>
+                    <div class="text-xs font-medium text-slate-600 space-y-1">
+                        <p style="color: #0f172a;" class="font-extrabold text-sm tracking-tight mb-1">
+    {% if payment_method == 'pay_now' %}
+        Secure Online Payment (Card/Momo)
+    {% elif payment_method == 'pay_on_delivery' %}
+        Pay on Delivery
+    {% else %}
+        {{ payment_method|title }}
+    {% endif %}
+</p>
+                        <p class="leading-relaxed text-slate-500">Your secure checkout parameters will finalize as soon as you confirm and execute this order request window.</p>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-200/60">
+                    <a href="{% url 'orders:checkout_payment' %}" style="color: #0f172a;" class="text-xs font-bold uppercase tracking-wide hover:opacity-70 transition-opacity inline-flex items-center gap-1">
+                        Modify Payment →
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-8">
+            <h3 style="color: #475569;" class="text-xs font-bold uppercase tracking-wider mb-4 flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.119-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                </svg>
+                <span>Items Ordered Summary</span>
+            </h3>
+            
+            <div style="border-color: #e2e8f0;" class="overflow-x-auto border rounded-xl">
+                <table class="min-w-full divide-y divide-slate-200 m-0 text-left">
+                    <thead style="background-color: #f8fafc;">
+                        <tr>
+                            <th scope="col" style="color: #475569;" class="px-5 py-3 text-xs font-bold uppercase tracking-wider">Product Name</th>
+                            <th scope="col" style="color: #475569;" class="px-5 py-3 text-xs font-bold uppercase tracking-wider text-center">Qty</th>
+                            <th scope="col" style="color: #475569;" class="px-5 py-3 text-xs font-bold uppercase tracking-wider text-right">Unit Price</th>
+                            <th scope="col" style="color: #475569;" class="px-5 py-3 text-xs font-bold uppercase tracking-wider text-right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-slate-100">
+                        {% for item in cart.items.all %}
+                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                <td style="color: #0f172a;" class="px-5 py-4 whitespace-nowrap text-sm font-semibold tracking-tight">{{ item.product.name }}</td>
+                                <td style="color: #475569;" class="px-5 py-4 whitespace-nowrap text-sm font-medium text-center">{{ item.quantity }}</td>
+                                <td style="color: #475569;" class="px-5 py-4 whitespace-nowrap text-sm font-medium text-right">GHS {{ item.product.price|floatformat:2 }}</td>
+                                <td style="color: #0f172a;" class="px-5 py-4 whitespace-nowrap text-sm font-bold text-right">GHS {{ item.get_total_item_price|floatformat:2 }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div style="background-color: #f8fafc; border-color: #e2e8f0;" class="mb-8 p-5 sm:p-6 border rounded-xl">
+            <h3 style="color: #475569;" class="text-xs font-bold uppercase tracking-wider mb-4 flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
+                </svg>
+                <span>Promotional Voucher Code</span>
+            </h3>
+            
+            <form action="{% url 'orders:checkout_review' %}" method="post" class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end m-0">
+                {% csrf_token %}
+                <input type="hidden" name="apply_coupon" value="true">
+                <div class="flex-grow flex flex-col premium-coupon-input-field">
+                    {% if coupon_form.code.label %}
+                        <label for="{{ coupon_form.code.id_for_label }}" style="color: #0f172a;" class="text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                            {{ coupon_form.code.label }}
+                        </label>
+                    {% endif %}
+                    {{ coupon_form.code }}
+                    
+                    {% for error in coupon_form.code.errors %}
+                        <p style="color: #ef4444;" class="text-xs font-bold mt-1.5 flex items-center gap-1">
+                            <span>{{ error }}</span>
+                        </p>
+                    {% endfor %}
+                </div>
+                <button type="submit" style="background-color: #0f172a; color: #ffffff;" class="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-slate-800 transition-colors shadow-2xs whitespace-nowrap cursor-pointer">
+                    Apply Code
+                </button>
+            </form>
+            
+            {% if applied_coupon %}
+                <div style="background-color: #f0fdf4; border-color: #bbf7d0; color: #16a34a;" class="mt-4 p-3 rounded-lg border text-xs font-bold flex items-center gap-2">
+                    <span class="text-sm">✓</span> Coupon "{{ applied_coupon.code }}" Successfully Activated: {{ applied_coupon.discount }}% Off Added!
+                </div>
+            {% elif coupon_discount_percentage > 0 %}
+                <div style="background-color: #f0fdf4; border-color: #bbf7d0; color: #16a34a;" class="mt-4 p-3 rounded-lg border text-xs font-bold flex items-center gap-2">
+                    <span class="text-sm">✓</span> Markdown deduction of {{ coupon_discount_percentage }}% integrated.
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="border-top: 1px solid #f1f5f9;" class="pt-6 space-y-3">
+            <div class="flex justify-between items-center text-sm font-semibold">
+                <span style="color: #64748b;">Cart Subtotal:</span>
+                <span style="color: #0f172a;">GHS {{ cart.get_total_price|floatformat:2 }}</span>
+            </div>
+            {% if coupon_discount_percentage > 0 %}
+                <div class="flex justify-between items-center text-sm font-bold text-emerald-600">
+                    <span>Voucher Deduction ({{ coupon_discount_percentage }}%):</span>
+                    <span>- GHS {{ discount_amount|floatformat:2 }}</span>
+                </div>
+            {% endif %}
+            
+            <div style="background-color: #f8fafc; border-top: 2px solid #0f172a;" class="flex justify-between items-center p-4 rounded-xl mt-4">
+                <h4 style="color: #0f172a;" class="text-base font-black uppercase tracking-tight">Final Grand Total:</h4>
+                <span style="color: #0f172a;" class="text-2xl sm:text-3xl font-black tracking-tight">GHS {{ final_total|floatformat:2 }}</span>
+            </div>
+        </div>
+
+        <div style="border-top: 1px solid #f1f5f9;" class="mt-8 pt-6 flex flex-col-reverse sm:flex-row justify-between items-center gap-4">
+            <a href="{% url 'orders:checkout_payment' %}" 
+               style="background-color: #ffffff; color: #475569; border: 1px solid #cbd5e1;" 
+               class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-slate-50 transition-colors">
+                ← Back to Payment
+            </a>
+            <form action="{% url 'orders:place_order' %}" method="post" class="w-full sm:w-auto m-0">
+                {% csrf_token %}
+                <button type="submit" 
+                        style="background-color: #0f172a; color: #ffffff;" 
+                        class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 text-xs font-black uppercase tracking-wider rounded-xl hover:bg-slate-800 transition-all shadow-sm tracking-widest cursor-pointer">
+                    Place Final Order ✓
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const couponInput = document.querySelector('.premium-coupon-input-field input');
+        if (couponInput) {
+            couponInput.className = "w-full px-3.5 py-2.5 rounded-xl border font-medium text-sm transition-all focus:outline-none focus:bg-white focus:border-slate-900 focus:ring-4 focus:ring-slate-900/5";
+            couponInput.placeholder = "Enter coupon code...";
+            couponInput.style.borderColor = "#cbd5e1";
+            couponInput.style.backgroundColor = "#ffffff";
+            couponInput.style.color = "#0f172a";
+        }
+    });
+</script>
+{% endblock %}

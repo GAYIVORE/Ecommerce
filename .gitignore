@@ -1,0 +1,5 @@
+.env
+*.env
+secrets.txt
+passwords.txt
+.env

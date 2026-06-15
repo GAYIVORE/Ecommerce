@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login - E-commerce Shop{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-md mx-auto px-4 py-12 flex items-center justify-center min-h-full-content">
+    <div style="background-color: #ffffff; border-color: #e2e8f0;" class="w-full rounded-2xl border shadow-xs p-6 sm:p-10">
+        
+        <div class="text-center mb-8">
+            <h2 style="color: #0f172a;" class="text-3xl font-black tracking-tight mb-2">Welcome Back</h2>
+            <p style="color: #64748b;" class="text-xs font-semibold uppercase tracking-wider">Login to your account</p>
+        </div>
+
+        {% if form.non_field_errors %}
+            <div style="background-color: #fef2f2; border-color: #fecaca; color: #991b1b;" class="p-3.5 mb-6 text-xs font-bold rounded-xl border space-y-1">
+                {% for error in form.non_field_errors %}
+                    <p class="flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>{{ error }}</span>
+                    </p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" class="space-y-5 m-0">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div class="form-group flex flex-col w-full">
+                    <label for="{{ field.id_for_label }}" style="color: #0f172a;" class="text-xs font-bold uppercase tracking-wider mb-1.5 block">
+                        {{ field.label }}
+                    </label>
+                    
+                    <div class="relative w-full authentication-input-wrapper">
+                        {{ field }}
+                    </div>
+                    
+                    {% for error in field.errors %}
+                        <p style="color: #ef4444;" class="text-xs font-bold mt-1.5 flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>{{ error }}</span>
+                        </p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" 
+                    style="background-color: #0f172a; color: #ffffff;" 
+                    class="w-full inline-flex items-center justify-center px-4 py-3 text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-slate-800 transition-all shadow-xs active:scale-[0.99] cursor-pointer mt-2">
+                Sign In
+            </button>
+        </form>
+
+        <div style="border-t: 1px solid #f1f5f9;" class="mt-8 pt-6 text-center">
+            <p style="color: #64748b;" class="text-sm font-medium">
+                Don't have an account? 
+                <a href="{% url 'users:register' %}" style="color: #d97706;" class="font-bold hover:underline ml-1">
+                    Register now
+                </a>
+            </p>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const inputs = document.querySelectorAll('.authentication-input-wrapper input');
+        inputs.forEach(input => {
+            if (!input.classList.contains('w-full')) {
+                input.className = "w-full px-3.5 py-2.5 rounded-xl border font-medium text-sm transition-all focus:outline-none focus:bg-white";
+                input.style.borderColor = "#cbd5e1";
+                input.style.backgroundColor = "#f8fafc";
+                input.style.color = "#0f172a";
+            }
+        });
+    });
+</script>
+{% endblock %}
