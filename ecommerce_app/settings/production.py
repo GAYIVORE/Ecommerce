@@ -30,6 +30,12 @@ DATABASES = {
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'  # Collected static files for deployment
 
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 # Media files (user-uploaded content) for production
 # These should be served by a web server or cloud storage (e.g., S3)
 MEDIA_URL = '/media/'
