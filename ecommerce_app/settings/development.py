@@ -26,6 +26,9 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static', # Global static files
 ]
 
+
+
+
 # Ensure Cloudinary is loaded before staticfiles in INSTALLED_APPS
 if 'cloudinary_storage' not in INSTALLED_APPS:
     try:
@@ -40,6 +43,11 @@ CLOUDINARY_STORAGE = {
     'API_KEY': config('CLOUDINARY_API_KEY', default=''),
     'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
 }
+
+DEFAULT_FILE_STORAGE = None
+# Force-remove the old deprecated file storage string if it leaks from base.py
+if 'DEFAULT_FILE_STORAGE' in locals():
+    del DEFAULT_FILE_STORAGE
 
 # Modern Django Storage Configuration (Replaces DEFAULT_FILE_STORAGE)
 STORAGES = {
