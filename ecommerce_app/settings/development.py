@@ -30,14 +30,6 @@ STATICFILES_DIRS = [
 # Required for Vercel deployment build process
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Ensure Cloudinary is loaded before staticfiles in INSTALLED_APPS
-if 'cloudinary_storage' not in INSTALLED_APPS:
-    try:
-        staticfiles_index = INSTALLED_APPS.index('django.contrib.staticfiles')
-        INSTALLED_APPS.insert(staticfiles_index, 'cloudinary_storage')
-    except ValueError:
-        INSTALLED_APPS.append('cloudinary_storage')
-
 # Cloudinary Storage Configurations
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
@@ -55,8 +47,11 @@ STORAGES = {
     },
 }
 
-# ADDED: Legacy property patch to fix django-cloudinary-storage internal lookup crash
+# PATCH 1: Fixes the django-cloudinary-storage internal AttributeError crash
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+
+# PATCH 2: Ensures backward compatibility for file storage engines
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Media files (user-uploaded content)
 MEDIA_URL = '/media/'
