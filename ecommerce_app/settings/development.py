@@ -29,22 +29,6 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static', # Global static files
 ]
 
-# Cloudinary Storage Configurations
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME',default=''),
-    'API_KEY': config('CLOUDINARY_API_KEY',default=''),
-    'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
-}
-
-# Modern Django Storage Configuration (Replaces DEFAULT_FILE_STORAGE)
-STORAGES = {
-    "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
 # Media files (user-uploaded content)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
