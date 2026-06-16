@@ -64,26 +64,21 @@ if 'DEFAULT_FILE_STORAGE' in globals():
 # This prevents Django 5.2 from throwing an unexpected keyword argument crash on initialization.
 class LaxWhiteNoiseStorage(CompressedManifestStaticFilesStorage):
     manifest_strict = False
+import sys
+sys.modules['lax_storage_patch'] = sys.modules[__name__]
 
-# 3. Modern Django Storage Configuration (Replaces DEFAULT_FILE_STORAGE)
+# 4. Modern Django Storage Configuration (Replaces DEFAULT_FILE_STORAGE)
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        "BACKEND": LaxWhiteNoiseStorage, 
+        "BACKEND": "lax_storage_patch.LaxWhiteNoiseStorage",  # <-- Solves the .rsplit error cleanly!
     },
 }
 
-# 4. LEGACY ATTRIBUTE PATCH
-# Satisfies the internal package check within django-cloudinary-storage during collectstatic
-STATICFILES_STORAGE = LaxWhiteNoiseStorage
-
-# 4. LEGACY ATTRIBUTE PATCH
-# This satisfies the internal package check within django-cloudinary-storage during collectstatic
-STATICFILES_STORAGE = 'ecommerce_app.settings.development.LaxWhiteNoiseStorage'
-
-
+# 5. LEGACY ATTRIBUTE PATCH
+STATICFILES_STORAGE = "lax_storage_patch.LaxWhiteNoiseStorage"
 # Media files (user-uploaded content)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
