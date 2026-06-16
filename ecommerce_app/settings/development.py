@@ -12,7 +12,7 @@ SECRET_KEY = config('SECRET_KEY', default='your-insecure-dev-secret-key-please-c
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.vercel.app']
 
-# Database for development (SQLite is fine for local dev)
+# Database configuration (Auto-routes to Supabase via Vercel env, falls back to SQLite locally)
 DATABASES = {
     'default': config(
         'DATABASE_URL',
@@ -27,31 +27,34 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static', # Global static files
 ]
 
-# Required for Vercel deployment build process
+# Required for Vercel deployment build process compilation
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Cloudinary Storage Configurations
+# Cloudinary Account Configurations
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
     'API_KEY': config('CLOUDINARY_API_KEY', default=''),
     'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
 }
 
-# Modern Django 5.2 Storage Configuration
+# ==============================================================================
+# UNIFIED CLOUDINARY STORAGE ENGINE BLOCK (Fixes Vercel Read-Only & App Crashes)
+# ==============================================================================
+
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        "BACKEND": "cloudinary_storage.storage.StaticCloudinaryStorage",
     },
 }
 
-# PATCH 1: Fixes the django-cloudinary-storage internal AttributeError crash
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
-
-# PATCH 2: Ensures backward compatibility for file storage engines
+# Explicitly declare legacy properties to satisfy package checks during collectstatic
+STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticCloudinaryStorage'
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# ==============================================================================
 
 # Media files (user-uploaded content)
 MEDIA_URL = '/media/'
