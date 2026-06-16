@@ -4,6 +4,7 @@ from .base import *
 from decouple import config
 import dj_database_url
 from pathlib import Path
+from whitenoise.storage import CompressedManifestStaticFilesStorage
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -44,7 +45,6 @@ if 'cloudinary_storage' not in INSTALLED_APPS:
         INSTALLED_APPS.append('cloudinary_storage')
 
 # Cloudinary Storage Configurations
-# Cloudinary Storage Configurations
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
     'API_KEY': config('CLOUDINARY_API_KEY', default=''),
@@ -55,28 +55,29 @@ CLOUDINARY_STORAGE = {
 # MODERN STORAGE & COMPATIBILITY LAYER FOR DJANGO 5.2+ / CLOUDINARY
 # ==============================================================================
 
-# 1. Clear out the legacy media storage setting
+# 1. Clear out the legacy media storage setting cleanly from global scope
 DEFAULT_FILE_STORAGE = None
 if 'DEFAULT_FILE_STORAGE' in globals():
     del globals()['DEFAULT_FILE_STORAGE']
 
-# 2. Modern configuration dictionary for Django 4.2/5.x+
-# Modern Django Storage Configuration (Replaces DEFAULT_FILE_STORAGE)
+# 2. Safely subclass WhiteNoise to turn off manifest_strict mode.
+# This prevents Django 5.2 from throwing an unexpected keyword argument crash on initialization.
+class LaxWhiteNoiseStorage(CompressedManifestStaticFilesStorage):
+    manifest_strict = False
+
+# 3. Modern Django Storage Configuration (Replaces DEFAULT_FILE_STORAGE)
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-        "OPTIONS": {
-            "manifest_strict": False,  # <-- THIS IS THE FIX: Prevents strict crash on missing files
-        },
+        "BACKEND": "ecommerce_shop.settings.development.LaxWhiteNoiseStorage",
     },
 }
-# 3. LEGACY ATTRIBUTE PATCH
-# This injects the exact missing variable that django-cloudinary-storage attempts 
-# to look up directly on the settings object during collectstatic.
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# 4. LEGACY ATTRIBUTE PATCH
+# This satisfies the internal package check within django-cloudinary-storage during collectstatic
+STATICFILES_STORAGE = 'ecommerce_shop.settings.development.LaxWhiteNoiseStorage'
 
 
 # Media files (user-uploaded content)
