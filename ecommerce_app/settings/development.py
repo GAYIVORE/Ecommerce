@@ -44,6 +44,7 @@ if 'cloudinary_storage' not in INSTALLED_APPS:
         INSTALLED_APPS.append('cloudinary_storage')
 
 # Cloudinary Storage Configurations
+# Cloudinary Storage Configurations
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
     'API_KEY': config('CLOUDINARY_API_KEY', default=''),
@@ -51,16 +52,15 @@ CLOUDINARY_STORAGE = {
 }
 
 # ==============================================================================
-# FORCE REMOVE DEPRECATED STORAGE CONFIGURATIONS
+# MODERN STORAGE & COMPATIBILITY LAYER FOR DJANGO 5.2+ / CLOUDINARY
 # ==============================================================================
-# 1. Nullify it globally
-DEFAULT_FILE_STORAGE = None
 
-# 2. Forcefully purge it out of the global runtime namespace dictionary
+# 1. Clear out the legacy media storage setting
+DEFAULT_FILE_STORAGE = None
 if 'DEFAULT_FILE_STORAGE' in globals():
     del globals()['DEFAULT_FILE_STORAGE']
 
-# Modern Django Storage Configuration (Replaces DEFAULT_FILE_STORAGE)
+# 2. Modern configuration dictionary for Django 4.2/5.x+
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
@@ -70,10 +70,10 @@ STORAGES = {
     },
 }
 
-# 3. LEGACY COMPATIBILITY PATCH FOR CLOUDINARY_STORAGE OVERRIDE
-# This satisfies the third-party package check during collectstatic
+# 3. LEGACY ATTRIBUTE PATCH
+# This injects the exact missing variable that django-cloudinary-storage attempts 
+# to look up directly on the settings object during collectstatic.
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
 # Media files (user-uploaded content)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
