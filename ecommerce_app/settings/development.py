@@ -61,19 +61,24 @@ if 'DEFAULT_FILE_STORAGE' in globals():
     del globals()['DEFAULT_FILE_STORAGE']
 
 # 2. Modern configuration dictionary for Django 4.2/5.x+
+# Modern Django Storage Configuration (Replaces DEFAULT_FILE_STORAGE)
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "OPTIONS": {
+            "manifest_strict": False,  # <-- THIS IS THE FIX: Prevents strict crash on missing files
+        },
     },
 }
-
 # 3. LEGACY ATTRIBUTE PATCH
 # This injects the exact missing variable that django-cloudinary-storage attempts 
 # to look up directly on the settings object during collectstatic.
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
 # Media files (user-uploaded content)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
