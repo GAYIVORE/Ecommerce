@@ -1,4 +1,4 @@
-# ecommerce_shop/settings/development.py
+# ecommerc_app/settings/development.py
 import os
 from .base import *
 from decouple import config
@@ -71,13 +71,13 @@ STORAGES = {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        "BACKEND": "ecommerce_shop.settings.development.LaxWhiteNoiseStorage",
+        "BACKEND": "ecommerce_app.settings.development.LaxWhiteNoiseStorage",
     },
 }
 
 # 4. LEGACY ATTRIBUTE PATCH
 # This satisfies the internal package check within django-cloudinary-storage during collectstatic
-STATICFILES_STORAGE = 'ecommerce_shop.settings.development.LaxWhiteNoiseStorage'
+STATICFILES_STORAGE = 'ecommerce_app.settings.development.LaxWhiteNoiseStorage'
 
 
 # Media files (user-uploaded content)
