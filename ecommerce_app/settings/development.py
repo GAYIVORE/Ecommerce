@@ -27,10 +27,10 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static', # Global static files
 ]
 
-# ADDED: Tells Vercel where to safely build static files temporarily during compile
+# Required for Vercel deployment build process
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# ADDED: Safely injection layer to ensure cloudinary_storage loads exactly before staticfiles
+# Ensure Cloudinary is loaded before staticfiles in INSTALLED_APPS
 if 'cloudinary_storage' not in INSTALLED_APPS:
     try:
         staticfiles_index = INSTALLED_APPS.index('django.contrib.staticfiles')
@@ -38,14 +38,14 @@ if 'cloudinary_storage' not in INSTALLED_APPS:
     except ValueError:
         INSTALLED_APPS.append('cloudinary_storage')
 
-# ADDED: Cloudinary environment configuration parameters
+# Cloudinary Storage Configurations
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
     'API_KEY': config('CLOUDINARY_API_KEY', default=''),
     'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
 }
 
-# ADDED: Tell Django 5.2+ to route default uploads to Cloudinary and assets to WhiteNoise
+# Modern Django 5.2 Storage Configuration
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
@@ -55,6 +55,9 @@ STORAGES = {
     },
 }
 
+# ADDED: Legacy property patch to fix django-cloudinary-storage internal lookup crash
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+
 # Media files (user-uploaded content)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -62,9 +65,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Email settings for development (e.g., print to console)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# Optional: Add any development-specific apps or middleware here
-INSTALLED_APPS += []
-MIDDLEWARE += []
-
+# Paystack API Keys
 PAYSTACK_SECRET_KEY = config('PAYSTACK_SECRET_KEY', default='fallback-dev-secret-key')
 PAYSTACK_PUBLIC_KEY = config('PAYSTACK_PUBLIC_KEY', default='fallback-dev-public-key')
