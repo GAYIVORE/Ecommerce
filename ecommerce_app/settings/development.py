@@ -70,6 +70,10 @@ STORAGES = {
     },
 }
 
+# 3. LEGACY COMPATIBILITY PATCH FOR CLOUDINARY_STORAGE OVERRIDE
+# This satisfies the third-party package check during collectstatic
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 # Media files (user-uploaded content)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
