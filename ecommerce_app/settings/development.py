@@ -71,9 +71,13 @@ STORAGES = {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        "BACKEND": "ecommerce_app.settings.development.LaxWhiteNoiseStorage",
+        "BACKEND": LaxWhiteNoiseStorage, 
     },
 }
+
+# 4. LEGACY ATTRIBUTE PATCH
+# Satisfies the internal package check within django-cloudinary-storage during collectstatic
+STATICFILES_STORAGE = LaxWhiteNoiseStorage
 
 # 4. LEGACY ATTRIBUTE PATCH
 # This satisfies the internal package check within django-cloudinary-storage during collectstatic
