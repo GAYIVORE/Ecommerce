@@ -3,9 +3,12 @@ import os
 from .base import *
 from decouple import config
 import dj_database_url
+from pathlib import Path
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 SECRET_KEY = config('SECRET_KEY', default='your-insecure-dev-secret-key-please-change')
 
@@ -22,10 +25,14 @@ DATABASES = {
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
+
+# This is where WhiteNoise looks for your raw local development assets
 STATICFILES_DIRS = [
-    BASE_DIR / 'static', # Global static files
+    os.path.join(BASE_DIR, 'static'),
 ]
 
+# THE MISSING LINK: This tells WhiteNoise where to compile production static assets
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 
