@@ -8,6 +8,7 @@ from pathlib import Path
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Recalculate BASE_DIR cleanly based on this file's position
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 SECRET_KEY = config('SECRET_KEY', default='your-insecure-dev-secret-key-please-change')
@@ -31,10 +32,8 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-# THE MISSING LINK: This tells WhiteNoise where to compile production static assets
+# This tells WhiteNoise where to compile production static assets
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-
 
 # Ensure Cloudinary is loaded before staticfiles in INSTALLED_APPS
 if 'cloudinary_storage' not in INSTALLED_APPS:
@@ -51,10 +50,15 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
 }
 
+# ==============================================================================
+# FORCE REMOVE DEPRECATED STORAGE CONFIGURATIONS
+# ==============================================================================
+# 1. Nullify it globally
 DEFAULT_FILE_STORAGE = None
-# Force-remove the old deprecated file storage string if it leaks from base.py
-if 'DEFAULT_FILE_STORAGE' in locals():
-    del DEFAULT_FILE_STORAGE
+
+# 2. Forcefully purge it out of the global runtime namespace dictionary
+if 'DEFAULT_FILE_STORAGE' in globals():
+    del globals()['DEFAULT_FILE_STORAGE']
 
 # Modern Django Storage Configuration (Replaces DEFAULT_FILE_STORAGE)
 STORAGES = {
