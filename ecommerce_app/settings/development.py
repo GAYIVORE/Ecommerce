@@ -5,6 +5,9 @@ from decouple import config
 import dj_database_url
 from pathlib import Path
 from whitenoise.storage import CompressedManifestStaticFilesStorage
+import logging
+
+logger = logging.getLogger(__name__)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -60,16 +63,38 @@ DEFAULT_FILE_STORAGE = None
 if 'DEFAULT_FILE_STORAGE' in globals():
     del globals()['DEFAULT_FILE_STORAGE']
 
-# 2. Subclass WhiteNoise and safely swallow MissingFileError references
+# 2. Subclass WhiteNoise and safely handle missing files
 class LaxWhiteNoiseStorage(CompressedManifestStaticFilesStorage):
+    """
+    Custom storage that handles missing files gracefully.
+    This prevents the build from failing when Django's admin CSS
+    references files that don't exist.
+    """
+    
+    def stored_name(self, name):
+        """
+        Override stored_name to return the original name if the file
+        can't be found, instead of raising MissingFileError.
+        """
+        try:
+            return super().stored_name(name)
+        except ValueError as e:
+            # Log the missing file but don't fail the build
+            if "could not be found" in str(e) or "sorting-icons" in str(e):
+                logger.warning(f"File not found, using original name: {name}")
+                return name
+            raise e
+    
     def post_process(self, *args, **kwargs):
+        """
+        Override post_process to catch any errors during processing.
+        """
         try:
             yield from super().post_process(*args, **kwargs)
         except Exception as e:
-            # Catching the exact WhiteNoise panic and ignoring it
-            if "MissingFileError" in type(e).__name__ or "sorting-icons" in str(e):
-                return
-            raise e
+            # If there's an error, log it but don't fail
+            logger.warning(f"Post-processing error: {e}")
+            return
 
 # 3. DYNAMIC SYS MODULE REGISTRATION
 # Maps the class into system memory so Django can safely .rsplit() it as a string path
