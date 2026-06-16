@@ -2,6 +2,7 @@
 import os
 from .base import *
 from decouple import config
+import dj_database_url
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -15,10 +16,11 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.vercel.app']
 
 # Database for development (SQLite is fine for local dev)
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': config(
+        'DATABASE_URL',
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        cast=dj_database_url.parse
+    )
 }
 
 # Static files (CSS, JavaScript, Images)
