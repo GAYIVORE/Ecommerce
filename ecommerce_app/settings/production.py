@@ -27,29 +27,19 @@ DATABASES = {
 
 # Static files (CSS, JavaScript, Images) for production
 # These should be served by a web server (Nginx/Apache) or CDN
-# Static files (CSS, JavaScript, Images) for production
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Collected static files for deployment
 
-# ==============================================================================
-# MODERN STORAGE & COMPATIBILITY LAYER FOR DJANGO 5.2+
-# ==============================================================================
-from whitenoise.storage import CompressedManifestStaticFilesStorage
-
-class LaxProdWhiteNoiseStorage(CompressedManifestStaticFilesStorage):
-    manifest_strict = False
 
 STORAGES = {
     "staticfiles": {
-        "BACKEND": "ecommerce_app.settings.production.LaxProdWhiteNoiseStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
-# ==============================================================================
-
 # Media files (user-uploaded content) for production
+# These should be served by a web server or cloud storage (e.g., S3)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-
 
 # Email settings for production (e.g., SendGrid, Mailgun)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
