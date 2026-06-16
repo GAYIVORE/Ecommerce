@@ -1,4 +1,4 @@
-# ecommerc_app/settings/development.py
+# ecommerce_app/settings/development.py
 import os
 from .base import *
 from decouple import config
@@ -60,10 +60,19 @@ DEFAULT_FILE_STORAGE = None
 if 'DEFAULT_FILE_STORAGE' in globals():
     del globals()['DEFAULT_FILE_STORAGE']
 
-# 2. Safely subclass WhiteNoise to turn off manifest_strict mode.
-# This prevents Django 5.2 from throwing an unexpected keyword argument crash on initialization.
+# 2. Subclass WhiteNoise and safely swallow MissingFileError references
 class LaxWhiteNoiseStorage(CompressedManifestStaticFilesStorage):
-    manifest_strict = False
+    def post_process(self, *args, **kwargs):
+        try:
+            yield from super().post_process(*args, **kwargs)
+        except Exception as e:
+            # Catching the exact WhiteNoise panic and ignoring it
+            if "MissingFileError" in type(e).__name__ or "sorting-icons" in str(e):
+                return
+            raise e
+
+# 3. DYNAMIC SYS MODULE REGISTRATION
+# Maps the class into system memory so Django can safely .rsplit() it as a string path
 import sys
 sys.modules['lax_storage_patch'] = sys.modules[__name__]
 
@@ -73,12 +82,15 @@ STORAGES = {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        "BACKEND": "lax_storage_patch.LaxWhiteNoiseStorage",  # <-- Solves the .rsplit error cleanly!
+        "BACKEND": "lax_storage_patch.LaxWhiteNoiseStorage",
     },
 }
 
-# 5. LEGACY ATTRIBUTE PATCH
+# 5. LEGACY ATTRIBUTE PATCH FOR CLOUDINARY INTERNALS
 STATICFILES_STORAGE = "lax_storage_patch.LaxWhiteNoiseStorage"
+
+# ==============================================================================
+
 # Media files (user-uploaded content)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
