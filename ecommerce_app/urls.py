@@ -28,12 +28,14 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', include('apps.users.urls', namespace='users')),  # Include user app URLs
     path('', include('apps.core.urls', namespace='core')),
+    path('shops/', include('apps.shops.urls', namespace='shops')),
     path('products/', include('apps.products.urls', namespace='products')),
     path('cart/', include('apps.cart.urls', namespace='cart')),
     path('orders/', include('apps.orders.urls', namespace='orders')),
     path('reviews/', include('apps.reviews.urls', namespace='reviews')),
     path('wishlist/', include('apps.wishlist.urls', namespace='wishlist')),
     path('promotions/', include('apps.promotions.urls', namespace='promotions')),# ADDED: Homepage for the core app
+    path('accounts/', include('allauth.urls')),
     # Add other app URLs here as you create them
     # path('products/', include('apps.products.urls', namespace='products')),
     # path('cart/', include('apps.cart.urls', namespace='cart')),

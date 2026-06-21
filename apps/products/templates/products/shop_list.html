@@ -1,0 +1,10 @@
+<h1>Available Shops</h1>
+<ul>
+    {% for shop in shops %}
+        <li>
+            <a href="{% url 'products:shop_storefront' shop.slug %}">{{ shop.name }}</a>
+        </li>
+    {% empty %}
+        <li>No shops found.</li>
+    {% endfor %}
+</ul>

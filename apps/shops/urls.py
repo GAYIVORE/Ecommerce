@@ -1,0 +1,11 @@
+from django.urls import path
+from . import views
+
+app_name = 'shops' 
+
+urlpatterns = [
+    path('', views.shop_directory, name='shop_directory'),
+    path('dashboard/', views.vendor_dashboard, name='vendor_dashboard'),
+    # Add this line below:
+    path('apply/', views.create_shop, name='create_shop'), 
+]

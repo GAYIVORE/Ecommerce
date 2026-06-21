@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Shop Restricted - {{ shop.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-16 text-center">
+    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-rose-100 mb-6">
+        <svg class="h-8 w-8 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+    </div>
+
+    <h1 class="text-3xl font-black text-slate-900 mb-2">Shop Currently Disabled</h1>
+    <p class="text-slate-500 mb-8">Your store <strong>{{ shop.name }}</strong> is currently inactive. You cannot manage inventory or access the vendor dashboard while the shop is in this state.</p>
+
+    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-left mb-8">
+        <h3 class="font-bold text-slate-900 mb-2">Why am I seeing this?</h3>
+        <ul class="text-sm text-slate-600 list-disc list-inside space-y-2">
+            <li>Your account is awaiting administrative approval.</li>
+            <li>Your shop has been flagged for a policy violation.</li>
+            <li>Your shop have been suspended.</li>
+        </ul>
+    </div>
+
+    <div class="flex flex-col gap-3">
+        <a href="{% url 'core:home' %}" class="w-full px-6 py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition">
+            Return to Homepage
+        </a>
+        <a href="mailto:support@yourdomain.com" class="text-sm font-semibold text-slate-400 hover:text-slate-600">
+            Contact Support for Assistance
+        </a>
+    </div>
+</div>
+{% endblock %}

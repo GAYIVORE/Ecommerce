@@ -1,3 +1,5 @@
+# apps/orders/forms.py
+
 from django import forms
 from .models import ShippingAddress
 
@@ -16,45 +18,55 @@ class ShippingAddressForm(forms.ModelForm):
             'full_name': forms.TextInput(attrs={'placeholder': 'Full Name'}),
             'address_line1': forms.TextInput(attrs={'placeholder': 'Street Address, P.O. Box'}),
             'address_line2': forms.TextInput(attrs={'placeholder': 'Apartment, suite, unit, etc. (optional)'}),
-            'city': forms.TextInput(attrs={'placeholder': 'City'}),
-            'state': forms.TextInput(attrs={'placeholder': 'State / Region (optional)'}),
-            'postal_code': forms.TextInput(attrs={'placeholder': 'Postal Code (optional)'}),
-            'country': forms.TextInput(attrs={'placeholder': 'Country (e.g., Ghana)'}),
-            'phone_number': forms.TextInput(attrs={'placeholder': 'Phone Number'}),
+            'city': forms.TextInput(attrs={'placeholder': 'City / Town'}),
+            'state': forms.TextInput(attrs={'placeholder': 'Region (e.g., Greater Accra, Ashanti)'}),
+            'postal_code': forms.TextInput(attrs={'placeholder': 'Digital Address / Postal Code (optional)'}),
+            'country': forms.TextInput(attrs={'placeholder': 'Country'}),
+            'phone_number': forms.TextInput(attrs={'placeholder': '024 XXX XXXX'}),
         }
         labels = {
             'full_name': 'Full Name',
             'address_line1': 'Address Line 1',
             'address_line2': 'Address Line 2',
-            'city': 'City',
-            'state': 'State/Region',
-            'postal_code': 'Postal Code',
+            'city': 'City / Town',
+            'state': 'Region',
+            'postal_code': 'Postal Code / Digital Address',
             'country': 'Country',
-            'phone_number': 'Phone Number',
-            'is_default': 'Set as default address',
+            'phone_number': 'Active Phone Number',
+            'is_default': 'Set as my default shipping profile address',
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        # Apply standard localized placeholder defaults
+        if not self.initial.get('country'):
+            self.fields['country'].initial = "Ghana"
+            
         for field_name, field in self.fields.items():
             if field_name != 'is_default':
                 field.widget.attrs.update({
-                    'class': 'w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-900/10'
+                    'class': 'w-full px-4 py-2.5 text-sm font-medium text-slate-900 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 transition-all placeholder:text-slate-400'
                 })
+            else:
+                field.widget.attrs.update({
+                    'class': 'h-4 w-4 rounded-sm border-slate-300 text-amber-600 focus:ring-amber-500 transition-colors cursor-pointer'
+                })
+
 
 class PaymentMethodForm(forms.Form):
     """
-    Form for selecting between Pay Now (Paystack) and Pay on Delivery.
+    ⚡ Updated: Maps form selections directly to our new multi-vendor backend payment choices.
     """
-    # These keys match the logic in your views.py 'place_order' function
     METHOD_CHOICES = [
-        ('pay_now', 'Pay Now (Card / Mobile Money)'),
-        ('pay_on_delivery', 'Pay on Delivery (Cash / USSD)'),
+        ('paystack', 'Pay Now with Card or Mobile Money (via Paystack)'),
+        ('cod', 'Pay on Delivery / Cash / Merchant Transfer'),
     ]
     
     method = forms.ChoiceField(
         choices=METHOD_CHOICES,
-        widget=forms.RadioSelect(attrs={'class': 'hidden'}), # We use CSS/JS to style these
+        widget=forms.RadioSelect(attrs={'class': 'sr-only'}), # Screen-reader safe hiding for custom Tailwind radio designs
         label="Select Payment Method",
-        required=True
+        required=True,
+        initial='paystack'
     )

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Confirm Inventory De-listing{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto px-4 py-16">
+    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm text-center">
+        <div class="mx-auto w-12 h-12 rounded-full bg-rose-50 flex items-center justify-center text-rose-500 border border-rose-100 mb-4">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        </div>
+        <h1 class="text-lg font-extrabold text-slate-900 tracking-tight">De-list "{{ object.name }}"?</h1>
+        <p class="text-xs text-slate-500 mt-2 leading-relaxed">This action flags the inventory unit as soft-deleted. The public listing storefront layout is detached immediately, though analytics, historical sales logs, and accounting matrices are preserved.</p>
+        
+        <form method="post" class="mt-6 flex gap-2 justify-center m-0">
+            {% csrf_token %}
+            <button type="submit" class="px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white bg-rose-600 hover:bg-rose-500 rounded-lg cursor-pointer transition-colors">
+                Confirm De-list
+            </button>
+            <a href="{% url 'products:vendor_dashboard' %}" class="px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 transition-colors">
+                Abort Action
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}

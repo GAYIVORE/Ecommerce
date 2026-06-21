@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Merchant Financial Onboarding{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto px-4 py-16">
+    <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-50 text-amber-500 mb-4 font-bold text-xl">
+            🏪
+        </div>
+        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Activate Payout Account</h1>
+        <p class="mt-2 text-sm text-slate-500 max-w-sm mx-auto">
+            Your store was approved by management! Add your Mobile Money details to begin accepting customer payouts.
+        </p>
+    </div>
+
+    <div class="bg-white border border-slate-200/80 shadow-sm rounded-2xl p-6 sm:p-8">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div class="space-y-2">
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-slate-800">
+                        {{ field.label }}
+                    </label>
+                    <div class="relative">
+                        {{ field }}
+                    </div>
+                    {% if field.help_text %}
+                        <p class="text-xs text-slate-400">{{ field.help_text }}</p>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <p class="text-xs font-semibold text-rose-600 mt-1">🚨 {{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-start space-x-3">
+                <span class="text-base mt-0.5">🔒</span>
+                <p class="text-xs text-slate-500 leading-relaxed">
+                    Account splitting is fully managed by Paystack. Payout calculations assume a platform commission adjustment rate of <span class="font-bold text-slate-800">5.0%</span> per completed sub-transaction.
+                </p>
+            </div>
+
+            <div class="pt-2">
+                <button type="submit" class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-900/10 active:scale-[0.99] transition-all cursor-pointer">
+                    Verify and Launch Shop
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

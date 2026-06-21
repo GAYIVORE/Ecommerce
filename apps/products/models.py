@@ -1,12 +1,26 @@
 # apps/products/models.py
 
 from django.db import models
-from django.urls import reverse # Used for getting URL of a product
+from django.urls import reverse
+from django.conf import settings
+from apps.shops.models import Shop
+from django.utils.text import slugify
 
-class Category(models.Model):
+class TimeStampedModel(models.Model):
+    """
+    An abstract base class model that provides self-updating
+    created_at and updated_at fields for all inherited entities.
+    """
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Last Updated")
+
+    class Meta:
+        abstract = True
+
+
+class Category(TimeStampedModel):
     """
     Represents a product category.
-    Categories can be nested (optional, but good for future).
     """
     name = models.CharField(max_length=255, unique=True, verbose_name="Category Name")
     slug = models.SlugField(max_length=255, unique=True, help_text="A unique slug for the category URL.")
@@ -18,52 +32,75 @@ class Category(models.Model):
         verbose_name_plural = 'Categories'
         ordering = ['name']
 
+
+    def save(self, *args, **kwargs):
+        if not self.slug and self.name:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+        
+        
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        """
-        Returns the URL to a specific category.
-        """
-        return reverse('products:category_list', args=[self.slug]) # Placeholder, will update later for specific category view
+        return reverse('products:category_list', args=[self.slug])
 
 
-class Product(models.Model):
+class Product(TimeStampedModel):
     """
-    Represents a single product in the store.
+    Represents a single product inside the store, protected with 
+    enterprise compound indexes and soft deletion status metrics.
     """
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='products', verbose_name="Product Category")
-    name = models.CharField(max_length=255, unique=True, verbose_name="Product Name")
+    # 🛠️ CRITICAL TEMPORARY UPDATE: Added null=True, blank=True to clean existing data columns
+    shop = models.ForeignKey(
+        'shops.Shop', 
+        on_delete=models.CASCADE, 
+        related_name='products',
+        null=True,
+        blank=True,
+        verbose_name="Associated Shop"
+    )
+    
+    category = models.ForeignKey(
+        Category, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='products', 
+        verbose_name="Product Category"
+    )
+    name = models.CharField(max_length=255, verbose_name="Product Name")
     slug = models.SlugField(max_length=255, unique=True, help_text="A unique slug for the product URL.")
     description = models.TextField(verbose_name="Product Description")
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Price (GHS)")
+    price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Price (GHS)") 
     stock = models.PositiveIntegerField(default=0, verbose_name="Available Stock")
     available = models.BooleanField(default=True, verbose_name="Is Available")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
-    updated_at = models.DateTimeField(auto_now=True, verbose_name="Last Updated")
-    # Placeholder image for products without an image
+    is_deleted = models.BooleanField(default=False, verbose_name="Soft Deleted")
     image = models.ImageField(
         upload_to='products/',
         blank=True,
         null=True,
         verbose_name="Product Image",
-        help_text="Upload a product image. If none, a placeholder will be used.",
+        help_text="Upload a product image.",
     )
 
     class Meta:
         verbose_name = 'Product'
         verbose_name_plural = 'Products'
-        ordering = ['-created_at'] # Order by newest first
+        ordering = ['-created_at']
         indexes = [
-            models.Index(fields=['-created_at']), # Index for faster ordering
-            models.Index(fields=['slug']), # Index for faster slug lookups
+            models.Index(fields=['slug']),
+            models.Index(fields=['shop', '-created_at']),
+            models.Index(fields=['available', 'is_deleted', '-created_at']),
         ]
+        
+    def save(self, *args, **kwargs):
+        if not self.slug and self.name:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        """
-        Returns the URL to a specific product.
-        """
         return reverse('products:product_detail', args=[self.slug])

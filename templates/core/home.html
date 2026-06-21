@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="min-h-full-content flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div class="card max-w-3xl w-full text-center bg-white p-8 sm:p-12 rounded-2xl shadow-sm border border-gray-100">
+    <div class="card  max-w-3xl w-full text-center bg-white p-8 sm:p-12 rounded-2xl shadow-sm border border-gray-100">
         
         <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-950 tracking-tight mb-6">
             Welcome to Your E-commerce Shop!
@@ -16,14 +16,27 @@
         </p>
         
         <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
-            <a href="{% url 'admin:index' %}" class="btn-primary w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-200 shadow-sm">
-                Go to Admin Panel
-            </a>
-            <a href="#" class="btn-primary w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-emerald-600 hover:bg-emerald-700 transition-colors duration-200 shadow-sm">
-                Explore Products (Coming Soon!)
+           {% if user.is_authenticated %}
+                {% if user.shop %}
+                    {# If the user has a OneToOne shop record, show their dashboard #}
+                    <a href="{% url 'shops:vendor_dashboard' %}" class="nav-dashboard-btn bg-indigo-100 text-indigo-700 px-3 py-2 rounded-lg font-medium hover:bg-indigo-200 transition">
+                        Vendor Dashboard ({{ user.shop.name }})
+                    </a>
+                {% else %}
+                    {# If they are authenticated but have no shop, show 'Apply for Shop' #}
+                    <a href="{% url 'shops:create_shop' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 transition shadow-sm">
+                    Apply for Shop
+                </a>
+                {% endif %}
+                
+                <span class="text-gray-600">Welcome, <strong>{{ user.username }}</strong></span>
+             
+                {% endif %}
+            <a href="{% url 'shops:shop_directory' %}" class="btn-primary w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-emerald-600 hover:bg-emerald-700 transition-colors duration-200 shadow-sm">
+                Explore Products (ALL SHOPS)
             </a>
         </div>
-        
+      
         <p class="mt-12 text-sm text-gray-400 border-t border-gray-100 pt-6">
             Stay tuned for more features like user registration, product listings, shopping cart, and checkout!
         </p>

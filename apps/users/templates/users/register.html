@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load socialaccount %}
 
 {% block title %}Register - E-commerce Shop{% endblock %}
 
@@ -29,16 +30,17 @@
             {% csrf_token %}
             
             {% for field in form %}
-                <div class="form-group flex flex-col w-full">
-                    <label for="{{ field.id_for_label }}" style="color: #0f172a;" class="text-xs font-bold uppercase tracking-wider mb-1.5 block">
+                <div class="form-group flex {% if field.field.widget.input_type == 'checkbox' %}flex-row-reverse justify-end items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100{% else %}flex-col{% endif %} w-full">
+                    
+                    <label for="{{ field.id_for_label }}" style="color: #0f172a;" class="text-xs font-bold uppercase tracking-wider {% if field.field.widget.input_type != 'checkbox' %}mb-1.5 block{% else %}m-0 cursor-pointer select-none normal-case text-slate-600 font-semibold{% endif %}">
                         {{ field.label }}
                     </label>
                     
-                    <div class="relative w-full registration-input-wrapper">
+                    <div class="relative {% if field.field.widget.input_type != 'checkbox' %}w-full{% endif %} registration-input-wrapper">
                         {{ field }}
                     </div>
 
-                    {% if field.help_text %}
+                    {% if field.help_text and field.field.widget.input_type != 'checkbox' %}
                         <p style="color: #64748b; line-height: 1.4;" class="text-[11px] mt-1.5 font-medium leading-relaxed bg-slate-50 p-2 rounded-lg border border-slate-100">
                             {{ field.help_text|safe }}
                         </p>
@@ -70,16 +72,40 @@
                 </a>
             </p>
         </div>
+        
+        <div class="relative flex py-2 items-center">
+            <div class="flex-grow border-t border-slate-100"></div>
+            <span class="flex-shrink mx-4 text-slate-300 text-[10px] font-bold uppercase tracking-widest">or</span>
+            <div class="flex-grow border-t border-slate-100"></div>
+        </div>
+
+        <div class="text-center">
+            <form action="{% provider_login_url 'google' process='login' %}" method="post" class="w-full m-0">
+                {% csrf_token %}
+                <button type="submit" 
+                        style="border-color: #cbd5e1; background-color: #ffffff; color: #0f172a;"
+                        class="w-full border inline-flex items-center justify-center gap-2.5 px-4 py-3 text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-slate-50 transition-all shadow-xs active:scale-[0.99] cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-google shrink-0" viewBox="0 0 16 16">
+                        <path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0c2.158 0 4 .797 5.415 2.091l-2.161 2.161C10.22 3.302 9.242 3 8 3c-2.42 0-4.439 1.567-5.174 3.674A4.965 4.965 0 0 0 2.5 8c0 .354.038.696.101 1.026C3.335 11.139 5.355 12.7 8 12.7c1.47 0 2.698-.485 3.593-1.315C12.693 10.457 13.3 9.07 13.3 7.551c0-.34-.035-.67-.099-1H15.54z"/>
+                    </svg>
+                    <span>Continue with Google</span>
+                </button>
+            </form>
+        </div>
 
     </div>
 </div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const inputs = document.querySelectorAll('.registration-input-wrapper input');
-        inputs.forEach(input => {
-            if (!input.classList.contains('w-full')) {
-                input.className = "w-full px-3.5 py-2.5 rounded-xl border font-medium text-sm transition-all focus:outline-none focus:bg-white";
+        const inputWrappers = document.querySelectorAll('.registration-input-wrapper input');
+        inputWrappers.forEach(input => {
+            if (input.type === 'checkbox') {
+                // Keep checkbox elements square and small
+                input.className = "h-4 w-4 text-amber-600 focus:ring-amber-500/20 border-slate-300 rounded transition-all cursor-pointer";
+            } else if (!input.classList.contains('w-full')) {
+                // Style text, email, and password fields beautifully
+                input.className = "w-full px-3.5 py-2.5 rounded-xl border font-medium text-sm transition-all focus:outline-none focus:bg-white focus:border-amber-500 focus:ring-4 focus:ring-amber-500/5";
                 input.style.borderColor = "#cbd5e1";
                 input.style.backgroundColor = "#f8fafc";
                 input.style.color = "#0f172a";

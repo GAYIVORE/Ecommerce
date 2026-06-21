@@ -2,14 +2,18 @@
 
 from django.urls import path
 from . import views
-from django.contrib.auth import views as auth_views # Import Django's built-in auth views if needed later
 
-app_name = 'users' # Namespace for this app's URLs
+app_name = 'users'  # Namespace for clean reverse routing: e.g., 'users:login'
 
 urlpatterns = [
+    # Core Authentication Routes
     path('register/', views.register, name='register'),
     path('login/', views.user_login, name='login'),
-    # Use POST for logout for security reasons (prevents accidental logout via image/link prefetch)
+    
+    # Secure POST-driven logout pathway to mitigate link prefetch session termination
     path('logout/', views.user_logout, name='logout'),
+    
+    # Profile & Account Verification Panel Elements
     path('profile/', views.profile, name='profile'),
+    path('activate/<str:uidb64>/<str:token>/', views.activate, name='activate'),
 ]

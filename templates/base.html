@@ -12,12 +12,12 @@
 <body class="flex flex-col min-h-screen custom-bg">
  
  
-<header style="background-color: #320EFD !important; border-bottom: 1px solid #F2FD5C !important; box-shadow: 0 1px 2px 0 rgba(240, 41, 41, 0.05) !important;" class="w-full sticky top-0 z-50 py-3.5">
+<header style="background-color: #3B0AD1 !important; border-bottom: 1px solid #383B0C !important; box-shadow: 0 1px 2px 0 rgba(240, 41, 41, 0.05) !important;" class="w-full sticky top-0 z-50 py-3.5">
     <nav class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 px-4">
         
         <a href="{% url 'core:home' %}" style="color: #0f172a !important;" class="text-2xl font-black tracking-tighter hover:opacity-80 transition-opacity flex items-center gap-2 shrink-0">
-            <span style="background-color: #000000 !important; color: #E2EC57 !important;" class="px-2.5 py-1 rounded-lg text-lg font-black tracking-normal">E</span>
-            <span style="color: #3C6FE6 !important;">SHOP</span>
+            <span style="background-color: #000000 !important; color: #FFFFFF !important;" class="px-2.5 py-1 rounded-lg text-lg font-black tracking-normal">E</span>
+            <span style="color: #050606 !important;">SHOP</span>
         </a>
         
         <div class="w-full md:flex-grow max-w-md mx-0 md:mx-8">
@@ -38,11 +38,11 @@
         </div>
         
         <div class="flex items-center gap-x-6 gap-y-2 flex-wrap justify-center shrink-0">
-            <a href="{% url 'core:home' %}" style="color: #0C0C0C !important; background-color: transparent !important;" class="text-xs font-bold uppercase tracking-wider hover:text-amber-600 transition-colors">Home</a>
-            <a href="{% url 'products:product_list' %}" style="color: #000000 !important; background-color: transparent !important;" class="text-xs font-bold uppercase tracking-wider hover:text-amber-600 transition-colors">Products</a>
-            <a href="{% url 'cart:cart_detail' %}" style="color: #000000 !important; background-color: transparent !important;" class="text-xs font-bold uppercase tracking-wider hover:text-amber-600 transition-colors">Cart</a>
+            <a href="{% url 'core:home' %}" style="color: #000000 !important; background-color: #ECC940A1 !important; border: 2px solid #e2e8f0 !important;" class="text-xs font-bold uppercase tracking-wider px-2 py-2 rounded-full hover:bg-slate-200/80 transition-all active:scale-[0.98]">Home</a>
+            <a href="{% url 'products:product_list' %}" style="color: #000000 !important; background-color: #ECC940A1 !important; border: 2px solid #e2e8f0 !important;" class="text-xs font-bold uppercase tracking-wider px-2 py-2 rounded-full hover:bg-slate-200/80 transition-all active:scale-[0.98]">Products</a>
+            <a href="{% url 'cart:cart_detail' %}" style="color: #000000 !important; background-color: #ECC940A1 !important;border: 2px solid #e2e8f0 !important;" class="text-xs font-bold uppercase tracking-wider px-2 py-2 rounded-full hover:bg-slate-200/80 transition-all active:scale-[0.98]">Cart</a>
 
-            <span style="background-color: #e2e8f0 !important;" class="h-4 w-px hidden sm:inline-block"></span>
+            <span style="background-color: #000000 !important;" class="h-4 w-px hidden sm:inline-block"></span>
 
             {% if user.is_authenticated %}
                 <a href="{% url 'users:profile' %}" style="color: #000000 !important; background-color: transparent !important;" class="text-xs font-bold uppercase tracking-wider hover:text-amber-600 transition-colors">Profile</a>
@@ -59,7 +59,7 @@
                 <a href="{% url 'users:login' %}" style="color: #F9F6F6 !important; background-color: transparent !important;" class="text-xs font-bold uppercase tracking-wider hover:text-amber-600 transition-colors">Login</a>
                 
                 <a href="{% url 'users:register' %}" 
-                   style="background-color: #0f172a !important; color: #ffffff !important;" 
+                   style="background-color: #0D8075 !important; color: #ffffff !important;" 
                    class="inline-flex items-center px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-slate-800 transition-all shadow-xs active:scale-[0.98]">
                     Register
                 </a>
@@ -68,6 +68,7 @@
         
     </nav>
 </header>
+
 
     <main class="flex-grow container mx-auto p-4 ">
         {% if messages %}

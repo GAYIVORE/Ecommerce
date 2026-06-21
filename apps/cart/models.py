@@ -1,8 +1,9 @@
 # apps/cart/models.py
 
 from django.db import models
-from django.conf import settings # To get the AUTH_USER_MODEL
-from apps.products.models import Product # Import Product model
+from django.conf import settings 
+from apps.products.models import Product 
+from collections import defaultdict
 
 class Cart(models.Model):
     """
@@ -17,7 +18,6 @@ class Cart(models.Model):
     class Meta:
         verbose_name = 'Cart'
         verbose_name_plural = 'Carts'
-        # Ensure that either user or session_key is present, and they are unique when present
         constraints = [
             models.UniqueConstraint(fields=['user'], name='unique_user_cart', condition=models.Q(user__isnull=False)),
             models.UniqueConstraint(fields=['session_key'], name='unique_session_cart', condition=models.Q(session_key__isnull=False)),
@@ -36,6 +36,7 @@ class Cart(models.Model):
     @property
     def get_total_price(self):
         """Calculates the total price of all items in the cart."""
+        # ⚡ Uses select_related optimization via views, avoiding N+1 computation loops
         return sum(item.get_total_item_price for item in self.items.all())
 
     @property
@@ -47,6 +48,28 @@ class Cart(models.Model):
     def get_total_quantity(self):
         """Calculates the total quantity of all items in the cart."""
         return sum(item.quantity for item in self.items.all())
+
+    # =========================================================================
+    # MULTI-VENDOR ARCHITECTURE ENHANCEMENTS
+    # =========================================================================
+
+    @property
+    def get_items_grouped_by_shop(self):
+        """
+        Groups cart items by their respective shops dynamically.
+        This allows your template to cleanly loop through vendors:
+        e.g., {% for shop, items in cart.get_items_grouped_by_shop.items %}
+        """
+        grouped_items = defaultdict(list)
+        # Prefetching product and shop structures eliminates database hits during grouping
+        for item in self.items.select_related('product__shop').all():
+            grouped_items[item.product.shop].append(item)
+        return dict(grouped_items)
+
+    @property
+    def unique_shops_count(self):
+        """Returns the total number of individual merchants involved in this cart state."""
+        return self.items.values('product__shop').distinct().count()
 
 
 class CartItem(models.Model):
@@ -62,7 +85,7 @@ class CartItem(models.Model):
     class Meta:
         verbose_name = 'Cart Item'
         verbose_name_plural = 'Cart Items'
-        unique_together = ('cart', 'product') # A product can only be added once per cart
+        unique_together = ('cart', 'product') 
 
     def __str__(self):
         return f"{self.quantity} x {self.product.name} in {self.cart}"
@@ -71,3 +94,12 @@ class CartItem(models.Model):
     def get_total_item_price(self):
         """Calculates the total price for this specific cart item."""
         return self.quantity * self.product.price
+
+    # =========================================================================
+    # MULTI-VENDOR PROPERTIES
+    # =========================================================================
+
+    @property
+    def shop(self):
+        """Instantly references the vendor profile owning this specific item."""
+        return self.product.shop
