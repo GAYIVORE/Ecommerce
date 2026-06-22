@@ -107,7 +107,7 @@ class SubOrder(models.Model):
     STATUS_CHOICES = (
         ('Pending', 'Pending Fulfillment'),
         ('Processing', 'Processing / Packing'),
-        ('Shipped', 'Handed over to Courier'),
+        ('Shipped', 'Handed over to Courier(Delivering)'),
         ('Delivered', 'Delivered Successfully'),
         ('Cancelled', 'Cancelled / Invalid'),
         ('Refunded', 'Returned & Funds Reversed'),
