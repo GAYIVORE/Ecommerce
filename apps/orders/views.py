@@ -13,6 +13,8 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.conf import settings
+from django.db import transaction, models  # ✅ Added 'models' here
+from django.db.models import F
 
 from apps.cart.cart_utils import get_or_create_user_cart
 from apps.products.models import Product
@@ -273,8 +275,8 @@ def place_order(request):
             coupon_applied=coupon_code if applied_coupon else None,
             discount_percentage=applied_coupon.discount if applied_coupon else 0,
             payment_method=payment_method,
-            status='Pending',
-            payment_status=True if payment_method == 'cod' else False,
+            status='Processing' if payment_method == 'cod' else 'Pending',
+            payment_status=False 
         )
 
         # 2. Extract and Group items by Shop to generate SubOrders dynamically
@@ -390,10 +392,15 @@ def process_payment(request, order_id):
     Fallback loop allowing outstanding unpaid parent invoices to trigger gateway handshakes,
     fully supporting dynamic vendor subaccount payment splits.
     """
-    order = get_or_create_user_cart = get_object_or_404(Order, id=order_id, user=request.user)
-    if order.payment_status or order.payment_method == 'cod':
-        messages.info(request, "This invoice is already paid or set to Cash on Delivery.")
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    if order.payment_status:
+        messages.info(request, "This invoice is already paid.")
         return redirect('orders:order_history')
+
+    # 2. If it was COD but they clicked "Pay Now", dynamically migrate them to Paystack
+    if order.payment_method == 'cod':
+        order.payment_method = 'paystack'
+        order.save()
 
     paystack_url = "https://api.paystack.co/transaction/initialize"
     headers = {
