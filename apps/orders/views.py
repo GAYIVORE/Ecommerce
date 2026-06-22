@@ -22,6 +22,8 @@ from apps.promotions.models import Coupon
 from apps.promotions.forms import CouponApplyForm
 from .models import Order, SubOrder, OrderItem, ShippingAddress
 from .forms import ShippingAddressForm, PaymentMethodForm
+import uuid # Ensure uuid is imported at top or here inline
+       
 
 
 def get_checkout_step(request):
@@ -356,11 +358,12 @@ def place_order(request):
                     "subaccount": sub_order.shop.paystack_subaccount_code,
                     "share": vendor_share_pesewas
                 })
+        unique_tx_ref = f"PRE-ORD-{order.id}-{uuid.uuid4().hex[:6].upper()}"
         
         payload = {
             "amount": int(order.total_amount * 100), # Explicit Pesewas integer conversions
             "email": request.user.email,
-            "reference": f"PRE-ORD-{order.id}",
+            "reference": unique_tx_ref,
             "currency": "GHS",
             "callback_url": request.build_absolute_uri(f"/orders/order-confirmation/{order.id}/")
         }
@@ -424,12 +427,12 @@ def process_payment(request, order_id):
                 "subaccount": sub_order.shop.paystack_subaccount_code,
                 "share": vendor_share_pesewas
             })
-
+    unique_retry_ref = f"RETRY-ORD-{order.id}-{uuid.uuid4().hex[:6].upper()}"
     # Reference includes retry tracker string token parameters
     payload = {
         "amount": int(order.total_amount * 100),
         "email": request.user.email,
-        "reference": f"RETRY-ORD-{order.id}",
+        "reference": unique_retry_ref,
         "currency": "GHS",
         "callback_url": request.build_absolute_uri(f"/orders/order-confirmation/{order.id}/")
     }
@@ -532,9 +535,12 @@ def paystack_webhook(request):
 def order_confirmation(request, order_id):
     """Validates the transaction status on final redirect landings."""
     order = get_object_or_404(Order, id=order_id, user=request.user)
-    reference = f"PRE-ORD-{order.id}"
+    reference = request.GET.get('ref')
     
     if order.payment_method == 'paystack' and not order.payment_status:
+        if not reference:
+            # Fallback handling structure just in case parameters drop
+            reference = f"PRE-ORD-{order.id}"
         url = f"https://api.paystack.co/transaction/verify/{reference}"
         headers = {"Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}"}
         try:
