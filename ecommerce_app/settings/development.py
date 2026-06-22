@@ -37,6 +37,9 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
 }
 
+
+
+
 # ==============================================================================
 # UNIFIED CLOUDINARY STORAGE ENGINE BLOCK (Fixes Vercel Read-Only & App Crashes)
 # ==============================================================================
@@ -73,3 +76,23 @@ DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default=EMAIL_HOST_USER)
 # Paystack API Keys
 PAYSTACK_SECRET_KEY = config('PAYSTACK_SECRET_KEY', default='fallback-dev-secret-key')
 PAYSTACK_PUBLIC_KEY = config('PAYSTACK_PUBLIC_KEY', default='fallback-dev-public-key')
+
+# 🔧 UPDATE THIS BLOCK AT THE BOTTOM OF YOUR development.py:
+
+ACCOUNT_EMAIL_VERIFICATION = "none"
+
+# Modern Syntax Updates:
+ACCOUNT_LOGIN_METHODS = {'email', 'username'}
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
