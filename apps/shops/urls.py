@@ -8,4 +8,5 @@ urlpatterns = [
     path('dashboard/', views.vendor_dashboard, name='vendor_dashboard'),
     # Add this line below:
     path('apply/', views.create_shop, name='create_shop'), 
+    path('live-restocks/', views.recent_restocks_feed, name='recent_restocks_api'),
 ]

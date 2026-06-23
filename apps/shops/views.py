@@ -97,3 +97,12 @@ def vendor_dashboard(request):
     }
         
     return render(request, 'products/vendor_dashboard.html', context)
+
+def recent_restocks_feed(request):
+    """
+    Endpoint targeted by HTMX to pull the latest 4 in-stock items.
+    """
+    recent_restocks = Product.objects.filter(stock__gt=0).order_by('-updated_at')[:4]
+    
+    # Updated template path format based on your directory layout
+    return render(request, 'shops/partials/restock_feed.html', {'recent_restocks': recent_restocks})

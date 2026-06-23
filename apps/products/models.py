@@ -5,6 +5,8 @@ from django.urls import reverse
 from django.conf import settings
 from apps.shops.models import Shop
 from django.utils.text import slugify
+from django.utils import timezone
+import datetime
 
 class TimeStampedModel(models.Model):
     """
@@ -74,6 +76,7 @@ class Product(TimeStampedModel):
     description = models.TextField(verbose_name="Product Description")
     price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Price (GHS)") 
     stock = models.PositiveIntegerField(default=0, verbose_name="Available Stock")
+    updated_at = models.DateTimeField(auto_now=True)
     available = models.BooleanField(default=True, verbose_name="Is Available")
     is_deleted = models.BooleanField(default=False, verbose_name="Soft Deleted")
     image = models.ImageField(
@@ -83,6 +86,12 @@ class Product(TimeStampedModel):
         verbose_name="Product Image",
         help_text="Upload a product image.",
     )
+    
+    
+    @property
+    def is_newly_restocked(self):
+        # Returns True if updated in the last 24 hours and is in stock
+        return self.stock > 0 and self.updated_at >= timezone.now() - datetime.timedelta(hours=24)
 
     class Meta:
         verbose_name = 'Product'
