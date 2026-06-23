@@ -34,18 +34,20 @@ class Category(TimeStampedModel):
         verbose_name_plural = 'Categories'
         ordering = ['name']
 
-
     def save(self, *args, **kwargs):
         if not self.slug and self.name:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
         
-        
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('products:category_list', args=[self.slug])
+        """
+        Generates the canonical URL for routing customers directly to 
+        the product list filtered by this category sector.
+        """
+        return reverse('products:product_list_by_category', kwargs={'category_slug': self.slug})
 
 
 class Product(TimeStampedModel):
@@ -53,7 +55,6 @@ class Product(TimeStampedModel):
     Represents a single product inside the store, protected with 
     enterprise compound indexes and soft deletion status metrics.
     """
-    # 🛠️ CRITICAL TEMPORARY UPDATE: Added null=True, blank=True to clean existing data columns
     shop = models.ForeignKey(
         'shops.Shop', 
         on_delete=models.CASCADE, 
@@ -76,7 +77,6 @@ class Product(TimeStampedModel):
     description = models.TextField(verbose_name="Product Description")
     price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Price (GHS)") 
     stock = models.PositiveIntegerField(default=0, verbose_name="Available Stock")
-    updated_at = models.DateTimeField(auto_now=True)
     available = models.BooleanField(default=True, verbose_name="Is Available")
     is_deleted = models.BooleanField(default=False, verbose_name="Soft Deleted")
     image = models.ImageField(
@@ -86,7 +86,6 @@ class Product(TimeStampedModel):
         verbose_name="Product Image",
         help_text="Upload a product image.",
     )
-    
     
     @property
     def is_newly_restocked(self):

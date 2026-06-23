@@ -6,13 +6,15 @@
 {% endblock %}
 
 {% block content %}
-<div class="w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
-    <div class="mb-6 sm:mb-8 pb-4 border-b border-slate-200/60">
-        <h1 class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight">
+{% with primary_color="#EE7535DD" text_dark="#0f172a" card_bg="#ffffff" image_bg="#f8fafc" border_color="#e2e8f0" %}
+
+<div class="w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6" style="color: {{ text_dark }};">
+    <div class="mb-4 sm:mb-6 pb-4 border-b" style="border-color: {{ border_color }};">
+        <h1 class="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight">
             {% if query %}
-                Query Results: <span class="text-amber-600">"{{ query }}"</span>
+                Query Results: <span style="color: {{ primary_color }};">"{{ query }}"</span>
             {% elif category %}
-                Category: <span class="text-amber-600">{{ category.name }}</span>
+                Category: <span style="color: {{ primary_color }};">{{ category.name }}</span>
             {% else %}
                 All Inventory Records
             {% endif %}
@@ -21,19 +23,25 @@
 
     <div class="flex flex-col lg:flex-row w-full gap-6 sm:gap-8 items-start">
         
-        <aside class="w-full lg:w-64 shrink-0 rounded-2xl border border-slate-200 bg-slate-50/50 p-4 sm:p-5 lg:sticky lg:top-24 shadow-xs">
-            <h3 class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 block">Categories</h3>
-            <div class="flex flex-row flex-wrap lg:flex-col gap-1.5 overflow-x-auto pb-2 lg:pb-0 scrollbar-none snap-x">
+        <aside class="w-full lg:w-64 shrink-0 lg:rounded-2xl lg:border lg:p-4 lg:sticky lg:top-24 lg:shadow-xs lg:bg-transparent" 
+               style="border-color: {{ border_color }};">
+            <h3 class="hidden lg:block text-[10px] font-black uppercase tracking-widest opacity-40 mb-2.5">Categories</h3>
+            
+            <div class="flex flex-row lg:flex-col gap-2 overflow-x-auto pb-3 pt-1 lg:py-0 scrollbar-none snap-x snap-mandatory -mx-2 px-2 sm:mx-0 sm:px-0">
                 
                 <div class="snap-start shrink-0 lg:w-full">
                     {% if not category and not query %}
                         <a href="{% url 'products:product_list' %}" 
-                           class="flex items-center justify-between px-3 py-2.5 text-xs sm:text-sm font-bold rounded-xl bg-slate-950 text-white shadow-sm transition-all">
+                           class="flex items-center justify-between px-4 py-2 text-xs sm:text-sm font-bold rounded-full lg:rounded-xl shadow-xs transition-all text-white"
+                           style="background-color: {{ text_dark }};">
                             <span>All Products</span>
                         </a>
                     {% else %}
                         <a href="{% url 'products:product_list' %}" 
-                           class="flex items-center justify-between px-3 py-2.5 text-xs sm:text-sm font-bold rounded-xl text-slate-600 transition-all hover:bg-white hover:text-slate-900 border border-transparent hover:border-slate-200">
+                           class="flex items-center justify-between px-4 py-2 text-xs sm:text-sm font-medium rounded-full lg:rounded-xl transition-all border hover:bg-white"
+                           style="color: {{ text_dark }}; border-color: {{ border_color }}; background-color: {{ card_bg }};"
+                           onmouseenter="this.style.borderColor='{{ text_dark }}'"
+                           onmouseleave="this.style.borderColor='{{ border_color }}'">
                             <span>All Products</span>
                         </a>
                     {% endif %}
@@ -43,31 +51,37 @@
                     <div class="snap-start shrink-0 lg:w-full">
                         {% if category and category.slug == cat.slug %}
                             <a href="{% url 'products:product_list_by_category' category_slug=cat.slug %}" 
-                               class="flex items-center justify-between px-3 py-2.5 text-xs sm:text-sm font-bold rounded-xl bg-slate-950 text-white shadow-sm transition-all">
-                                <span class="truncate max-w-[140px] sm:max-w-none">{{ cat.name }}</span>
+                               class="flex items-center justify-between px-4 py-2 text-xs sm:text-sm font-bold rounded-full lg:rounded-xl shadow-xs transition-all text-white"
+                               style="background-color: {{ text_dark }};">
+                                <span class="whitespace-nowrap">{{ cat.name }}</span>
                             </a>
                         {% else %}
                             <a href="{% url 'products:product_list_by_category' category_slug=cat.slug %}" 
-                               class="flex items-center justify-between px-3 py-2.5 text-xs sm:text-sm font-bold rounded-xl text-slate-600 transition-all hover:bg-white hover:text-slate-900 border border-transparent hover:border-slate-200">
-                                <span class="truncate max-w-[140px] sm:max-w-none">{{ cat.name }}</span>
+                               class="flex items-center justify-between px-4 py-2 text-xs sm:text-sm font-medium rounded-full lg:rounded-xl transition-all border hover:bg-white"
+                               style="color: {{ text_dark }}; border-color: {{ border_color }}; background-color: {{ card_bg }};"
+                               onmouseenter="this.style.borderColor='{{ text_dark }}'"
+                               onmouseleave="this.style.borderColor='{{ border_color }}'">
+                                <span class="whitespace-nowrap">{{ cat.name }}</span>
                             </a>
                         {% endif %}
                     </div>
                 {% endfor %}
-
             </div>
         </aside>
 
         <section class="flex-1 w-full">
             {% if products %}
-                <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+                <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
                     {% for product in products %}
-                        <div class="group bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-all duration-200 p-4 flex flex-col justify-between relative overflow-hidden">
+                        <div class="group rounded-xl border shadow-xs hover:shadow-md transition-all duration-200 p-3 flex flex-col justify-between relative overflow-hidden"
+                             style="background-color: {{ card_bg }}; border-color: {{ border_color }};">
                             
-                            <a href="{{ product.get_absolute_url }}" class="block focus:outline-none mb-3">
-                                <div class="w-full aspect-square bg-slate-50 rounded-xl p-3 flex items-center justify-center mb-3.5 overflow-hidden relative">
+                            <a href="{{ product.get_absolute_url }}" class="block focus:outline-none mb-2">
+                                <div class="w-full h-32 sm:h-36 rounded-lg p-2 flex items-center justify-center mb-2 overflow-hidden relative"
+                                     style="background-color: {{ image_bg }};">
                                     {% if product.stock <= 0 or not product.available %}
-                                        <div class="absolute top-2 left-2 z-10 bg-slate-900/90 backdrop-blur-xs text-[10px] font-black text-white px-2 py-0.5 uppercase tracking-wider rounded-md">
+                                        <div class="absolute top-1.5 left-1.5 z-10 text-[9px] font-black text-white px-1.5 py-0.5 uppercase tracking-wider rounded"
+                                             style="background-color: {{ text_dark }};">
                                             Sold Out
                                         </div>
                                     {% endif %}
@@ -80,37 +94,44 @@
                                 </div>
                                 
                                 {% if product.shop %}
-                                    <span class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-slate-400 mb-1 group-hover:text-slate-500 transition-colors">
-                                        <svg class="w-3 h-3 text-slate-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z"/></svg>
+                                    <span class="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wide opacity-50 mb-0.5 transition-colors group-hover:opacity-80">
+                                        <svg class="w-2.5 h-2.5 opacity-60" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z"/></svg>
                                         {{ product.shop.name }}
                                     </span>
                                 {% endif %}
 
-                                <h2 class="text-sm sm:text-base font-extrabold text-slate-800 group-hover:text-amber-600 transition-colors line-clamp-2 min-h-[2.5rem] sm:min-h-[2.75rem] leading-tight">
+                                <h2 class="text-xs sm:text-sm font-extrabold transition-colors line-clamp-2 min-h-[2rem] sm:min-h-[2.25rem] leading-tight"
+                                    style="color: {{ text_dark }};"
+                                    onmouseenter="this.style.color='{{ primary_color }}'"
+                                    onmouseleave="this.style.color='{{ text_dark }}'">
                                     {{ product.name }}
                                 </h2>
                             </a>
 
                             <div class="mt-auto">
-                                <p class="text-base sm:text-lg font-black text-slate-900 mb-3">
+                                <p class="text-sm sm:text-base font-black mb-2" style="color: {{ text_dark }};">
                                     GHS {{ product.price|floatformat:2 }}
                                 </p>
                                 
-                                <div class="flex flex-col gap-2">
+                                <div class="flex flex-col gap-1.5">
                                     {% if product.stock > 0 and product.available %}
                                         <form action="{% url 'cart:add_to_cart' product.id %}" method="post" class="w-full m-0">
                                             {% csrf_token %}
                                             <input type="hidden" name="quantity" value="1">
                                             <button type="submit" 
-                                                    class="w-full inline-flex justify-center items-center px-4 py-3 text-xs font-black uppercase tracking-wider text-sm bg-emerald-950 rounded-xl transition-all active:scale-[0.98] cursor-pointer hover:bg-amber-500 shadow-md shadow-amber-600/10">
-                                                <svg class="w-4 h-4 mr-2 stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    class="w-full inline-flex justify-center items-center px-3 py-2 text-[11px] font-black uppercase tracking-wider text-white rounded-lg transition-all active:scale-[0.98] cursor-pointer shadow-sm"
+                                                    style="background-color: {{ primary_color }};"
+                                                    onmouseenter="this.style.opacity='0.9'"
+                                                    onmouseleave="this.style.opacity='1'">
+                                                <svg class="w-3.5 h-3.5 mr-1.5 stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                                                 </svg>
                                                 Add to Cart
                                             </button>
                                         </form>
                                     {% else %}
-                                        <button class="w-full inline-flex justify-center items-center px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-400 bg-slate-50 border border-slate-200 rounded-xl cursor-not-allowed" disabled>
+                                        <button class="w-full inline-flex justify-center items-center px-3 py-2 text-[11px] font-bold uppercase tracking-wider border rounded-lg cursor-not-allowed" 
+                                                style="color: {{ border_color }}; background-color: {{ image_bg }}; border-color: {{ border_color }};" disabled>
                                             Sold Out
                                         </button>
                                     {% endif %}
@@ -119,11 +140,14 @@
                                         <form action="{% url 'wishlist:add_to_wishlist' product.id %}" method="post" class="w-full m-0">
                                             {% csrf_token %}
                                             <button type="submit" 
-                                                    class="w-full inline-flex justify-center items-center px-4 py-2.5 border border-slate-200 text-xs font-bold uppercase tracking-wider rounded-xl text-slate-900 bg-white transition-all active:scale-[0.98] cursor-pointer hover:bg-slate-50">
-                                                <svg class="w-4 h-4 mr-2 stroke-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    class="w-full inline-flex justify-center items-center px-3 py-1.5 border text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all active:scale-[0.98] cursor-pointer"
+                                                    style="color: {{ text_dark }}; background-color: {{ card_bg }}; border-color: {{ border_color }};"
+                                                    onmouseenter="this.style.backgroundColor='{{ image_bg }}'"
+                                                    onmouseleave="this.style.backgroundColor='{{ card_bg }}'">
+                                                <svg class="w-3.5 h-3.5 mr-1.5 stroke-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                                                 </svg>
-                                                Add to Wishlist
+                                                Wishlist
                                             </button>
                                         </form>
                                     {% endif %}
@@ -134,15 +158,18 @@
                     {% endfor %}
                 </div>
             {% else %}
-                <div class="bg-white rounded-2xl border border-dashed border-slate-200 p-8 sm:p-12 text-center max-w-xl mx-auto mt-4">
-                    <svg class="mx-auto h-12 w-12 text-slate-300 mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
-                    <p class="text-slate-600 text-sm sm:text-base font-semibold">
+                <div class="rounded-2xl border border-dashed p-8 sm:p-12 text-center max-w-xl mx-auto mt-4"
+                     style="background-color: {{ card_bg }}; border-color: {{ border_color }};">
+                    <svg class="mx-auto h-12 w-12 mb-4 opacity-30" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                    <p class="text-sm sm:text-base font-semibold" style="color: {{ text_dark }};">
                         No product results match execution filters.
                     </p>
-                    <p class="text-xs text-slate-400 mt-1.5">Adjust filters, look for alternative categories, or change your search parameters.</p>
+                    <p class="text-xs opacity-50 mt-1.5">Adjust filters, look for alternative categories, or change your search parameters.</p>
                 </div>
             {% endif %}
         </section>
     </div>
 </div>
+
+{% endwith %}
 {% endblock %}

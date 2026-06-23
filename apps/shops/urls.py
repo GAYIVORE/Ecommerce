@@ -9,4 +9,5 @@ urlpatterns = [
     # Add this line below:
     path('apply/', views.create_shop, name='create_shop'), 
     path('live-restocks/', views.recent_restocks_feed, name='recent_restocks_api'),
+    path('sectors-showcase/', views.sectors_showcase_api, name='sectors_showcase_api'),
 ]

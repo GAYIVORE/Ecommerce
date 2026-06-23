@@ -94,52 +94,29 @@
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
-            <div>
-                <span class="text-xs font-black tracking-widest text-indigo-600 uppercase">Premium Curation</span>
-                <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-1">Explore Marketplace Sectors</h2>
-            </div>
-            <a href="{% url 'shops:shop_directory' %}" style="color: #d97706;" class="text-xs font-bold uppercase tracking-wider hover:text-slate-900 transition-colors flex items-center gap-1.5 underline decoration-2 underline-offset-4">
-                View All Catalog Outlets →
-            </a>
-        </div>
+    
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="group bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all p-6 flex flex-col justify-between min-h-[180px]">
-                <div>
-                    <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25"/></svg>
-                    </div>
-                    <h3 class="text-base font-black text-slate-900 tracking-tight">Trending Consumer Electronics</h3>
-                    <p class="text-xs font-medium text-slate-500 mt-1">Next-generation hardware accessories and high-performance smart gadgets.</p>
+    <div hx-get="{% url 'shops:sectors_showcase_api' %}" 
+        hx-trigger="load" 
+        hx-swap="outerHTML"
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+        
+        <div class="w-full space-y-8 animate-pulse">
+            <div class="flex justify-between items-end">
+                <div class="space-y-2 w-1/3">
+                    <div class="h-3 bg-slate-200 rounded-sm w-1/4"></div>
+                    <div class="h-7 bg-slate-200 rounded-md w-full"></div>
                 </div>
-                <a href="{% url 'shops:shop_directory' %}" style="color: #4F46E5;" class="text-xs font-bold uppercase tracking-wide group-hover:translate-x-1 transition-transform mt-4 inline-flex items-center gap-1">Browse Stock →</a>
+                <div class="h-4 bg-slate-200 rounded-sm w-32"></div>
             </div>
-
-            <div class="group bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all p-6 flex flex-col justify-between min-h-[180px]">
-                <div>
-                    <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>
-                    </div>
-                    <h3 class="text-base font-black text-slate-900 tracking-tight">Apparel & Lifestyle Staples</h3>
-                    <p class="text-xs font-medium text-slate-500 mt-1">Premium design elements built for structural comfort and contemporary aesthetics.</p>
-                </div>
-                <a href="{% url 'shops:shop_directory' %}" style="color: #d97706;" class="text-xs font-bold uppercase tracking-wide group-hover:translate-x-1 transition-transform mt-4 inline-flex items-center gap-1">Browse Stock →</a>
-            </div>
-
-            <div class="group bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all p-6 flex flex-col justify-between min-h-[180px] sm:col-span-2 lg:col-span-1">
-                <div>
-                    <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center mb-4">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/></svg>
-                    </div>
-                    <h3 class="text-base font-black text-slate-900 tracking-tight">Luxury Home & General Essentials</h3>
-                    <p class="text-xs font-medium text-slate-500 mt-1">Curated selections tailored perfectly to complement modern interior environments.</p>
-                </div>
-                <a href="{% url 'shops:shop_directory' %}" style="color: #d97706;" class="text-xs font-bold uppercase tracking-wide group-hover:translate-x-1 transition-transform mt-4 inline-flex items-center gap-1">Browse Stock →</a>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="h-44 bg-slate-100 rounded-2xl border border-slate-200/50"></div>
+                <div class="h-44 bg-slate-100 rounded-2xl border border-slate-200/50"></div>
+                <div class="h-44 bg-slate-100 rounded-2xl border border-slate-200/50 sm:col-span-2 lg:col-span-1"></div>
             </div>
         </div>
     </div>
+
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 relative z-30">
         <div class="bg-white border border-slate-200 rounded-2xl shadow-xs grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100 p-2">
@@ -173,20 +150,54 @@
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
-        <div class="w-full rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 border border-slate-200" style="background-color: #EEF2F6;">
+    {% if coupon %}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 animate-fade-in">
+        <!-- Dynamic Background and Text Theme Mapping -->
+        <div class="w-full rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 border border-slate-200"
+            style="background-color: {{ coupon.banner_bg_color }}; color: {{ coupon.banner_text_color }};">
+            
             <div class="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-                <div class="w-12 h-12 rounded-xl bg-white text-slate-900 flex items-center justify-center font-black text-lg shadow-xs shrink-0">%</div>
+                <!-- Icon Frame matching the outer text color for contrast -->
+                <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center font-black text-lg shadow-xs shrink-0 select-none"
+                    style="color: {{ coupon.banner_text_color }}; border: 1px solid {{ coupon.banner_bg_color }};">
+                    %
+                </div>
                 <div>
-                    <h3 class="text-slate-950 text-base font-black tracking-tight">Launch Celebration Discount Token</h3>
-                    <p class="text-xs font-semibold text-slate-500 mt-0.5">Apply code <span class="font-bold text-slate-800 bg-white px-1.5 py-0.5 rounded border border-slate-300">LAUNCH20</span> at checkout to clear 20% off multi-vendor processing fees.</p>
+                    <h3 class="text-base font-black tracking-tight" style="color: {{ coupon.banner_text_color }};">
+                        Launch Celebration Discount Token
+                    </h3>
+                    <p class="text-xs font-semibold mt-0.5 opacity-80">
+                        Apply code 
+                        <span class="font-mono font-bold bg-white px-1.5 py-0.5 rounded border border-slate-300 text-slate-800">{{ coupon.code }}</span> 
+                        at checkout to clear {{ coupon.discount }}% off processing fees.
+                    </p>
                 </div>
             </div>
-            <button onclick="navigator.clipboard.writeText('LAUNCH20'); alert('Code copied!')" style="background-color: #0F172A !important; color: #ffffff !important;" class="text-xs font-bold uppercase tracking-wider px-5 py-3 rounded-xl transition-all shadow-xs hover:opacity-90 shrink-0">
+            
+            <!-- Dynamic Button Theme Mapping -->
+            <button 
+                type="button"
+                onclick="
+                    navigator.clipboard.writeText('{{ coupon.code|escapejs }}');
+                    const btn = this;
+                    const originalText = btn.innerHTML;
+                    const originalBg = btn.style.backgroundColor;
+                    btn.innerHTML = 'Copied!';
+                    btn.style.backgroundColor = '#059669'; /* Flash success emerald */
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.style.backgroundColor = originalBg;
+                    }, 2000);
+                " 
+                aria-label="Copy promotion discount code {{ coupon.code }}"
+                class="w-full sm:w-auto text-xs font-bold uppercase tracking-wider px-5 py-3 rounded-xl transition-all duration-200 shadow-xs shrink-0 cursor-pointer active:scale-[0.98]"
+                style="background-color: {{ coupon.button_bg_color }}; color: {{ coupon.button_text_color }};"
+            >
                 Copy Code
             </button>
         </div>
     </div>
+    {% endif %}
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="w-full rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-md" 

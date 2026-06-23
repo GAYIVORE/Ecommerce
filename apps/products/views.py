@@ -115,8 +115,15 @@ class ShopStorefrontView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['shop'] = self.shop
+        
+        # ✅ Fetch only categories that have active products inside THIS vendor's shop
+        context['categories'] = Category.objects.filter(
+            products__shop=self.shop,
+            products__available=True,
+            products__is_deleted=False
+        ).distinct()
+        
         return context
-
 
 # =============================================================================
 # PRIVATE VENDOR DASHBOARD VIEWS (MERCHANT WORKSPACE)
