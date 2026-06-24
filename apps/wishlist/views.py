@@ -85,7 +85,9 @@ def move_to_cart(request, item_id):
     # Check inventory and active listing visibility parameters
     if product.stock > 0 and product.available:
         try:
-            add_item_to_cart(request, product, quantity=1)
+            #  FIXED: Pass product.id instead of the product object
+            add_item_to_cart(request, product.id, quantity=1)
+            
             wishlist_item.delete()  # Drop from wishlist container on successful cart transfer
             messages.success(request, f"{product.name} has been moved to your cart!")
         except Exception as e:
