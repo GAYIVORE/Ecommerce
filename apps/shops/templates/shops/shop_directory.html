@@ -5,7 +5,9 @@
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 py-8 sm:py-12">
     <div class="mb-8 sm:mb-10 text-center">
-        <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">Our Verified Shops</h1>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-emerald-500 tracking-tight">
+            Our Verified Shops
+        </h1>
         <p class="mt-2 sm:mt-3 text-sm sm:text-lg text-slate-500 max-w-xl mx-auto">Discover unique products directly from your favorite local vendors.</p>
     </div>
 
@@ -25,7 +27,8 @@
                                 {% endif %}
                             </div>
                             
-                            <h3 class="text-sm sm:text-lg font-bold text-slate-900 group-hover:text-amber-600 transition-colors line-clamp-1">
+                            <!-- FLIPPED: Starts as Amber, transitions to Slate on card hover -->
+                            <h3 class="text-sm sm:text-lg font-bold text-amber-600 group-hover:text-slate-900 transition-colors line-clamp-1">
                                 {{ shop.name }}
                             </h3>
                             <p class="text-xs sm:text-sm text-slate-500 mt-1 line-clamp-2">
@@ -38,6 +41,7 @@
                                 {{ shop.total_products }} Product{{ shop.total_products|pluralize }} Live
                             </span>
                             
+                            <!-- FLIPPED: Icon starts as Slate, transitions to Amber on card hover -->
                             <span class="text-[11px] sm:text-xs font-bold text-slate-400 group-hover:text-amber-600 group-hover:translate-x-0.5 transition-all flex items-center gap-0.5">
                                 <span class="hidden sm:inline text-slate-900">Visit</span> →
                             </span>

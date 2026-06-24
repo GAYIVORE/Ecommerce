@@ -7,6 +7,8 @@ from django.contrib import messages
 # Fixed model import typos securely
 from .models import Shop
 from apps.products.models import Category, Product
+# Import your OrderItem model here (adjust the app name 'orders' if yours is different)
+from apps.orders.models import OrderItem, SubOrder
 
 
 def shop_directory(request):
@@ -80,28 +82,35 @@ def vendor_dashboard(request):
     elif shop.status == 'SUSPENDED' or not shop.is_active or shop.is_deleted: 
         return render(request, 'shops/shop_disabled.html', {'shop': shop})
         
+    # 1. Fetching shop inventory items
     products = Product.objects.filter(shop=shop, is_deleted=False).order_by('-created_at')
+    
+    # 2. Fetch incoming SubOrders tied to this vendor shop
+    # Filters out completed/cancelled/refunded records to display actionable dispatches
+    vendor_orders = SubOrder.objects.filter(
+        shop=shop,
+        status__in=['Pending', 'Processing']
+    ).select_related('parent_order', 'parent_order__user').prefetch_related('items').order_by('-created_at')
+    
+    # 3. Compute operational alerts (items low on stock)
+    low_stock_count = products.filter(stock__lte=5).count()
         
     context = {
         'shop': shop,
         'products': products,
+        'vendor_orders': vendor_orders,      # Pass sub-orders context
+        'low_stock_count': low_stock_count,  # Pass critical inventory alert context
     }
     return render(request, 'products/vendor_dashboard.html', context)
 
-
 def recent_restocks_feed(request):
-    """
-    Endpoint targeted by HTMX to pull the latest 4 in-stock items.
-    """
+    """ Endpoint targeted by HTMX to pull the latest 4 in-stock items. """
     recent_restocks = Product.objects.filter(available=True, is_deleted=False, stock__gt=0).order_by('-updated_at')[:4]
     return render(request, 'shops/partials/restock_feed.html', {'recent_restocks': recent_restocks})
 
 
 def sectors_showcase_api(request):
-    """
-    Renders the marketplace sectors grid asynchronously.
-    """
-    # Fallback to display empty sectors if you are initializing your local database scratch space
+    """ Renders the marketplace sectors grid asynchronously. """
     categories = (
         Category.objects
         .annotate(total_products=Count('products'))

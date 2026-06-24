@@ -1,16 +1,18 @@
-# apps/products/views.py
-
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 from django.http import Http404
 
 from .models import Product, Category, Shop
 from apps.reviews.forms import ReviewForm
 from apps.reviews.models import Review
+# Import SubOrder to trace vendor-specific order partitions
+from apps.orders.models import SubOrder  
 
 
 # =============================================================================
@@ -138,14 +140,13 @@ class VendorRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
         user = self.request.user
         return hasattr(user, 'shop') and user.shop.status == 'ACTIVE' and user.shop.is_active and not user.shop.is_deleted
 
+
 class VendorDashboardView(VendorRequiredMixin, ListView):
     template_name = 'products/vendor_dashboard.html'
     context_object_name = 'products'
     paginate_by = 15
 
     def get_queryset(self):
-        # 🌟 STRATEGY SHIFT: Directly look up products owned by the user's shop 
-        # via the relationship span filter 'shop__owner' (This is bulletproof!)
         return Product.objects.filter(
             shop__owner=self.request.user, 
             is_deleted=False
@@ -154,14 +155,31 @@ class VendorDashboardView(VendorRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Safely fetch the shop instance just for the top layout title text
+        # Pull or locate target shop profile 
         if hasattr(self.request.user, 'shop'):
-            context['shop'] = self.request.user.shop
+            shop = self.request.user.shop
         else:
-            context['shop'] = Shop.objects.filter(owner=self.request.user).first()
+            shop = Shop.objects.filter(owner=self.request.user).first()
+        
+        context['shop'] = shop
+        
+        # 📊 Injected Dashboard Metrics to satisfy your dashboard template requirements
+        if shop:
+            # 1. Pull only SubOrders assigned explicitly to this shop
+            context['vendor_orders'] = SubOrder.objects.filter(shop=shop).order_by('-created_at')
             
-        return context
-      
+            # 2. Derive low stock counts dynamically (e.g., threshold <= 5 units)
+            context['low_stock_count'] = Product.objects.filter(
+                shop=shop, 
+                is_deleted=False, 
+                stock__lte=5
+            ).count()
+        else:
+            context['vendor_orders'] = SubOrder.objects.none()
+            context['low_stock_count'] = 0
+            
+        return context    
+
 class VendorProductCreateView(VendorRequiredMixin, CreateView):
     """
     Secure inventory intake. Silently binds new products to the 
@@ -173,7 +191,6 @@ class VendorProductCreateView(VendorRequiredMixin, CreateView):
     success_url = reverse_lazy('products:vendor_dashboard')
 
     def form_valid(self, form):
-        # FIXED: Accessing singular relation wrapper securely
         if hasattr(self.request.user, 'shop'):
             user_shop = self.request.user.shop
             form.instance.shop = user_shop
@@ -194,7 +211,6 @@ class VendorProductUpdateView(VendorRequiredMixin, UpdateView):
     success_url = reverse_lazy('products:vendor_dashboard')
 
     def get_queryset(self):
-        # Security Boundary: Restricts alteration strictly to items owned by the user's shop
         return Product.objects.filter(shop__owner=self.request.user, is_deleted=False)
 
     def form_valid(self, form):
@@ -221,3 +237,77 @@ class VendorProductDeleteView(VendorRequiredMixin, DeleteView):
         self.object.save()
         messages.warning(request, f'Product "{self.object.name}" removed from marketplace listings.')
         return redirect(self.get_success_url())
+
+
+# apps/products/views.py
+
+class VendorInventoryBaseView(VendorRequiredMixin, ListView):
+    """
+    Dedicated view for isolating the Inventory Tracking Base away from the overview metrics dashboard.
+    Supports catalog analytics, full data descriptions, and stock level warnings.
+    """
+    model = Product
+    template_name = 'products/inventory_base.html'  # Points to your standalone template
+    context_object_name = 'products'
+    paginate_by = 25  # Keeps catalog data lists easy to read per page execution
+
+    def get_queryset(self):
+        # Grabs inventory tracking items belonging explicitly to this shop owner
+        return Product.objects.filter(
+            shop__owner=self.request.user, 
+            is_deleted=False
+        ).select_related('category').order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Safely determine the merchant shop profile
+        if hasattr(self.request.user, 'shop'):
+            shop = self.request.user.shop
+        else:
+            shop = Shop.objects.filter(owner=self.request.user).first()
+        
+        context['shop'] = shop
+        
+        # Inject dynamic operational alert stock totals 
+        if shop:
+            context['low_stock_count'] = Product.objects.filter(
+                shop=shop, 
+                is_deleted=False, 
+                stock__lte=5
+            ).count()
+        else:
+            context['low_stock_count'] = 0
+            
+        return context
+
+# =============================================================================
+# ORDER MANAGEMENT & STATUS TRANSITIONS
+# =============================================================================
+
+@login_required
+@require_POST
+def update_order_status(request, sub_order_id):
+    """
+    Fulfillment Engine: Shifts specific vendor SubOrder slices to 'Shipped' status.
+    Ensures severe access separation boundaries remain unbreached.
+    """
+    if not hasattr(request.user, 'shop'):
+        messages.error(request, "Unauthorized vendor management profile context.")
+        return redirect('core:home')
+        
+    shop = request.user.shop
+    
+    # Isolation Query: Vendor can only retrieve a SubOrder belonging to their specific Shop ID
+    sub_order = get_object_or_404(SubOrder, id=sub_order_id, shop=shop)
+    
+    if sub_order.status in ['Pending', 'Processing']:
+        sub_order.status = 'Shipped'
+        sub_order.save()
+        messages.success(request, f"SubOrder #{sub_order.id} updated to Shipped status.")
+    else:
+        messages.warning(request, f"SubOrder #{sub_order.id} is already processed as {sub_order.status}.")
+        
+    return redirect('products:vendor_dashboard')
+
+

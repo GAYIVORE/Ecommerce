@@ -20,7 +20,7 @@
 
             <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-950 tracking-tight leading-tight max-w-3xl mb-4">
                 Curated Premium Goods.
-                <span class="block sm:inline sm:ml-2" style="color: #10B981;">Fast Delivery.</span>
+                <span class="block sm:inline sm:ml-2 text-emerald-500">Fast Delivery.</span>
             </h1>
             
             <p class="text-sm sm:text-base text-slate-600 max-w-2xl font-medium leading-relaxed mb-6">
@@ -29,23 +29,23 @@
             
             <div class="w-full max-w-md sm:max-w-xl flex flex-col sm:flex-row justify-center items-center gap-3">
                 
+                <!-- Start Shopping Button: Replaced #10B981 with bg-emerald-500 -->
                 <a href="{% url 'shops:shop_directory' %}" 
-                   style="background-color: #10B981 !important; color: #ffffff !important;" 
-                   class="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 text-sm font-bold uppercase tracking-wider transition-all rounded-xl shadow-md hover:opacity-95 transform hover:-translate-y-0.5 duration-150">
+                   class="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 text-sm font-bold uppercase tracking-wider text-white bg-emerald-500 hover:bg-emerald-600 transition-all rounded-xl shadow-md transform hover:-translate-y-0.5 duration-150">
                      Start Shopping (All Malls)
                 </a>
 
                 {% if user.is_authenticated %}
                     {% if user.shop %}
+                        <!-- Dashboard Button: Replaced #EEF2F6 with bg-slate-100 and #4F46E5 with text-indigo-600 -->
                         <a href="{% url 'shops:vendor_dashboard' %}" 
-                           style="background-color: #EEF2F6 !important; color: #4F46E5 !important;" 
-                           class="w-full sm:w-auto inline-flex justify-center items-center px-5 py-3 text-sm font-bold uppercase tracking-wider transition-all rounded-xl border border-slate-200 shadow-sm hover:bg-slate-200">
-                            Dashboard ({{ user.shop.name }})
+                           class="w-full sm:w-auto inline-flex justify-center items-center px-5 py-3 text-sm font-bold uppercase tracking-wider bg-slate-100 text-indigo-600 transition-all rounded-xl border border-slate-200 shadow-sm hover:bg-slate-200">
+                             Dashboard ({{ user.shop.name }})
                         </a>
                     {% else %}
+                        <!-- Apply Shop Button: Replaced #FEF3C7 with bg-amber-100 and #92400E with text-amber-800 -->
                         <a href="{% url 'shops:create_shop' %}" 
-                           style="background-color: #FEF3C7 !important; color: #92400E !important;" 
-                           class="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 text-sm font-bold uppercase tracking-wider transition-all rounded-xl shadow-md hover:opacity-95 transform hover:-translate-y-0.5 duration-150">
+                           class="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 text-sm font-bold uppercase tracking-wider bg-amber-100 text-amber-800 transition-all rounded-xl shadow-md hover:opacity-95 transform hover:-translate-y-0.5 duration-150">
                             APPLY FOR A SHOP →
                         </a>
                     {% endif %}
@@ -57,7 +57,8 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
         <div class="flex justify-between items-end mb-6">
             <div>
-                <span class="text-xs font-black tracking-widest uppercase" style="color: #10B981;">Live Feed</span>
+                <!-- Live Feed Header Tag: Replaced #10B981 with text-emerald-500 -->
+                <span class="text-xs font-black tracking-widest uppercase text-emerald-500">Live Feed</span>
                 <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-0.5">Recently Restocked</h2>
             </div>
             <a href="{% url 'shops:shop_directory' %}" class="text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-slate-900 transition-colors">
@@ -94,8 +95,6 @@
         </div>
     </div>
 
-    
-
     <div hx-get="{% url 'shops:sectors_showcase_api' %}" 
         hx-trigger="load" 
         hx-swap="outerHTML"
@@ -116,7 +115,6 @@
             </div>
         </div>
     </div>
-
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 relative z-30">
         <div class="bg-white border border-slate-200 rounded-2xl shadow-xs grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100 p-2">
@@ -152,12 +150,10 @@
 
     {% if coupon %}
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 animate-fade-in">
-        <!-- Dynamic Background and Text Theme Mapping -->
         <div class="w-full rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 border border-slate-200"
             style="background-color: {{ coupon.banner_bg_color }}; color: {{ coupon.banner_text_color }};">
             
             <div class="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-                <!-- Icon Frame matching the outer text color for contrast -->
                 <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center font-black text-lg shadow-xs shrink-0 select-none"
                     style="color: {{ coupon.banner_text_color }}; border: 1px solid {{ coupon.banner_bg_color }};">
                     %
@@ -174,7 +170,6 @@
                 </div>
             </div>
             
-            <!-- Dynamic Button Theme Mapping -->
             <button 
                 type="button"
                 onclick="
@@ -183,7 +178,7 @@
                     const originalText = btn.innerHTML;
                     const originalBg = btn.style.backgroundColor;
                     btn.innerHTML = 'Copied!';
-                    btn.style.backgroundColor = '#059669'; /* Flash success emerald */
+                    btn.style.backgroundColor = '#059669';
                     setTimeout(() => {
                         btn.innerHTML = originalText;
                         btn.style.backgroundColor = originalBg;
@@ -199,9 +194,9 @@
     </div>
     {% endif %}
 
+    <!-- Footer Banner Block: Replaced inline background-color #0F172A with bg-slate-900 -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="w-full rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-md" 
-             style="background-color: #0F172A !important;">
+        <div class="w-full bg-slate-900 rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-md">
             <div class="max-w-xl text-center md:text-left">
                 <h3 class="text-white text-lg font-black tracking-tight mb-1">Architecture Integration Status: Live</h3>
                 <p class="text-xs font-semibold text-slate-400 leading-relaxed">

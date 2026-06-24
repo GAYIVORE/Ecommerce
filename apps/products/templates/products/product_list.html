@@ -9,6 +9,8 @@
 {% with primary_color="#EE7535DD" text_dark="#0f172a" card_bg="#ffffff" image_bg="#f8fafc" border_color="#e2e8f0" %}
 
 <div class="w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6" style="color: {{ text_dark }};">
+    
+    <!-- Title Section -->
     <div class="mb-4 sm:mb-6 pb-4 border-b" style="border-color: {{ border_color }};">
         <h1 class="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight">
             {% if query %}
@@ -21,14 +23,16 @@
         </h1>
     </div>
 
+    <!-- Main Layout Grid -->
     <div class="flex flex-col lg:flex-row w-full gap-6 sm:gap-8 items-start">
         
-        <aside class="w-full lg:w-64 shrink-0 lg:rounded-2xl lg:border lg:p-4 lg:sticky lg:top-24 lg:shadow-xs lg:bg-transparent" 
-               style="border-color: {{ border_color }};">
+        <!-- Sidebar Navigation -->
+        <aside class="w-full lg:w-64 shrink-0 lg:rounded-2xl lg:border lg:p-4 lg:sticky lg:top-24 lg:shadow-xs lg:bg-transparent" style="border-color: {{ border_color }};">
             <h3 class="hidden lg:block text-[10px] font-black uppercase tracking-widest opacity-40 mb-2.5">Categories</h3>
             
             <div class="flex flex-row lg:flex-col gap-2 overflow-x-auto pb-3 pt-1 lg:py-0 scrollbar-none snap-x snap-mandatory -mx-2 px-2 sm:mx-0 sm:px-0">
                 
+                <!-- All Products Category Anchor -->
                 <div class="snap-start shrink-0 lg:w-full">
                     {% if not category and not query %}
                         <a href="{% url 'products:product_list' %}" 
@@ -47,6 +51,7 @@
                     {% endif %}
                 </div>
 
+                <!-- Loop Categories -->
                 {% for cat in categories %}
                     <div class="snap-start shrink-0 lg:w-full">
                         {% if category and category.slug == cat.slug %}
@@ -69,6 +74,7 @@
             </div>
         </aside>
 
+        <!-- Product Inventory Showcase Grid -->
         <section class="flex-1 w-full">
             {% if products %}
                 <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
@@ -76,9 +82,9 @@
                         <div class="group rounded-xl border shadow-xs hover:shadow-md transition-all duration-200 p-3 flex flex-col justify-between relative overflow-hidden"
                              style="background-color: {{ card_bg }}; border-color: {{ border_color }};">
                             
+                            <!-- Card Body Hyperlink Wrap -->
                             <a href="{{ product.get_absolute_url }}" class="block focus:outline-none mb-2">
-                                <div class="w-full h-32 sm:h-36 rounded-lg p-2 flex items-center justify-center mb-2 overflow-hidden relative"
-                                     style="background-color: {{ image_bg }};">
+                                <div class="w-full h-32 sm:h-36 rounded-lg p-2 flex items-center justify-center mb-2 overflow-hidden relative" style="background-color: {{ image_bg }};">
                                     {% if product.stock <= 0 or not product.available %}
                                         <div class="absolute top-1.5 left-1.5 z-10 text-[9px] font-black text-white px-1.5 py-0.5 uppercase tracking-wider rounded"
                                              style="background-color: {{ text_dark }};">
@@ -108,6 +114,7 @@
                                 </h2>
                             </a>
 
+                            <!-- Card Action/Pricing Footer -->
                             <div class="mt-auto">
                                 <p class="text-sm sm:text-base font-black mb-2" style="color: {{ text_dark }};">
                                     GHS {{ product.price|floatformat:2 }}
@@ -158,8 +165,8 @@
                     {% endfor %}
                 </div>
             {% else %}
-                <div class="rounded-2xl border border-dashed p-8 sm:p-12 text-center max-w-xl mx-auto mt-4"
-                     style="background-color: {{ card_bg }}; border-color: {{ border_color }};">
+                <!-- Empty State Layout -->
+                <div class="rounded-2xl border border-dashed p-8 sm:p-12 text-center max-w-xl mx-auto mt-4" style="background-color: {{ card_bg }}; border-color: {{ border_color }};">
                     <svg class="mx-auto h-12 w-12 mb-4 opacity-30" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
                     <p class="text-sm sm:text-base font-semibold" style="color: {{ text_dark }};">
                         No product results match execution filters.
@@ -172,4 +179,5 @@
 </div>
 
 {% endwith %}
+{% block title_suffix %}{% endblock %}
 {% endblock %}

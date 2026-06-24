@@ -470,7 +470,6 @@ def paystack_webhook(request):
     if not signature:
         return HttpResponseBadRequest("Missing security token.")
 
-    # 🔧 FIX: Paystack uses SHA256 encoding for signing webhook payloads
     computed_signature = hmac.new(
         bytes(settings.PAYSTACK_SECRET_KEY, 'utf-8'),
         msg=request.body,
@@ -487,12 +486,10 @@ def paystack_webhook(request):
             reference = data.get('reference', '')
             transaction_id = data.get('id')
 
-            # Parse out the base primary database model integer ID token
-            order_id = reference.split('-')[-1]
+            # 🛠️ FIXED: Grabs the actual numerical order_id string correctly now
+            order_id = reference.split('-')[-2]
             
-            # Open up safe transaction block to run inventory reductions securely
             with transaction.atomic():
-                # Lock rows using select_for_update to handle simultaneous concurrent webhooks
                 order = Order.objects.select_for_update().get(id=order_id)
 
                 if not order.payment_status:
@@ -502,7 +499,7 @@ def paystack_webhook(request):
                     order.status = 'Processing'
                     order.save()
                     
-                    # 2. Sync Status Changes to child SubOrders
+                    # 2. Sync Status Changes to child SubOrders (Perfect for vendor dashboard)
                     order.sub_orders.all().update(status='Processing')
                     
                     # 3. Secure Stock Subtraction Loops & Real-time Sold Out Checks
@@ -511,25 +508,24 @@ def paystack_webhook(request):
                         product = item.product
                         product.stock -= item.quantity
                         
-                        # Check if product hits zero balance thresholds
                         if product.stock <= 0:
                             product.stock = 0
-                            product.available = False  # 🌟 Automatically labels product as 'Sold Out'
+                            product.available = False  # Automatically labels product as 'Sold Out'
                             
                         product.save()
 
                     # 4. Asynchronous tracking coupon counter execution
                     if order.coupon_applied:
                         Coupon.objects.filter(code=order.coupon_applied).update(
-                            times_used=models.F('times_used') + 1
+                            times_used=F('times_used') + 1
                         )
                         
-    except (ValueError, Order.DoesNotExist) as e:
-        # Always return 200 OK block to Paystack for handled/not-found issues 
-        # so they cease firing duplicate retries at your Vercel logs
+    except (ValueError, Order.DoesNotExist, IndexError) as e:
+        # Returning 200 handles edge cases smoothly without Paystack slamming your logs with retries
         return HttpResponse(status=200)
 
     return HttpResponse(status=200)
+
 
 @login_required
 def order_confirmation(request, order_id):

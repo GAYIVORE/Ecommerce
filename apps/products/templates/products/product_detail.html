@@ -5,10 +5,8 @@
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
-    <!-- Main Product Presentation Card -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 p-4 sm:p-8 items-start mb-8">
         
-        <!-- Media Column -->
         <div class="w-full lg:col-span-5 bg-slate-50 rounded-xl p-4 flex justify-center items-center aspect-square lg:sticky lg:top-24 max-h-[320px] sm:max-h-[450px] lg:max-h-none">
             {% if product.image %}
                 <img src="{{ product.image.url }}" alt="{{ product.name }}" class="max-h-full max-w-full object-contain mix-blend-multiply transition-transform duration-300 hover:scale-105">
@@ -17,17 +15,15 @@
             {% endif %}
         </div>
 
-        <!-- Meta Information Frame Column -->
         <div class="w-full lg:col-span-7 flex flex-col justify-between">
             <div>
-                <!-- Breadcrumbs -->
-                <nav class="flex items-center space-x-2 text-xs text-slate-400 font-semibold uppercase tracking-wider mb-3">
-                    <a href="{% url 'products:product_list' %}" class="hover:text-amber-600 transition-colors">Catalog</a>
-                    <span>/</span>
+                <nav class="flex items-center space-x-2 text-xs text-amber-600 font-semibold uppercase tracking-wider mb-3">
+                    <a href="{% url 'products:product_list' %}" class="hover:text-slate-400 transition-colors">Catalog</a>
+                    <span class="text-slate-400">/</span>
                     {% if product.category %}
-                        <a href="{% url 'products:product_list_by_category' category_slug=product.category.slug %}" class="hover:text-amber-600 transition-colors truncate max-w-[120px] sm:max-w-none">{{ product.category.name }}</a>
+                        <a href="{% url 'products:product_list_by_category' category_slug=product.category.slug %}" class="hover:text-slate-400 transition-colors truncate max-w-[120px] sm:max-w-none">{{ product.category.name }}</a>
                     {% else %}
-                        <span>General</span>
+                        <span class="text-slate-400">General</span>
                     {% endif %}
                 </nav>
 
@@ -35,7 +31,6 @@
                     {{ product.name }}
                 </h1>
                 
-                <!-- Multi-Vendor Vendor Anchor -->
                 {% if product.shop %}
                 <div class="text-xs sm:text-sm font-medium text-slate-500 mb-4">
                     Sold by: <a href="{% url 'products:shop_storefront' shop_slug=product.shop.slug %}" class="text-amber-600 hover:text-amber-700 font-bold inline-flex items-center gap-0.5 group transition-colors">
@@ -56,7 +51,6 @@
                     {{ product.description }}
                 </p>
 
-                <!-- Data Table Block -->
                 <div class="bg-slate-50/80 rounded-xl border border-slate-100 p-4 mb-6 text-xs sm:text-sm text-slate-600 space-y-3">
                     <div class="flex items-center justify-between py-1 border-b border-slate-200/50 last:border-0">
                         <span class="font-medium text-slate-400">Category</span>
@@ -97,15 +91,14 @@
                 </div>
             </div>
 
-            <!-- Call to Action System (Add to Cart Showcase) -->
             <div class="flex flex-col sm:flex-row gap-3 mt-4">
                 {% if product.stock > 0 and product.available %}
                     <form action="{% url 'cart:add_to_cart' product.id %}" method="post" class="flex-1 flex items-stretch gap-3 m-0">
                         {% csrf_token %}
                         <div class="flex items-center justify-center border border-slate-200 rounded-xl bg-white px-3 shrink-0">
-                            <label for="quantity" class="text-[10px] font-black text-slate-400 tracking-wider mr-2 uppercase">QTY</label>
+                            <label for="quantity" class="text-[10px] font-black text-slate-400 tracking-wider mr-1 uppercase">QTY</label>
                             <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock }}"
-                                   class="w-10 text-center font-bold text-slate-800 bg-transparent focus:outline-none focus:ring-0 border-none p-0">
+                                   class="w-12 text-center font-bold text-slate-800 bg-transparent focus:outline-none focus:ring-0 border-none p-0 block balance-spin-buttons">
                         </div>
                         <button type="submit" class="flex-1 inline-flex justify-center items-center px-6 py-4 text-sm font-bold uppercase tracking-wider text-white bg-amber-600 hover:bg-amber-500 active:bg-amber-700 rounded-xl transition-all shadow-md shadow-amber-600/10 hover:shadow-lg active:scale-[0.99] cursor-pointer">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1,0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0,1-1.12-1.243l1.264-12A1.125 1.125 0 0,1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1,1-.75 0 .375.375 0 0,1 .75 0Zm7.5 0a.375.375 0 1,1-.75 0 .375.375 0 0,1 .75 0Z"/></svg>
@@ -131,11 +124,9 @@
         </div>
     </div>
 
-    <!-- Review Block Frame -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-8">
         <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight mb-6">Customer Reviews</h3>
 
-        <!-- Review Input Interface -->
         {% if user.is_authenticated %}
             <div class="mb-8 p-4 sm:p-6 rounded-xl bg-slate-50 border border-slate-200/60">
                 <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4">
@@ -179,7 +170,6 @@
             </div>
         {% endif %}
 
-        <!-- Active User Reviews Output Grid -->
         {% if product.reviews.all %}
             <div class="divide-y divide-slate-100">
                 {% for review in product.reviews.all %}

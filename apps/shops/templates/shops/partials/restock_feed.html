@@ -1,9 +1,9 @@
 {% for product in recent_restocks %}
 <a href="{% url 'products:product_detail' product.slug %}" class="group bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md hover:border-slate-300 transition-all flex flex-col w-full animate-fade-in block text-left">
     
-    <div class="h-40 bg-slate-50 relative overflow-hidden flex items-center justify-center p-2">
+    <div class="h-40 bg-white relative overflow-hidden flex items-center justify-center p-2">
         {% if product.is_newly_restocked %}
-            <span class="absolute top-2 left-2 z-10 text-[9px] font-black tracking-wider uppercase text-white px-1.5 py-0.5 rounded-md shadow-xs" style="background-color: #10B981;">
+            <span class="absolute top-2 left-2 z-10 text-[9px] font-black tracking-wider uppercase text-white bg-emerald-500 px-1.5 py-0.5 rounded-md shadow-xs">
                 Restocked
             </span>
         {% endif %}
@@ -17,12 +17,23 @@
 
     <div class="p-3 flex-1 flex flex-col justify-between bg-white">
         <div>
-            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">{{ product.shop.name }}</span>
-            <h4 class="text-xs font-bold text-slate-900 truncate mt-0.5 group-hover:text-emerald-600 transition-colors">{{ product.name }}</h4>
+            <!-- UPDATED: Shop name transitions from Amber to Dark Slate Charcoal -->
+            <span class="text-[10px] font-black text-amber-600 group-hover:text-slate-900 transition-colors uppercase tracking-wider block">
+                {{ product.shop.name }}
+            </span>
+            
+            <!-- UPDATED: Product title is now static Dark Charcoal -->
+            <h4 class="text-xs font-black text-slate-900 truncate mt-0.5">
+                {{ product.name }}
+            </h4>
         </div>
         <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100">
-            <span class="text-xs font-black text-slate-950">¢{{ product.price }}</span>
-            <span class="w-6 h-6 text-xs rounded-md inline-flex items-center justify-center transition-colors border border-slate-200 group-hover:bg-slate-900 group-hover:text-white text-slate-700">→</span>
+            <!-- UPDATED: Price transitions from Amber to Dark Charcoal -->
+            <span class="text-xs font-black text-amber-600 group-hover:text-slate-900 transition-colors">
+                ¢{{ product.price }}
+            </span>
+            
+            <span class="w-6 h-6 text-xs rounded-md inline-flex items-center justify-center transition-colors border border-slate-200 text-amber-600 group-hover:bg-amber-50">→</span>
         </div>
     </div>
 </a>

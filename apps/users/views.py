@@ -127,4 +127,15 @@ def user_logout(request):
 
 @login_required
 def profile(request):
-    return render(request, 'users/profile.html', {})
+    """
+    Handles rendering user profile metadata and saving incoming 
+    profile picture files instantly upon user mutation.
+    """
+    if request.method == 'POST':
+        if 'profile_picture' in request.FILES:
+            request.user.profile_picture = request.FILES['profile_picture']
+            request.user.save()
+            messages.success(request, 'Your profile avatar has been successfully updated!')
+            return redirect('users:profile')
+            
+    return render(request, 'users/profile.html')

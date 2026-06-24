@@ -19,12 +19,8 @@ def wishlist_detail(request):
     """
     wishlist, created = Wishlist.objects.get_or_create(user=request.user)
     
-    # Optimize query rendering: Pre-fetch items and related products/images in 1 single pass
-    wishlist_items = (
-        wishlist.items.select_related('product')
-        .prefetch_related('product__images')
-        .all()
-    )
+    # Updated: Removed .prefetch_related('product__images') which caused the AttributeError
+    wishlist_items = wishlist.items.select_related('product').all()
     
     context = {
         'wishlist': wishlist,
@@ -48,7 +44,6 @@ def add_to_wishlist(request, product_id):
     except IntegrityError:
         messages.info(request, f"{product.name} is already in your wishlist.")
     except ValidationError as e:
-        # Handles your model's custom defensive rules (e.g. self-vendor check) safely
         messages.warning(request, e.message if hasattr(e, 'message') else str(e))
     except Exception as e:
         messages.error(request, f"An error occurred while adding to wishlist: {e}")
@@ -84,6 +79,7 @@ def move_to_cart(request, item_id):
         id=item_id, 
         wishlist__user=request.user
     )
+    
     product = wishlist_item.product
 
     # Check inventory and active listing visibility parameters

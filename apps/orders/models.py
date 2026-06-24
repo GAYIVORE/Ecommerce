@@ -158,6 +158,6 @@ class OrderItem(models.Model):
 
     @property
     def get_item_total(self):
-        price = self.price or 0
+        price = self.product_price or 0
         quantity = self.quantity or 0
         return price * quantity

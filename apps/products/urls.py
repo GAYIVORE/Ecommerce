@@ -24,7 +24,9 @@ urlpatterns = [
     # -------------------------------------------------------------------------
     # Core Vendor Dashboard landing engine
     path('dashboard/', views.VendorDashboardView.as_view(), name='vendor_dashboard'),
-    
+    path('sub-order/<int:sub_order_id>/ship/', views.update_order_status, name='update_order_status'),
+
+    path('dashboard/inventory/', views.VendorInventoryBaseView.as_view(), name='vendor_inventory_base'),
     # Inventory Lifecycle Management Actions
     path('dashboard/products/create/', views.VendorProductCreateView.as_view(), name='vendor_product_create'),
     path('dashboard/products/<slug:slug>/update/', views.VendorProductUpdateView.as_view(), name='vendor_product_update'),

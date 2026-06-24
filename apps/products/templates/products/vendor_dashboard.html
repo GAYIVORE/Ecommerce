@@ -17,132 +17,235 @@
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-5 border-b border-slate-200">
         <div>
             <h1 class="text-2xl font-black text-slate-900 tracking-tight">{{ shop.name }} Control Panel</h1>
-            <p class="text-sm text-slate-500 mt-1">Manage store inventory entries, pricing tables, and lifecycle availability states.</p>
+            <p class="text-sm text-slate-500 mt-1">Manage store inventory entries, monitoring key parameters, and listing lifecycles.</p>
         </div>
-        <a href="{% url 'products:vendor_product_create' %}" class="w-full sm:w-auto text-center inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-orange-600 hover:bg-orange-500 rounded-xl transition-all shadow-sm">
+        <a href="{% url 'products:vendor_product_create' %}" class="w-full sm:w-auto text-center inline-flex items-center justify-center px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-orange-600 hover:bg-orange-500 rounded-xl transition-all shadow-sm">
             + Add New Product
         </a>
     </div>
 
-    {% if products %}
-        <div class="hidden md:block bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
-            <table class="w-full text-left border-collapse m-0">
-                <thead>
-                    <tr class="bg-slate-50 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-200">
-                        <th class="p-4">Item Details</th>
-                        <th class="p-4">Category</th>
-                        <th class="p-4">Price</th>
-                        <th class="p-4">Stock</th>
-                        <th class="p-4">Status</th>
-                        <th class="p-4 text-right">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 text-sm text-slate-600">
-                    {% for product in products %}
-                        <tr>
-                            <td class="p-4 font-bold text-slate-900">{{ product.name }}</td>
-                            <td class="p-4">{{ product.category.name|default:"General" }}</td>
-                            <td class="p-4 font-semibold text-slate-800">GHS {{ product.price|floatformat:2 }}</td>
-                            <td class="p-4 font-mono">{{ product.stock }}</td>
-                            <td class="p-4">
-                                {% if product.available and product.stock > 0 %}
-                                    <span class="px-2 py-0.5 text-xs font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Live</span>
-                                {% else %}
-                                    <span class="px-2 py-0.5 text-xs font-bold rounded-full bg-slate-100 text-slate-500 border border-slate-200">Hidden/Out</span>
-                                {% endif %}
-                            </td>
-                            <td class="p-4 text-right space-x-4">
-                                <a href="{% url 'products:vendor_product_update' slug=product.slug %}" class="text-xs font-bold text-slate-600 hover:text-amber-600 transition-colors">Edit</a>
-                                <a href="{% url 'products:vendor_product_delete' slug=product.slug %}" class="text-xs font-bold text-rose-500 hover:text-rose-700 transition-colors">Remove</a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <!-- Stat Summary Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+        <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-xs">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Catalog Footprint</span>
+            <div class="flex items-baseline gap-2">
+                <span class="text-2xl font-black text-slate-900">{{ products|length }}</span>
+                <span class="text-xs font-medium text-slate-500">Tracked Records</span>
+            </div>
+        </div>
+        
+        <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-xs">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Pending Dispatches</span>
+            <div class="flex items-baseline gap-2">
+                <span class="text-2xl font-black text-orange-600">{{ vendor_orders|length|default:"0" }}</span>
+                <span class="text-xs font-medium text-slate-500">Awaiting Action</span>
+            </div>
         </div>
 
-        <div class="block md:hidden space-y-3">
-            {% for product in products %}
-                <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-xs flex flex-col justify-between gap-3">
-                    <div class="flex items-start justify-between gap-2">
-                        <div>
-                            <h4 class="font-bold text-slate-900 text-sm">{{ product.name }}</h4>
-                            <span class="text-[11px] px-2 py-0.5 bg-slate-100 rounded-md text-slate-500 mt-1 inline-block">
-                                {{ product.category.name|default:"General" }}
-                            </span>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-semibold text-slate-900 text-sm">GHS {{ product.price|floatformat:2 }}</p>
-                            <p class="text-[11px] font-mono text-slate-400 mt-0.5">Qty: {{ product.stock }}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
-                        {% if product.available and product.stock > 0 %}
-                            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">Live</span>
-                        {% else %}
-                            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-slate-100 text-slate-500 border border-slate-100">Hidden/Out</span>
-                        {% endif %}
-                        
-                        <div class="flex items-center gap-4">
-                            <a href="{% url 'products:vendor_product_update' slug=product.slug %}" class="text-xs font-bold text-slate-600">Edit</a>
-                            <a href="{% url 'products:vendor_product_delete' slug=product.slug %}" class="text-xs font-bold text-rose-500">Remove</a>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
+        <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-xs sm:col-span-2 lg:col-span-1">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Operational Alerts</span>
+            <div class="flex items-baseline gap-2">
+                <span class="text-2xl font-black text-rose-600">
+                    {{ low_stock_count|default:"0" }}
+                </span>
+                <span class="text-xs font-medium text-slate-500">Items Low on Stock</span>
+            </div>
         </div>
+    </div>
 
-        {% if is_paginated %}
-            <div class="mt-8 flex items-center justify-between border-t border-slate-200 pt-4 px-1">
-                <div class="flex flex-1 justify-between sm:hidden">
-                    {% if page_obj.has_previous %}
-                        <a href="?page={{ page_obj.previous_page_number }}" class="inline-flex items-center px-4 py-2 border border-slate-300 text-xs font-bold rounded-xl text-slate-700 bg-white hover:bg-slate-50">Previous</a>
-                    {% else %}
-                        <span class="opacity-40 inline-flex items-center px-4 py-2 border border-slate-200 text-xs font-bold rounded-xl text-slate-400 bg-slate-50 cursor-not-allowed">Previous</span>
-                    {% endif %}
-                    
-                    {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}" class="inline-flex items-center px-4 py-2 border border-slate-300 text-xs font-bold rounded-xl text-slate-700 bg-white hover:bg-slate-50">Next</a>
-                    {% else %}
-                        <span class="opacity-40 inline-flex items-center px-4 py-2 border border-slate-200 text-xs font-bold rounded-xl text-slate-400 bg-slate-50 cursor-not-allowed">Next</span>
-                    {% endif %}
-                </div>
-                <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                    <div>
-                        <p class="text-xs text-slate-500">
-                            Showing page <span class="font-bold text-slate-900">{{ page_obj.number }}</span> of <span class="font-bold text-slate-900">{{ paginator.num_pages }}</span>
-                        </p>
-                    </div>
-                    <div>
-                        <nav class="inline-flex -space-x-px rounded-md gap-1" aria-label="Pagination">
-                            {% if page_obj.has_previous %}
-                                <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 text-slate-600 bg-white hover:bg-slate-50">← Previous</a>
-                            {% endif %}
-                            
-                            {% for num in paginator.page_range %}
-                                {% if page_obj.number == num %}
-                                    <span class="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-900 text-white">{{ num }}</span>
-                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                                    <a href="?page={{ num }}" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 text-slate-600 bg-white hover:bg-slate-50">{{ num }}</a>
-                                {% endif %}
+    <!-- Section: Recent Orders Awaiting Dispatch -->
+    <div class="mb-10">
+        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-900 mb-4 flex items-center gap-2">
+            <span class="h-2 w-2 rounded-full bg-orange-500 {% if vendor_orders %}animate-pulse{% endif %}"></span>
+            Recent Orders Awaiting Dispatch
+        </h3>
+        
+        {% if vendor_orders %}
+            <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse m-0 min-w-[900px]">
+                        <thead>
+                            <tr class="bg-slate-50 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-200">
+                                <th class="p-4">SubOrder / Items Purchased</th>
+                                <th class="p-4">Customer Delivery Profile</th>
+                                <th class="p-4">Payment Verification</th>
+                                <th class="p-4">Fulfillment Status</th>
+                                <th class="p-4 text-right">Fulfillment Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-sm text-slate-600">
+                            {% for sub_order in vendor_orders %}
+                                <tr class="hover:bg-slate-50/40 transition-colors align-middle">
+                                    <td class="p-4">
+                                        <span class="font-mono text-[11px] text-slate-400 block mb-1">SubRef #{{ sub_order.id }}</span>
+                                        <div class="space-y-1 mb-1">
+                                            {% for item in sub_order.items.all %}
+                                                <div class="font-bold text-slate-900 text-xs sm:text-sm">
+                                                    {{ item.product_name }} <span class="text-slate-400 font-mono font-normal">×{{ item.quantity }}</span>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                        <span class="text-[10px] text-slate-400 block font-medium">Placed: {{ sub_order.parent_order.created_at|date:"M d, Y - H:i" }}</span>
+                                    </td>
+                                    
+                                    <td class="p-4">
+                                        <div class="flex flex-col items-start gap-1">
+                                            <span class="font-bold text-slate-900 text-sm">
+                                                {{ sub_order.parent_order.shipping_first_name }} {{ sub_order.parent_order.shipping_last_name }}
+                                            </span>
+                                            <button type="button" onclick="openModal('order-modal-{{ sub_order.id }}')" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors cursor-pointer border border-orange-200/40">
+                                                🔍 View Dispatch Details
+                                            </button>
+                                        </div>
+
+                                        <!-- HTML5 Dialog Component for Order Details -->
+                                        <dialog id="order-modal-{{ sub_order.id }}" class="modal-element p-0 rounded-2xl border border-slate-200 shadow-2xl backdrop:bg-slate-900/60 backdrop:backdrop-blur-xs w-full max-w-md overflow-hidden bg-white">
+                                            <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                                                <div>
+                                                    <h4 class="font-black text-slate-900 text-base">Dispatch Address File</h4>
+                                                    <p class="text-[11px] text-slate-400 font-mono mt-0.5">SubOrder Reference: #{{ sub_order.id }}</p>
+                                                </div>
+                                                <button type="button" onclick="closeModal('order-modal-{{ sub_order.id }}')" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1 cursor-pointer">✕</button>
+                                            </div>
+                                            
+                                            <div class="p-5 space-y-4 text-xs">
+                                                <div>
+                                                    <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block">Customer Name</span>
+                                                    <span class="text-sm font-bold text-slate-900">
+                                                        {{ sub_order.parent_order.shipping_first_name }} {{ sub_order.parent_order.shipping_last_name }}
+                                                    </span>
+                                                    {% if sub_order.parent_order.user %}
+                                                        <span class="text-[10px] text-slate-400 font-mono block">Account User ID: @{{ sub_order.parent_order.user.username }}</span>
+                                                    {% endif %}
+                                                </div>
+
+                                                <div class="grid grid-cols-2 gap-4 pt-3 border-t border-slate-100">
+                                                    <div>
+                                                        <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block">Mobile Phone Contact</span>
+                                                        <a href="tel:{{ sub_order.parent_order.shipping_phone_number }}" class="font-bold text-orange-600 hover:underline text-sm block mt-0.5">
+                                                            {{ sub_order.parent_order.shipping_phone_number }}
+                                                        </a>
+                                                    </div>
+                                                    <div>
+                                                        <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block">Email Address</span>
+                                                            <span class="font-medium text-slate-700 block mt-0.5 break-all">
+                                                                {% if sub_order.parent_order.shipping_email %}
+                                                                    {{ sub_order.parent_order.shipping_email }}
+                                                                {% elif sub_order.parent_order.user %}
+                                                                    {{ sub_order.parent_order.user.email }}
+                                                                {% else %}
+                                                                    <span class="text-slate-400 italic">No email provided</span>
+                                                                {% endif %}
+                                                            </span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="pt-3 border-t border-slate-100">
+                                                    <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block mb-1">Physical Delivery Destination</span>
+                                                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                                                        <p class="text-slate-800 font-semibold leading-relaxed">
+                                                            <span class="text-slate-900 block font-bold mb-0.5">{{ sub_order.parent_order.shipping_street_address }}</span>
+                                                            {{ sub_order.parent_order.shipping_city }}, {{ sub_order.parent_order.shipping_region }} Region
+                                                        </p>
+                                                        {% if sub_order.parent_order.shipping_digital_address %}
+                                                            <span class="inline-flex items-center gap-1 mt-2 font-mono text-[10px] font-black bg-slate-900 text-white px-2 py-0.5 rounded shadow-xs">
+                                                                🇬🇭 {{ sub_order.parent_order.shipping_digital_address }}
+                                                            </span>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+
+                                                {% if sub_order.parent_order.delivery_notes %}
+                                                    <div class="pt-3 border-t border-slate-100">
+                                                        <span class="text-[9px] font-black uppercase tracking-wider text-amber-700 block">Special Delivery Notes</span>
+                                                        <p class="text-amber-900 font-medium italic mt-1 bg-amber-50 border border-amber-200/60 p-2.5 rounded-xl leading-normal">
+                                                            "{{ sub_order.parent_order.delivery_notes }}"
+                                                        </p>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+
+                                            <div class="p-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+                                                <button type="button" onclick="closeModal('order-modal-{{ sub_order.id }}')" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-xl transition-colors cursor-pointer">
+                                                    Close File
+                                                </button>
+                                            </div>
+                                        </dialog>
+                                    </td>
+                                    
+                                    <td class="p-4">
+                                        <div class="font-bold text-slate-900 text-base mb-1">GHS {{ sub_order.sub_total|floatformat:2 }}</div>
+                                        {% if sub_order.parent_order.payment_method == 'cod' %}
+                                            <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-bold rounded bg-amber-100 text-amber-800 border border-amber-200">💵 COD</span>
+                                        {% else %}
+                                            <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-100 text-emerald-800 border border-emerald-200">💳 Paid</span>
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <td class="p-4">
+                                        <span class="px-2 py-0.5 text-[10px] font-bold rounded-md uppercase border block text-center {% if sub_order.status == 'Pending' %}bg-amber-50 text-amber-700 border-amber-200{% elif sub_order.status == 'Processing' %}bg-blue-50 text-blue-700 border-blue-200{% else %}bg-emerald-50 text-emerald-700 border-emerald-200{% endif %}">
+                                            {{ sub_order.status }}
+                                        </span>
+                                    </td>
+                                    
+                                    <td class="p-4 text-right">
+                                        <form action="{% url 'products:update_order_status' sub_order.id %}" method="post" class="inline-block m-0">
+                                            {% csrf_token %}
+                                            <button type="submit" class="px-3 py-1.5 bg-slate-900 text-white text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-orange-600 transition-colors cursor-pointer whitespace-nowrap shadow-xs">
+                                                Mark Shipped
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
                             {% endfor %}
-
-                            {% if page_obj.has_next %}
-                                <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 text-slate-600 bg-white hover:bg-slate-50">Next →</a>
-                            {% endif %}
-                        </nav>
-                    </div>
+                        </tbody>
+                    </table>
                 </div>
             </div>
+        {% else %}
+            <div class="text-center py-8 border border-dashed border-slate-200 bg-slate-50/50 rounded-2xl text-xs font-semibold text-slate-400">
+                No active processing requests pending dispatch.
+            </div>
         {% endif %}
+    </div>
 
-    {% else %}
-        <div class="text-center py-16 border-2 border-dashed border-slate-200 bg-white rounded-2xl max-w-xl mx-auto px-4">
-            <p class="font-bold text-slate-700 mb-1">Your store is completely empty.</p>
-            <p class="text-xs text-slate-400 mb-6">Create your initial inventory tracking entry to open your marketplace profile window.</p>
-            <a href="{% url 'products:vendor_product_create' %}" class="px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-colors">Launch First Product</a>
-        </div>
-    {% endif %}
+    <!-- Section: Inventory Tracking Base -->
+    <!-- Replace the old Inventory Tracking Base section on the main dashboard with this clean redirection block -->
+<div class="mt-6 bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div>
+        <h3 class="text-base font-black text-slate-900 tracking-tight">Inventory Tracking Base</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Manage stock health records, item metadata, categories, and direct pricing metrics in an isolated portal.</p>
+    </div>
+    <a href="{% url 'products:vendor_inventory_base' %}" class="w-full sm:w-auto text-center inline-flex items-center justify-center px-4 py-2 text-xs font-bold uppercase bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl transition-colors tracking-wider border border-slate-300/30">
+        Open Tracking Portal ↗
+    </a>
 </div>
+</div>
+
+<!-- Refactored, Unified Vanilla Script Handlers -->
+<script>
+    function openModal(id) {
+        const dialog = document.getElementById(id);
+        if (dialog) {
+            dialog.showModal();
+            document.body.classList.add('overflow-hidden');
+        }
+    }
+
+    function closeModal(id) {
+        const dialog = document.getElementById(id);
+        if (dialog) {
+            dialog.close();
+            document.body.classList.remove('overflow-hidden');
+        }
+    }
+
+    // Dynamic bounding overlay click detector for closing all matching dialog layers
+    window.addEventListener('click', function(e) {
+        if (e.target.classList.contains('modal-element')) {
+            e.target.close();
+            document.body.classList.remove('overflow-hidden');
+        }
+    });
+</script>
 {% endblock %}
