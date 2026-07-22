@@ -1,0 +1,47 @@
+{% extends "earn/base_earn.html" %}
+
+{% block title %}Quick Cash{% endblock %}
+
+{% block earn_content %}
+<div class="flex items-center justify-between mb-6 gap-3 flex-wrap">
+    <div>
+        <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight text-white">Quick Cash Offers</h2>
+        <p class="text-sm text-zinc-400">Earn money instantly with no experience required</p>
+    </div>
+    <a href="{% url 'earn:add_offer' %}" class="px-5 py-2.5 text-sm font-medium border border-zinc-700 hover:bg-zinc-900 rounded-3xl flex items-center gap-x-2">
+        <i class="fa-solid fa-plus"></i> <span>Add My Link</span>
+    </a>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+{% for offer in offers %}
+    <div class="earn-card p-5 flex flex-col">
+        <div class="font-semibold text-white">{{ offer.title }}</div>
+        <div class="text-xs text-zinc-400 mt-1 uppercase tracking-wide">{{ offer.get_offer_type_display }}</div>
+        <p class="text-sm text-zinc-300 mt-2 flex-1">{{ offer.description }}</p>
+        {% if offer.earning_range %}<div class="text-emerald-400 text-sm font-semibold mt-2">{{ offer.earning_range }}</div>{% endif %}
+        <div class="flex items-center justify-between mt-4 pt-4 border-t border-zinc-700">
+            <span class="text-xs text-zinc-500">{% if offer.submitted_by %}by {{ offer.submitted_by.username }}{% else %}Official Partner{% endif %}</span>
+            <div class="flex gap-x-2">
+                {% if offer.link %}<a href="{{ offer.link }}" target="_blank" class="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-emerald-950 rounded-2xl text-xs font-semibold">Open</a>{% endif %}
+                {% if offer.submitted_by_id == request.user.id %}
+                <form method="post" action="{% url 'earn:delete_offer' offer.pk %}">{% csrf_token %}<button class="px-3 py-1.5 border border-zinc-700 hover:bg-zinc-800 rounded-2xl text-xs">Remove</button></form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% empty %}
+    <p class="col-span-full text-center text-zinc-400 py-10">No offers yet — be the first to add one.</p>
+{% endfor %}
+</div>
+
+<div class="mt-8 earn-card p-6">
+    <div class="flex flex-col lg:flex-row items-center gap-x-6 gap-y-4">
+        <div class="flex-1 text-center lg:text-left">
+            <div class="font-semibold text-white">Partner with Earn</div>
+            <div class="text-sm text-zinc-400">Add your own affiliate links, digital products, or local gigs and let other users discover them.</div>
+        </div>
+        <a href="{% url 'earn:add_offer' %}" class="earn-btn px-6 py-3 font-semibold rounded-3xl text-sm shrink-0">Add Affiliate Link</a>
+    </div>
+</div>
+{% endblock %}

@@ -35,6 +35,7 @@ urlpatterns = [
     path('reviews/', include('apps.reviews.urls', namespace='reviews')),
     path('wishlist/', include('apps.wishlist.urls', namespace='wishlist')),
     path('promotions/', include('apps.promotions.urls', namespace='promotions')),# ADDED: Homepage for the core app
+    path('earn/', include('apps.earn.urls', namespace='earn')),
     path('accounts/', include('allauth.urls')),
     # Add other app URLs here as you create them
     # path('products/', include('apps.products.urls', namespace='products')),

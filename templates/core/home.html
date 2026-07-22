@@ -54,6 +54,28 @@
         </div>
     </div>
 
+    {% if user.is_authenticated %}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+        <div class="rounded-3xl p-6 sm:p-8 flex flex-col lg:flex-row items-center justify-between gap-5"
+             style="background-color: #09090b !important;">
+            <div class="flex items-center gap-x-4 text-center lg:text-left flex-col lg:flex-row">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style="background-color: #00c853 !important;">
+                    <i class="fa-solid fa-coins text-lg" style="color:#052e16 !important;"></i>
+                </div>
+                <div>
+                    <div class="font-black text-xl sm:text-2xl tracking-tight" style="color:#ffffff !important;">Earn money on E SHOP</div>
+                    <p class="text-sm" style="color:#a1a1aa !important;">Post local services, browse quick cash offers, and track every cedi you make — right from your account.</p>
+                </div>
+            </div>
+            <a href="{% url 'earn:dashboard' %}"
+               class="shrink-0 inline-flex items-center gap-x-2 px-6 py-3 rounded-3xl text-sm font-bold uppercase tracking-wider transition-all hover:opacity-90 active:scale-[0.98]"
+               style="background-color: #00c853 !important; color: #052e16 !important;">
+                Open Earn <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
         <div class="flex justify-between items-end mb-6">
             <div>

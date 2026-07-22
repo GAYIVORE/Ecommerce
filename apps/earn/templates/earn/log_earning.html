@@ -1,0 +1,22 @@
+{% extends "earn/base_earn.html" %}
+
+{% block title %}Log Earning{% endblock %}
+
+{% block earn_content %}
+<div class="earn-card p-8 max-w-lg mx-auto">
+    <div class="font-semibold text-2xl text-white mb-1">Log an Earning</div>
+    <div class="text-xs text-zinc-400 mb-6">Record income from a Quick Cash gig, referral, or anything not tracked automatically by Earn.</div>
+
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+        {% for field in form %}
+        <div>
+            <label class="text-xs font-medium text-zinc-400 block mb-1.5 uppercase">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<p class="text-red-400 text-xs mt-1">{{ field.errors|striptags }}</p>{% endif %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="earn-btn w-full py-4 text-lg font-semibold rounded-3xl">Log Earning</button>
+    </form>
+</div>
+{% endblock %}

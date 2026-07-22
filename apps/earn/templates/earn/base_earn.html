@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+<style>
+    .earn-wrap { background:#09090b; border-radius: 1.75rem; padding: 1.75rem; color:#e4e4e7; }
+    .earn-card { background:#18181b; border:1px solid #3f3f46; border-radius:1.5rem; }
+    .earn-pill { transition: all .15s ease; white-space: nowrap; }
+    .earn-btn {
+        background: linear-gradient(135deg, #00c853, #00e676);
+        color:#052e16; box-shadow: 0 10px 15px -3px rgba(0,200,83,0.3);
+        transition: transform .15s ease;
+    }
+    .earn-btn:hover { transform: translateY(-2px); }
+    .earn-wrap input, .earn-wrap select, .earn-wrap textarea { color:#f4f4f5; }
+    .earn-wrap table { color: #e4e4e7; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="earn-wrap">
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
+        <div class="flex items-center gap-x-3">
+            <div class="w-11 h-11 bg-emerald-500 rounded-2xl flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-coins text-emerald-950 text-xl"></i>
+            </div>
+            <div>
+                <div class="font-bold text-2xl tracking-tight text-white">Earn</div>
+                <div class="text-emerald-500 text-[10px] font-bold tracking-widest uppercase">Powered by E Shop</div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-x-1 bg-zinc-900 border border-zinc-800 p-1 rounded-3xl flex-wrap">
+            <a href="{% url 'earn:dashboard' %}" class="earn-pill px-4 py-2 text-xs sm:text-sm font-semibold rounded-3xl {% if active_tab == 'dashboard' %}bg-emerald-500 text-emerald-950{% else %}text-zinc-300 hover:text-white{% endif %}">Overview</a>
+            <a href="{% url 'earn:marketplace' %}" class="earn-pill px-4 py-2 text-xs sm:text-sm font-semibold rounded-3xl {% if active_tab == 'marketplace' %}bg-emerald-500 text-emerald-950{% else %}text-zinc-300 hover:text-white{% endif %}">Marketplace</a>
+            <a href="{% url 'earn:quickcash' %}" class="earn-pill px-4 py-2 text-xs sm:text-sm font-semibold rounded-3xl {% if active_tab == 'quickcash' %}bg-emerald-500 text-emerald-950{% else %}text-zinc-300 hover:text-white{% endif %}">Quick Cash</a>
+            <a href="{% url 'earn:earnings' %}" class="earn-pill px-4 py-2 text-xs sm:text-sm font-semibold rounded-3xl {% if active_tab == 'earnings' %}bg-emerald-500 text-emerald-950{% else %}text-zinc-300 hover:text-white{% endif %}">Earnings</a>
+            <a href="{% url 'earn:my_bookings' %}" class="earn-pill px-4 py-2 text-xs sm:text-sm font-semibold rounded-3xl {% if active_tab == 'bookings' %}bg-emerald-500 text-emerald-950{% else %}text-zinc-300 hover:text-white{% endif %}">Bookings</a>
+        </div>
+
+        <div class="bg-zinc-900 border border-zinc-700 px-4 py-2.5 rounded-3xl text-sm flex items-center gap-x-2 self-start lg:self-auto">
+            <i class="fa-solid fa-wallet text-emerald-400"></i>
+            <span class="font-bold text-white">₵{{ nav_balance|floatformat:2 }}</span>
+        </div>
+    </div>
+
+    {% block earn_content %}{% endblock %}
+</div>
+{% endblock %}

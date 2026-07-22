@@ -7,10 +7,12 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://unpkg.com/htmx.org@2.0.0"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     {% load static %} {# Load the staticfiles tag library #}
     <link rel="stylesheet" href="{% static 'css/style.css' %}"> {# Link to our custom CSS file #}
+    {% block extra_head %}{% endblock %}
 </head>
 <body class="flex flex-col min-h-screen custom-bg">
  
@@ -43,6 +45,11 @@
             <a href="{% url 'core:home' %}" style="color: #000000 !important; background-color: #ECC940A1 !important; border: 2px solid #e2e8f0 !important;" class="text-xs font-bold uppercase tracking-wider px-2 py-2 rounded-full hover:bg-slate-200/80 transition-all active:scale-[0.98]">Home</a>
             <a href="{% url 'products:product_list' %}" style="color: #000000 !important; background-color: #ECC940A1 !important; border: 2px solid #e2e8f0 !important;" class="text-xs font-bold uppercase tracking-wider px-2 py-2 rounded-full hover:bg-slate-200/80 transition-all active:scale-[0.98]">Products</a>
             <a href="{% url 'cart:cart_detail' %}" style="color: #000000 !important; background-color: #ECC940A1 !important; border: 2px solid #e2e8f0 !important;" class="text-xs font-bold uppercase tracking-wider px-2 py-2 rounded-full hover:bg-slate-200/80 transition-all active:scale-[0.98]">Cart</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'earn:dashboard' %}" style="color: #ffffff !important; background-color: #00c853 !important; border: 2px solid #00c853 !important;" class="text-xs font-bold uppercase tracking-wider px-2 py-2 rounded-full hover:opacity-90 transition-all active:scale-[0.98] flex items-center gap-1">
+                    <i class="fa-solid fa-coins"></i> Earn
+                </a>
+            {% endif %}
 
             {% if user.is_authenticated %}
                 <a href="{% url 'wishlist:wishlist_detail' %}" 
@@ -121,5 +128,6 @@
         </div>
     </div>
 </footer>
+{% block extra_scripts %}{% endblock %}
 </body>
 </html>
