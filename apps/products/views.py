@@ -1,23 +1,56 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
-from django.db.models import Q
+from django.db.models import Q, Sum, Count
+from django.db.models.functions import TruncDate
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, JsonResponse, HttpResponse
+from django.utils import timezone
+import csv
+import datetime
+import json
 
 from .models import Product, Category, Shop
 from apps.reviews.forms import ReviewForm
 from apps.reviews.models import Review
 # Import SubOrder to trace vendor-specific order partitions
-from apps.orders.models import SubOrder  
+from apps.orders.models import SubOrder
 
 
 # =============================================================================
 # PUBLIC MARKETPLACE VIEWS (CUSTOMER FACING)
 # =============================================================================
+
+def search_suggest(request):
+    """
+    Lightweight JSON endpoint powering the search-as-you-type dropdown in the
+    nav bar and product list. Deliberately small and fast: top 6 name matches
+    only, no full-text ranking — this is a typeahead, not a search results page.
+    """
+    query = request.GET.get('q', '').strip()
+    if len(query) < 2:
+        return JsonResponse({'results': []})
+
+    products = Product.objects.select_related('shop').filter(
+        Q(name__icontains=query),
+        available=True, is_deleted=False, shop__status='ACTIVE',
+    ).order_by('-created_at')[:6]
+
+    results = [
+        {
+            'name': p.name,
+            'url': p.get_absolute_url(),
+            'price': f"{p.price:.2f}",
+            'shop': p.shop.name if p.shop else '',
+            'image': p.image.url if p.image else '',
+        }
+        for p in products
+    ]
+    return JsonResponse({'results': results})
+
 
 class GlobalProductListView(ListView):
     """
@@ -103,6 +136,19 @@ class ProductDetailView(DetailView):
 
         context['review_form'] = review_form
         context['user_review'] = user_review
+
+        related_products = Product.objects.select_related('shop', 'category').filter(
+            category=product.category, available=True, is_deleted=False, stock__gt=0
+        ).exclude(pk=product.pk)[:8]
+
+        if related_products.count() < 4:
+            # Not enough in the same category — top up with more from the same shop
+            more = Product.objects.select_related('shop', 'category').filter(
+                shop=product.shop, available=True, is_deleted=False, stock__gt=0
+            ).exclude(pk=product.pk).exclude(pk__in=[p.pk for p in related_products])[:8]
+            related_products = list(related_products) + list(more)
+
+        context['related_products'] = related_products[:4]
         return context
 
 
@@ -176,8 +222,11 @@ class VendorDashboardView(VendorRequiredMixin, ListView):
         
         # 📊 Injected Dashboard Metrics to satisfy your dashboard template requirements
         if shop:
-            # 1. Pull only SubOrders assigned explicitly to this shop
-            context['vendor_orders'] = SubOrder.objects.filter(shop=shop).order_by('-created_at')
+            # 1. Only orders actually awaiting vendor action, most recent first, capped —
+            # the full history lives in the CSV export, not this table.
+            context['vendor_orders'] = SubOrder.objects.filter(
+                shop=shop, status__in=['Pending', 'Processing']
+            ).select_related('parent_order').order_by('-created_at')[:15]
             
             # 2. Derive low stock counts dynamically (e.g., threshold <= 5 units)
             context['low_stock_count'] = Product.objects.filter(
@@ -185,11 +234,43 @@ class VendorDashboardView(VendorRequiredMixin, ListView):
                 is_deleted=False, 
                 stock__lte=5
             ).count()
+
+            # 3. Sales analytics — last 30 days revenue trend + lifetime/monthly totals
+            cutoff = timezone.now() - datetime.timedelta(days=30)
+            daily = (
+                SubOrder.objects.filter(shop=shop, created_at__gte=cutoff)
+                .annotate(day=TruncDate('created_at'))
+                .values('day')
+                .annotate(total=Sum('sub_total'))
+                .order_by('day')
+            )
+            daily_map = {row['day']: float(row['total'] or 0) for row in daily}
+            labels, values = [], []
+            for i in range(29, -1, -1):
+                day = (timezone.now() - datetime.timedelta(days=i)).date()
+                labels.append(day.strftime('%b %d'))
+                values.append(round(daily_map.get(day, 0), 2))
+            context['sales_chart_labels'] = json.dumps(labels)
+            context['sales_chart_values'] = json.dumps(values)
+
+            all_orders = SubOrder.objects.filter(shop=shop)
+            context['lifetime_revenue'] = all_orders.aggregate(t=Sum('sub_total'))['t'] or 0
+            context['month_revenue'] = all_orders.filter(
+                created_at__gte=timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            ).aggregate(t=Sum('sub_total'))['t'] or 0
+            context['month_order_count'] = all_orders.filter(
+                created_at__gte=timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            ).count()
         else:
             context['vendor_orders'] = SubOrder.objects.none()
             context['low_stock_count'] = 0
+            context['sales_chart_labels'] = json.dumps([])
+            context['sales_chart_values'] = json.dumps([])
+            context['lifetime_revenue'] = 0
+            context['month_revenue'] = 0
+            context['month_order_count'] = 0
             
-        return context    
+        return context
 
 class VendorProductCreateView(VendorRequiredMixin, CreateView):
     """
@@ -298,6 +379,103 @@ class VendorInventoryBaseView(VendorRequiredMixin, ListView):
 
 @login_required
 @require_POST
+@login_required
+@require_POST
+def bulk_update_order_status(request):
+    """
+    Lets a vendor mark several pending/processing sub-orders as Shipped in one
+    action from the dashboard table, instead of one submit per row.
+    """
+    if not hasattr(request.user, 'shop'):
+        messages.error(request, "Unauthorized vendor management profile context.")
+        return redirect('core:home')
+
+    shop = request.user.shop
+    sub_order_ids = request.POST.getlist('sub_order_ids')
+
+    if not sub_order_ids:
+        messages.warning(request, "No orders were selected.")
+        return redirect('products:vendor_dashboard')
+
+    # Scope strictly to this vendor's own sub-orders — a vendor can never touch
+    # another shop's orders even if IDs were tampered with in the request.
+    updated = SubOrder.objects.filter(
+        id__in=sub_order_ids, shop=shop, status__in=['Pending', 'Processing']
+    ).update(status='Shipped')
+
+    if updated:
+        messages.success(request, f"{updated} order{'s' if updated != 1 else ''} marked as shipped.")
+    else:
+        messages.warning(request, "Selected orders were already processed or don't belong to your shop.")
+
+    return redirect('products:vendor_dashboard')
+
+
+@login_required
+def export_orders_csv(request):
+    """CSV export of every order this vendor's shop has ever received."""
+    if not hasattr(request.user, 'shop'):
+        raise Http404()
+
+    shop = request.user.shop
+    sub_orders = SubOrder.objects.filter(shop=shop).select_related('parent_order').order_by('-created_at')
+
+    response = HttpResponse(content_type='text/csv')
+    filename = f"{shop.slug}-orders-{timezone.now().strftime('%Y-%m-%d')}.csv"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+    writer = csv.writer(response)
+    writer.writerow(['SubOrder ID', 'Order Date', 'Customer', 'Items', 'Subtotal (GHS)', 'Status', 'Payment Method', 'Paid'])
+
+    for sub_order in sub_orders:
+        order = sub_order.parent_order
+        item_summary = "; ".join(
+            f"{item.product_name} x{item.quantity}" for item in sub_order.items.all()
+        )
+        writer.writerow([
+            sub_order.id,
+            sub_order.created_at.strftime('%Y-%m-%d %H:%M'),
+            order.shipping_full_name,
+            item_summary,
+            sub_order.sub_total,
+            sub_order.status,
+            order.payment_method,
+            'Yes' if order.payment_status else 'No',
+        ])
+
+    return response
+
+
+@login_required
+def export_products_csv(request):
+    """CSV export of this vendor's full product catalog, for offline inventory review."""
+    if not hasattr(request.user, 'shop'):
+        raise Http404()
+
+    shop = request.user.shop
+    products = Product.objects.filter(shop=shop, is_deleted=False).select_related('category').order_by('name')
+
+    response = HttpResponse(content_type='text/csv')
+    filename = f"{shop.slug}-products-{timezone.now().strftime('%Y-%m-%d')}.csv"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Product ID', 'Name', 'Category', 'Price (GHS)', 'Stock', 'Available', 'Created'])
+
+    for product in products:
+        writer.writerow([
+            product.id,
+            product.name,
+            product.category.name if product.category else '',
+            product.price,
+            product.stock,
+            'Yes' if product.available else 'No',
+            product.created_at.strftime('%Y-%m-%d'),
+        ])
+
+    return response
+
+
 def update_order_status(request, sub_order_id):
     """
     Fulfillment Engine: Shifts specific vendor SubOrder slices to 'Shipped' status.

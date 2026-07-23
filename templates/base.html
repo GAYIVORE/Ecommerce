@@ -34,10 +34,10 @@
                 <span class="font-display font-bold text-lg tracking-tight text-white hidden sm:inline">SHOP</span>
             </a>
 
-            <div class="hidden md:block flex-grow max-w-xl mx-4">
-                <form action="{% url 'products:product_list' %}" method="get" class="w-full m-0">
+            <div class="hidden md:block flex-grow max-w-xl mx-4 relative" data-search-wrap>
+                <form action="{% url 'products:product_list' %}" method="get" class="w-full m-0" autocomplete="off">
                     <div class="relative w-full">
-                        <input type="search" name="q" placeholder="Search products, shops, categories…"
+                        <input type="search" name="q" placeholder="Search products, shops, categories…" data-search-input
                                class="field !bg-white/95 !border-transparent !py-2.5 pl-11 focus:!ring-marigold-500/30 focus:!border-marigold-500"
                                value="{{ request.GET.q|default:'' }}">
                         <button type="submit" aria-label="Search" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-900/40 hover:text-brand-500 transition-colors bg-transparent border-none p-0 cursor-pointer">
@@ -47,7 +47,9 @@
                         </button>
                     </div>
                 </form>
+                <div data-search-results class="hidden absolute left-0 right-0 top-full mt-2 bg-white border border-line rounded-xl shadow-lift overflow-hidden z-50"></div>
             </div>
+
 
             <div class="hidden md:flex items-center gap-6 shrink-0">
                 <a href="{% url 'core:home' %}" class="nav-link">Home</a>
@@ -111,14 +113,17 @@
             </button>
         </div>
 
-        <form action="{% url 'products:product_list' %}" method="get" class="md:hidden w-full mt-3 m-0">
-            <div class="relative w-full">
-                <input type="search" name="q" placeholder="Search products…" class="field !bg-white/95 !border-transparent pl-11" value="{{ request.GET.q|default:'' }}">
-                <button type="submit" aria-label="Search" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-900/40 bg-transparent border-none p-0 cursor-pointer">
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path></svg>
-                </button>
-            </div>
-        </form>
+        <div class="md:hidden w-full mt-3 relative" data-search-wrap>
+            <form action="{% url 'products:product_list' %}" method="get" class="w-full m-0" autocomplete="off">
+                <div class="relative w-full">
+                    <input type="search" name="q" placeholder="Search products…" data-search-input class="field !bg-white/95 !border-transparent pl-11" value="{{ request.GET.q|default:'' }}">
+                    <button type="submit" aria-label="Search" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-900/40 bg-transparent border-none p-0 cursor-pointer">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path></svg>
+                    </button>
+                </div>
+            </form>
+            <div data-search-results class="hidden absolute left-0 right-0 top-full mt-2 bg-white border border-line rounded-xl shadow-lift overflow-hidden z-50"></div>
+        </div>
     </nav>
 
     <div id="mobile-menu" class="md:hidden hidden border-t border-white/10 bg-ink-800">
@@ -208,6 +213,79 @@
             var isHidden = menu.classList.contains('hidden');
             menu.classList.toggle('hidden');
             toggle.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+        });
+    })();
+
+    (function () {
+        var SUGGEST_URL = "{% url 'products:search_suggest' %}";
+        var wraps = document.querySelectorAll('[data-search-wrap]');
+
+        wraps.forEach(function (wrap) {
+            var input = wrap.querySelector('[data-search-input]');
+            var results = wrap.querySelector('[data-search-results]');
+            if (!input || !results) return;
+
+            var debounceTimer = null;
+            var currentQuery = '';
+
+            function hide() {
+                results.classList.add('hidden');
+                results.innerHTML = '';
+            }
+
+            function render(items, query) {
+                if (!items.length) { hide(); return; }
+
+                results.innerHTML = items.map(function (item) {
+                    var img = item.image
+                        ? '<img src="' + item.image + '" alt="" class="w-10 h-10 rounded-lg object-cover border border-line shrink-0">'
+                        : '<div class="w-10 h-10 rounded-lg bg-paper border border-line shrink-0"></div>';
+                    return (
+                        '<a href="' + item.url + '" class="flex items-center gap-3 px-4 py-2.5 hover:bg-paper transition-colors border-b border-line last:border-0">' +
+                            img +
+                            '<div class="min-w-0 flex-1">' +
+                                '<div class="text-sm font-bold text-ink-900 truncate">' + item.name + '</div>' +
+                                '<div class="text-[11px] text-ink-900/40 truncate">' + (item.shop || '') + '</div>' +
+                            '</div>' +
+                            '<div class="text-xs font-bold text-ink-900 shrink-0">GHS ' + item.price + '</div>' +
+                        '</a>'
+                    );
+                }).join('') + (
+                    '<a href="{% url "products:product_list" %}?q=' + encodeURIComponent(query) + '" class="block px-4 py-2.5 text-center text-xs font-bold uppercase tracking-wider text-brand-500 hover:bg-paper transition-colors bg-paper/50">' +
+                        'See all results for &ldquo;' + query + '&rdquo;' +
+                    '</a>'
+                );
+                results.classList.remove('hidden');
+            }
+
+            input.addEventListener('input', function () {
+                var query = input.value.trim();
+                currentQuery = query;
+                clearTimeout(debounceTimer);
+
+                if (query.length < 2) { hide(); return; }
+
+                debounceTimer = setTimeout(function () {
+                    fetch(SUGGEST_URL + '?q=' + encodeURIComponent(query))
+                        .then(function (res) { return res.ok ? res.json() : { results: [] }; })
+                        .then(function (data) {
+                            if (currentQuery === query) { render(data.results || [], query); }
+                        })
+                        .catch(function () { hide(); });
+                }, 200);
+            });
+
+            input.addEventListener('focus', function () {
+                if (input.value.trim().length >= 2 && results.innerHTML) { results.classList.remove('hidden'); }
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!wrap.contains(e.target)) { hide(); }
+            });
+
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') { hide(); input.blur(); }
+            });
         });
     })();
 </script>

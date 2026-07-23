@@ -34,6 +34,31 @@ def set_checkout_step(request, step):
     request.session['checkout_step'] = step
 
 
+def restore_order_stock(order):
+    """
+    Reverses the stock reservation made at checkout time. Used when a Paystack
+    order fails, is abandoned, or expires unpaid — since place_order() now
+    reserves stock immediately regardless of payment method, this is the
+    counterpart that must run whenever that reservation doesn't convert into
+    a real sale.
+    """
+    with transaction.atomic():
+        order_items = order.items.select_for_update().select_related('product').all()
+        for item in order_items:
+            product = item.product
+            if product is None:
+                continue
+            product = Product.objects.select_for_update().get(pk=product.pk)
+            product.stock += item.quantity
+            if product.stock > 0:
+                product.available = True
+            product.save()
+
+        order.status = 'Cancelled'
+        order.save(update_fields=['status'])
+        order.sub_orders.update(status='Cancelled')
+
+
 @login_required
 def checkout_shipping(request):
     """Step 1: Collect or select delivery location profile."""
@@ -240,12 +265,6 @@ def place_order(request):
     cart_total = sum(item.quantity * item.product.price for item in cart_items)
     global_discount_amount = 0
 
-    # Early validation check: pre-verify inventory availability prior to building database records
-    for cart_item in cart_items:
-        if cart_item.product.stock < cart_item.quantity or not cart_item.product.available:
-            messages.error(request, f"Sorry, '{cart_item.product.name}' is sold out or unavailable. Adjust quantity.")
-            return redirect('cart:cart_detail')
-
     if applied_coupon:
         if applied_coupon.shop:
             vendor_target_total = sum(
@@ -260,6 +279,21 @@ def place_order(request):
 
     # Use atomic transactions block to protect database mutations
     with transaction.atomic():
+        # Lock every product row in this cart for the duration of the transaction, so two
+        # simultaneous checkouts can never both pass the stock check for the last unit.
+        # Re-validating stock *under the lock* (not just before, from a stale read) is what
+        # actually closes the race — the earlier pre-check was only advisory.
+        product_ids = [item.product_id for item in cart_items]
+        locked_products = {
+            p.id: p for p in Product.objects.select_for_update().filter(id__in=product_ids)
+        }
+
+        for cart_item in cart_items:
+            product = locked_products.get(cart_item.product_id)
+            if product is None or product.stock < cart_item.quantity or not product.available:
+                messages.error(request, f"Sorry, '{cart_item.product.name}' just sold out or became unavailable. Please adjust your cart.")
+                return redirect('cart:cart_detail')
+
         # 1. Instantiate Parent Container Record
         order = Order.objects.create(
             user=request.user,
@@ -317,16 +351,20 @@ def place_order(request):
                     quantity=cart_item.quantity
                 )
                 
-                # 🌟 SEPARATE LOGIC CHANNELS: Process structural stock deduction immediately ONLY for Cash On Delivery (COD)
-                if payment_method == 'cod':
-                    product = cart_item.product
-                    product.stock -= cart_item.quantity
-                    if product.stock <= 0:
-                        product.stock = 0
-                        product.available = False
-                    product.save()
+                # Reserve stock immediately for BOTH payment methods — this is the actual fix:
+                # stock used to only decrement for COD at order time, or for Paystack only once
+                # the webhook fired (long after checkout), leaving a window where two buyers
+                # could both "successfully" order the last unit. Using the row we locked above
+                # closes that window regardless of payment method.
+                product = locked_products[cart_item.product_id]
+                product.stock -= cart_item.quantity
+                if product.stock <= 0:
+                    product.stock = 0
+                    product.available = False
+                product.save()
 
-        # Update coupon limit calculations immediately if choosing COD
+        # Update coupon limit calculations immediately for COD (Paystack orders count usage
+        # once payment is confirmed, in the webhook / order_confirmation verification path)
         if payment_method == 'cod' and applied_coupon:
             Coupon.objects.filter(id=applied_coupon.id).update(times_used=models.F('times_used') + 1)
 
@@ -481,7 +519,9 @@ def paystack_webhook(request):
 
     try:
         payload = json.loads(request.body)
-        if payload.get('event') == 'charge.success':
+        event = payload.get('event')
+
+        if event == 'charge.success':
             data = payload.get('data', {})
             reference = data.get('reference', '')
             transaction_id = data.get('id')
@@ -501,25 +541,27 @@ def paystack_webhook(request):
                     
                     # 2. Sync Status Changes to child SubOrders (Perfect for vendor dashboard)
                     order.sub_orders.all().update(status='Processing')
-                    
-                    # 3. Secure Stock Subtraction Loops & Real-time Sold Out Checks
-                    order_items = order.items.select_related('product').all()
-                    for item in order_items:
-                        product = item.product
-                        product.stock -= item.quantity
-                        
-                        if product.stock <= 0:
-                            product.stock = 0
-                            product.available = False  # Automatically labels product as 'Sold Out'
-                            
-                        product.save()
 
-                    # 4. Asynchronous tracking coupon counter execution
+                    # Note: stock is NOT decremented here. place_order() already reserves
+                    # stock the moment the order is created (for both COD and Paystack), so
+                    # decrementing again here would double-count it. This webhook only
+                    # confirms that the reservation converted into a real, paid sale.
+
+                    # 3. Asynchronous tracking coupon counter execution
                     if order.coupon_applied:
                         Coupon.objects.filter(code=order.coupon_applied).update(
                             times_used=F('times_used') + 1
                         )
-                        
+
+        elif event == 'charge.failed':
+            data = payload.get('data', {})
+            reference = data.get('reference', '')
+            order_id = reference.split('-')[-2]
+
+            order = Order.objects.select_for_update().get(id=order_id)
+            if order.payment_method == 'paystack' and not order.payment_status and order.status != 'Cancelled':
+                restore_order_stock(order)
+
     except (ValueError, Order.DoesNotExist, IndexError) as e:
         # Returning 200 handles edge cases smoothly without Paystack slamming your logs with retries
         return HttpResponse(status=200)
@@ -541,14 +583,24 @@ def order_confirmation(request, order_id):
         headers = {"Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}"}
         try:
             res = requests.get(url, headers=headers, timeout=5)
-            if res.status_code == 200 and res.json().get('data', {}).get('status') == 'success':
-                order.payment_status = True
-                order.transaction_id = str(res.json()['data']['id'])
-                order.status = 'Processing'
-                order.save()
-                
-                if order.coupon_applied:
-                    Coupon.objects.filter(code=order.coupon_applied).update(times_used=models.F('times_used') + 1)
+            if res.status_code == 200:
+                verify_data = res.json().get('data', {})
+                verify_status = verify_data.get('status')
+
+                if verify_status == 'success':
+                    order.payment_status = True
+                    order.transaction_id = str(verify_data.get('id'))
+                    order.status = 'Processing'
+                    order.save()
+
+                    if order.coupon_applied:
+                        Coupon.objects.filter(code=order.coupon_applied).update(times_used=models.F('times_used') + 1)
+
+                elif verify_status in ('failed', 'abandoned') and order.status != 'Cancelled':
+                    # Payment definitively did not go through — release the stock this
+                    # order reserved at checkout instead of leaving it locked up forever.
+                    restore_order_stock(order)
+                    order.refresh_from_db()
         except requests.RequestException:
             pass
 

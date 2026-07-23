@@ -36,7 +36,8 @@ def get_or_create_user_cart(request):
     Handles both authenticated and anonymous users.
     Merges anonymous cart into user cart upon login.
     """
-    if request.user.is_authenticated:
+    user = getattr(request, 'user', None)
+    if user is not None and user.is_authenticated:
         user_cart = _get_or_create_cart_for_user(request.user)
         
         # Check for an anonymous cart and merge if it exists

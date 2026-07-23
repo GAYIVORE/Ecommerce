@@ -12,6 +12,7 @@ urlpatterns = [
     # -------------------------------------------------------------------------
     # Global feeds and entry points
     path('', views.GlobalProductListView.as_view(), name='product_list'),
+    path('search-suggest/', views.search_suggest, name='search_suggest'),
     path('category/<slug:category_slug>/', views.GlobalProductListView.as_view(), name='product_list_by_category'),
     path('detail/<slug:slug>/', views.ProductDetailView.as_view(), name='product_detail'),
     
@@ -25,6 +26,9 @@ urlpatterns = [
     # Core Vendor Dashboard landing engine
     path('dashboard/', views.VendorDashboardView.as_view(), name='vendor_dashboard'),
     path('sub-order/<int:sub_order_id>/ship/', views.update_order_status, name='update_order_status'),
+    path('dashboard/orders/bulk-ship/', views.bulk_update_order_status, name='bulk_update_order_status'),
+    path('dashboard/orders/export/', views.export_orders_csv, name='export_orders_csv'),
+    path('dashboard/products/export/', views.export_products_csv, name='export_products_csv'),
 
     path('dashboard/inventory/', views.VendorInventoryBaseView.as_view(), name='vendor_inventory_base'),
     # Inventory Lifecycle Management Actions
