@@ -1,41 +1,41 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Your Delivery Addresses - E-commerce Shop{% endblock %} {# CHANGED: Shipping to Delivery #}
+{% block title %}Your addresses — E Shop{% endblock %}
 
 {% block content %}
-<div class="min-h-full-content flex-col items-start w-full max-w-4xl">
-    <h1 class="text-4xl font-bold text-gray-900 mb-8 w-full text-center">Your Delivery Addresses</h1> {# CHANGED: Shipping to Delivery #}
+<div class="w-full max-w-4xl mx-auto px-4 py-8 sm:py-12 flex flex-col items-center">
+    <h1 class="text-2xl sm:text-4xl font-display font-bold tracking-tight mb-8 w-full text-center">Your delivery addresses</h1>
 
-    <div class="w-full card p-8">
+    <div class="w-full card p-5 sm:p-8">
         <div class="flex justify-end mb-6">
-            <a href="{% url 'orders:add_address' %}" class="btn-primary">Add New Delivery Address</a> {# CHANGED: Shipping to Delivery #}
+            <a href="{% url 'orders:add_address' %}" class="btn-primary">+ Add new address</a>
         </div>
 
         {% if addresses %}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {% for address in addresses %}
-                    <div class="border rounded-lg p-6 shadow-md {% if address.is_default %}border-primary-color ring-2 ring-primary-color{% else %}border-gray-200{% endif %}">
-                        <p class="font-semibold text-xl mb-2">{{ address.full_name }}</p>
-                        <p class="text-gray-700">{{ address.address_line1 }}</p>
-                        {% if address.address_line2 %}<p class="text-gray-700">{{ address.address_line2 }}</p>{% endif %}
-                        <p class="text-gray-700">{{ address.city }}{% if address.state %}, {{ address.state }}{% endif %}</p>
-                        <p class="text-gray-700">{{ address.country }} {% if address.postal_code %}({{ address.postal_code }}){% endif %}</p>
-                        <p class="text-gray-700">Phone: {{ address.phone_number }}</p>
+                    <div class="rounded-xl border p-5 sm:p-6 {% if address.is_default %}border-ink-900 ring-2 ring-ink-900/10{% else %}border-line{% endif %}">
+                        <p class="font-black text-lg mb-2 text-ink-900">{{ address.full_name }}</p>
+                        <p class="text-sm text-ink-900/60">{{ address.address_line1 }}</p>
+                        {% if address.address_line2 %}<p class="text-sm text-ink-900/60">{{ address.address_line2 }}</p>{% endif %}
+                        <p class="text-sm text-ink-900/60">{{ address.city }}{% if address.state %}, {{ address.state }}{% endif %}</p>
+                        <p class="text-sm text-ink-900/60">{{ address.country }} {% if address.postal_code %}({{ address.postal_code }}){% endif %}</p>
+                        <p class="text-sm text-ink-900/60">Phone: {{ address.phone_number }}</p>
 
-                        <div class="mt-4 flex flex-wrap gap-3 items-center">
+                        <div class="mt-4 pt-4 border-t border-line flex flex-wrap gap-3 items-center">
                             {% if address.is_default %}
-                                <span class="px-3 py-1 bg-green-100 text-green-800 text-sm font-semibold rounded-full">Default</span>
+                                <span class="badge-success">Default</span>
                             {% else %}
-                                <form action="{% url 'orders:set_default_address' address.id %}" method="post">
+                                <form action="{% url 'orders:set_default_address' address.id %}" method="post" class="m-0">
                                     {% csrf_token %}
-                                    <button type="submit" class="text-blue-600 hover:underline text-sm font-medium">Set as Default</button>
+                                    <button type="submit" class="text-xs font-bold text-brand-500 hover:text-brand-600 transition-colors cursor-pointer bg-transparent border-none">Set as default</button>
                                 </form>
                             {% endif %}
-                            <a href="{% url 'orders:edit_address' address.id %}" class="text-primary-color hover:underline text-sm font-medium">Edit</a>
-                            <form action="{% url 'orders:delete_address' address.id %}" method="post" class="inline">
+                            <a href="{% url 'orders:edit_address' address.id %}" class="text-xs font-bold text-ink-900/60 hover:text-ink-900 transition-colors">Edit</a>
+                            <form action="{% url 'orders:delete_address' address.id %}" method="post" class="inline m-0">
                                 {% csrf_token %}
-                                <button type="submit" class="text-red-600 hover:underline text-sm font-medium" onclick="return confirm('Are you sure you want to delete this address?');">Delete</button>
+                                <button type="submit" class="text-xs font-bold text-papaya-600 hover:text-papaya-700 transition-colors cursor-pointer bg-transparent border-none" onclick="return confirm('Delete this address?');">Delete</button>
                             </form>
                         </div>
                     </div>
@@ -43,8 +43,8 @@
             </div>
         {% else %}
             <div class="text-center py-10">
-                <p class="text-xl text-gray-600 mb-6">You don't have any saved delivery addresses yet.</p> {# CHANGED: shipping to delivery #}
-                <a href="{% url 'orders:add_address' %}" class="btn-primary">Add Your First Delivery Address</a> {# CHANGED: shipping to delivery #}
+                <p class="text-sm sm:text-base font-semibold text-ink-900/50 mb-6">You don't have any saved addresses yet.</p>
+                <a href="{% url 'orders:add_address' %}" class="btn-primary">Add your first address</a>
             </div>
         {% endif %}
     </div>

@@ -1,179 +1,161 @@
 {% extends 'base.html' %}
-{% block title %}Inventory Tracking Base - {{ shop.name }}{% endblock %}
+{% block title %}Inventory — {{ shop.name }}{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    
-    <!-- System Messages / Notifications -->
-    {% if messages %}
-        <div class="mb-6 space-y-2">
-            {% for message in messages %}
-                <div class="p-4 text-xs sm:text-sm font-semibold rounded-xl border {% if message.tags == 'success' %}bg-emerald-50 text-emerald-800 border-emerald-200{% elif message.tags == 'warning' %}bg-amber-50 text-amber-800 border-amber-200{% else %}bg-slate-50 text-slate-800 border-slate-200{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
 
-    <!-- Top Navigation Header -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-5 border-b border-slate-200">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-5 border-b border-line">
         <div>
-            <div class="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
-                <a href="{% url 'products:vendor_dashboard' %}" class="hover:text-orange-600 transition-colors">Dashboard</a>
+            <div class="flex items-center gap-2 text-xs font-bold text-ink-900/40 uppercase tracking-wider mb-1">
+                <a href="{% url 'products:vendor_dashboard' %}" class="hover:text-brand-500 transition-colors">Dashboard</a>
                 <span>/</span>
-                <span class="text-slate-600">Inventory Tracking Base</span>
+                <span class="text-ink-900/60">Inventory</span>
             </div>
-            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Inventory Tracking Base</h1>
-            <p class="text-sm text-slate-500 mt-1">Monitor catalog footprints, system statuses, stock levels, and item metadata.</p>
+            <h1 class="text-2xl font-display font-bold text-ink-900 tracking-tight">Inventory</h1>
+            <p class="text-sm text-ink-900/50 mt-1">Monitor stock levels, availability, and item details for {{ shop.name }}.</p>
         </div>
         <div class="flex items-center gap-3 w-full sm:w-auto">
-            <a href="{% url 'products:vendor_dashboard' %}" class="w-1/2 sm:w-auto text-center inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-all shadow-xs">
-                ← Back to Overview
+            <a href="{% url 'products:vendor_dashboard' %}" class="btn-ghost w-1/2 sm:w-auto !normal-case !font-semibold !tracking-normal">
+                &larr; Back to overview
             </a>
-            <a href="{% url 'products:vendor_product_create' %}" class="w-1/2 sm:w-auto text-center inline-flex items-center justify-center px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-orange-600 hover:bg-orange-500 rounded-xl transition-all shadow-sm">
-                + Add Product
+            <a href="{% url 'products:vendor_product_create' %}" class="btn-accent w-1/2 sm:w-auto">
+                + Add product
             </a>
         </div>
     </div>
 
-    <!-- Isolated Metric Footprints -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8">
-        <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-xs">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Total Tracked Items</span>
+        <div class="card p-5">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-ink-900/40 block mb-1">Total tracked items</span>
             <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-black text-slate-900">{{ products|length }}</span>
-                <span class="text-xs font-medium text-slate-500">Live Active Records</span>
+                <span class="text-2xl font-display font-bold text-ink-900">{{ products|length }}</span>
+                <span class="text-xs font-medium text-ink-900/45">Live active records</span>
             </div>
         </div>
-        
-        <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-xs">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Stock Level Exceptions</span>
+
+        <div class="card p-5">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-ink-900/40 block mb-1">Stock level exceptions</span>
             <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-black {% if low_stock_count %}text-rose-600{% else %}text-emerald-600{% endif %}">
+                <span class="text-2xl font-display font-bold {% if low_stock_count %}text-papaya-600{% else %}text-jade-600{% endif %}">
                     {{ low_stock_count|default:"0" }}
                 </span>
-                <span class="text-xs font-medium text-slate-500">Items Low on Stock</span>
+                <span class="text-xs font-medium text-ink-900/45">Items low on stock</span>
             </div>
         </div>
     </div>
 
-    <!-- Core Inventory Tracking Segment -->
     <div>
         {% if products %}
-            <!-- Desktop Micro-Table View -->
-            <div class="hidden md:block bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+            <div class="hidden md:block card overflow-hidden">
                 <table class="w-full text-left border-collapse m-0">
                     <thead>
-                        <tr class="bg-slate-50 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-200">
-                            <th class="p-4">Item Details</th>
+                        <tr class="bg-paper text-[10px] font-black uppercase tracking-wider text-ink-900/40 border-b border-line">
+                            <th class="p-4">Item details</th>
                             <th class="p-4">Category</th>
                             <th class="p-4">Price</th>
-                            <th class="p-4">Stock Parameters</th>
+                            <th class="p-4">Stock</th>
                             <th class="p-4">Status</th>
                             <th class="p-4 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 text-sm text-slate-600">
+                    <tbody class="divide-y divide-line text-sm text-ink-900/60">
                         {% for product in products %}
-                            <tr class="hover:bg-slate-50/50 transition-colors align-middle">
+                            <tr class="hover:bg-paper/60 transition-colors align-middle">
                                 <td class="p-4">
-                                    <div class="flex flex-col items-start gap-1">
-                                        <span class="font-bold text-slate-900">{{ product.name }}</span>
-                                        <button type="button" onclick="openModal('prod-modal-{{ product.id }}')" class="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded transition-colors cursor-pointer border border-slate-300/40">
-                                            🔍 View Details
+                                    <div class="flex flex-col items-start gap-1.5">
+                                        <span class="font-bold text-ink-900">{{ product.name }}</span>
+                                        <button type="button" onclick="openModal('prod-modal-{{ product.id }}')" class="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-ink-900/60 bg-paper hover:bg-line/60 rounded-md transition-colors cursor-pointer border border-line">
+                                            View details
                                         </button>
                                     </div>
 
-                                    <!-- HTML5 Dialog Component for Product Details -->
-                                    <dialog id="prod-modal-{{ product.id }}" class="modal-element p-0 rounded-2xl border border-slate-200 shadow-2xl backdrop:bg-slate-900/60 backdrop:backdrop-blur-xs w-full max-w-md overflow-hidden bg-white">
-                                        <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                                    <dialog id="prod-modal-{{ product.id }}" class="modal-element p-0 rounded-2xl border border-line shadow-lift backdrop:bg-ink-900/60 backdrop:backdrop-blur-xs w-full max-w-md overflow-hidden bg-white">
+                                        <div class="p-5 border-b border-line flex items-center justify-between bg-paper">
                                             <div>
-                                                <h4 class="font-black text-slate-900 text-base">Inventory Product Profile</h4>
-                                                <p class="text-[11px] text-slate-400 font-mono mt-0.5">System ID: #{{ product.id }}</p>
+                                                <h4 class="font-display font-bold text-ink-900 text-base">Product profile</h4>
+                                                <p class="text-[11px] text-ink-900/40 font-mono mt-0.5">System ID: #{{ product.id }}</p>
                                             </div>
-                                            <button type="button" onclick="closeModal('prod-modal-{{ product.id }}')" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1 cursor-pointer">✕</button>
+                                            <button type="button" onclick="closeModal('prod-modal-{{ product.id }}')" class="text-ink-900/40 hover:text-ink-900 text-lg font-bold p-1 cursor-pointer bg-transparent border-none">&times;</button>
                                         </div>
-                                        
+
                                         <div class="p-5 space-y-4 text-xs">
                                             <div>
-                                                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block">Product Title</span>
-                                                <span class="text-sm font-bold text-slate-900">{{ product.name }}</span>
-                                                <span class="text-[10px] text-slate-400 font-mono block mt-0.5">Slug lookup: {{ product.slug }}</span>
+                                                <span class="text-[9px] font-black uppercase tracking-wider text-ink-900/40 block">Product title</span>
+                                                <span class="text-sm font-bold text-ink-900">{{ product.name }}</span>
+                                                <span class="text-[10px] text-ink-900/40 font-mono block mt-0.5">Slug: {{ product.slug }}</span>
                                             </div>
 
-                                            <div class="grid grid-cols-2 gap-4 pt-3 border-t border-slate-100">
+                                            <div class="grid grid-cols-2 gap-4 pt-3 border-t border-line">
                                                 <div>
-                                                    <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block">Assigned Category</span>
-                                                    <span class="font-bold text-slate-800 text-sm block mt-0.5">
-                                                        {{ product.category.name|default:"General/Unassigned" }}
+                                                    <span class="text-[9px] font-black uppercase tracking-wider text-ink-900/40 block">Category</span>
+                                                    <span class="font-bold text-ink-900 text-sm block mt-0.5">
+                                                        {{ product.category.name|default:"General" }}
                                                     </span>
                                                 </div>
                                                 <div>
-                                                    <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block">Marketplace Price</span>
-                                                    <span class="font-black text-slate-900 text-sm block mt-0.5">
-                                                        GHS {{ product.price|floatformat:2 }}
-                                                    </span>
+                                                    <span class="text-[9px] font-black uppercase tracking-wider text-ink-900/40 block">Price</span>
+                                                    <span class="font-black text-ink-900 text-sm block mt-0.5">GHS {{ product.price|floatformat:2 }}</span>
                                                 </div>
                                             </div>
 
-                                            <div class="pt-3 border-t border-slate-100">
-                                                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block mb-1">Stock Parameters & Health</span>
-                                                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex items-center justify-between">
+                                            <div class="pt-3 border-t border-line">
+                                                <span class="text-[9px] font-black uppercase tracking-wider text-ink-900/40 block mb-1">Stock health</span>
+                                                <div class="bg-paper p-3 rounded-xl border border-line flex items-center justify-between">
                                                     <div>
-                                                        <span class="text-[10px] text-slate-400 block">Units Remained</span>
-                                                        <span class="font-mono font-black text-slate-950 text-base">{{ product.stock }}</span>
+                                                        <span class="text-[10px] text-ink-900/40 block">Units remaining</span>
+                                                        <span class="font-mono font-black text-ink-900 text-base">{{ product.stock }}</span>
                                                     </div>
                                                     <div>
                                                         {% if product.stock <= 5 %}
-                                                            <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-rose-50 text-rose-600 border border-rose-200 animate-pulse">Critical Restock</span>
+                                                            <span class="badge-danger">Critical restock</span>
                                                         {% else %}
-                                                            <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-bold rounded bg-emerald-50 text-emerald-600 border border-emerald-200">Stable Level</span>
+                                                            <span class="badge-success">Stable level</span>
                                                         {% endif %}
                                                     </div>
                                                 </div>
                                             </div>
 
                                             {% if product.description %}
-                                                <div class="pt-3 border-t border-slate-100">
-                                                    <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block">Product Meta Description</span>
-                                                    <p class="text-slate-600 font-medium leading-relaxed mt-1 whitespace-pre-line bg-slate-50/50 p-2.5 rounded-xl border border-slate-100">
+                                                <div class="pt-3 border-t border-line">
+                                                    <span class="text-[9px] font-black uppercase tracking-wider text-ink-900/40 block">Description</span>
+                                                    <p class="text-ink-900/60 font-medium leading-relaxed mt-1 whitespace-pre-line bg-paper p-2.5 rounded-xl border border-line">
                                                         {{ product.description }}
                                                     </p>
                                                 </div>
                                             {% endif %}
                                         </div>
 
-                                        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                                        <div class="p-4 bg-paper border-t border-line flex items-center justify-between">
                                             <div class="flex gap-3">
-                                                <a href="{% url 'products:vendor_product_update' slug=product.slug %}" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold uppercase rounded-lg transition-colors">Edit</a>
-                                                <a href="{% url 'products:vendor_product_delete' slug=product.slug %}" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold uppercase rounded-lg transition-colors border border-rose-200/40">Remove</a>
+                                                <a href="{% url 'products:vendor_product_update' slug=product.slug %}" class="px-3 py-1.5 bg-ink-900 hover:bg-ink-800 text-white text-xs font-bold uppercase rounded-lg transition-colors">Edit</a>
+                                                <a href="{% url 'products:vendor_product_delete' slug=product.slug %}" class="px-3 py-1.5 bg-papaya-50 hover:bg-papaya-100 text-papaya-700 text-xs font-bold uppercase rounded-lg transition-colors border border-papaya-100">Remove</a>
                                             </div>
-                                            <button type="button" onclick="closeModal('prod-modal-{{ product.id }}')" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors cursor-pointer">
-                                                Close File
+                                            <button type="button" onclick="closeModal('prod-modal-{{ product.id }}')" class="px-4 py-1.5 bg-line hover:bg-ink-900/15 text-ink-900/70 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors cursor-pointer border-none">
+                                                Close
                                             </button>
                                         </div>
                                     </dialog>
                                 </td>
                                 <td class="p-4">{{ product.category.name|default:"General" }}</td>
-                                <td class="p-4 font-semibold text-slate-800">GHS {{ product.price|floatformat:2 }}</td>
+                                <td class="p-4 font-semibold text-ink-900/80">GHS {{ product.price|floatformat:2 }}</td>
                                 <td class="p-4 font-mono">
                                     <div class="flex items-center gap-2">
                                         <span>{{ product.stock }}</span>
                                         {% if product.stock <= 5 %}
-                                            <span class="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 bg-rose-50 text-rose-600 rounded border border-rose-100">Low</span>
+                                            <span class="badge-danger !text-[9px]">Low</span>
                                         {% endif %}
                                     </div>
                                 </td>
                                 <td class="p-4">
                                     {% if product.available and product.stock > 0 %}
-                                        <span class="px-2 py-0.5 text-xs font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60">Live</span>
+                                        <span class="badge-success">Live</span>
                                     {% else %}
-                                        <span class="px-2 py-0.5 text-xs font-bold rounded-full bg-rose-50 text-rose-600 border border-rose-200">Sold Out</span>
+                                        <span class="badge-danger">Sold out</span>
                                     {% endif %}
                                 </td>
                                 <td class="p-4 text-right space-x-4">
-                                    <a href="{% url 'products:vendor_product_update' slug=product.slug %}" class="text-xs font-bold text-slate-600 hover:text-orange-600 transition-colors">Edit</a>
-                                    <a href="{% url 'products:vendor_product_delete' slug=product.slug %}" class="text-xs font-bold text-rose-500 hover:text-rose-700 transition-colors">Remove</a>
+                                    <a href="{% url 'products:vendor_product_update' slug=product.slug %}" class="text-xs font-bold text-ink-900/60 hover:text-brand-500 transition-colors">Edit</a>
+                                    <a href="{% url 'products:vendor_product_delete' slug=product.slug %}" class="text-xs font-bold text-papaya-600 hover:text-papaya-700 transition-colors">Remove</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -181,94 +163,68 @@
                 </table>
             </div>
 
-            <!-- Mobile Adaptive Card Layout -->
             <div class="block md:hidden space-y-3">
                 {% for product in products %}
-                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-xs flex flex-col justify-between gap-3">
+                    <div class="card p-4 flex flex-col justify-between gap-3">
                         <div class="flex items-start justify-between gap-2">
                             <div>
-                                <h4 class="font-bold text-slate-900 text-sm">{{ product.name }}</h4>
-                                <span class="text-[11px] px-2 py-0.5 bg-slate-100 rounded-md text-slate-500 mt-1 inline-block">
+                                <h4 class="font-bold text-ink-900 text-sm">{{ product.name }}</h4>
+                                <span class="text-[11px] px-2 py-0.5 bg-paper rounded-md text-ink-900/50 mt-1 inline-block border border-line">
                                     {{ product.category.name|default:"General" }}
                                 </span>
                             </div>
                             <div class="text-right">
-                                <p class="font-semibold text-slate-900 text-sm">GHS {{ product.price|floatformat:2 }}</p>
-                                <span class="text-[11px] font-mono text-slate-400 block mt-0.5">Qty: {{ product.stock }}</span>
+                                <p class="font-bold text-ink-900 text-sm">GHS {{ product.price|floatformat:2 }}</p>
+                                <span class="text-[11px] font-mono text-ink-900/40 block mt-0.5">Qty: {{ product.stock }}</span>
                             </div>
                         </div>
-                        
-                        <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
-                            <button type="button" onclick="openModal('prod-modal-{{ product.id }}')" class="text-xs font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-md border border-orange-100">
-                                🔍 Details
+
+                        <div class="pt-3 border-t border-line flex items-center justify-between">
+                            <button type="button" onclick="openModal('prod-modal-{{ product.id }}')" class="text-xs font-bold text-brand-500 bg-brand-50 px-2.5 py-1 rounded-md border border-brand-100">
+                                Details
                             </button>
-                            
+
                             <div class="flex items-center gap-4">
-                                <a href="{% url 'products:vendor_product_update' slug=product.slug %}" class="text-xs font-bold text-slate-600">Edit</a>
-                                <a href="{% url 'products:vendor_product_delete' slug=product.slug %}" class="text-xs font-bold text-rose-500">Remove</a>
+                                <a href="{% url 'products:vendor_product_update' slug=product.slug %}" class="text-xs font-bold text-ink-900/60">Edit</a>
+                                <a href="{% url 'products:vendor_product_delete' slug=product.slug %}" class="text-xs font-bold text-papaya-600">Remove</a>
                             </div>
                         </div>
                     </div>
                 {% endfor %}
             </div>
 
-            <!-- Advanced Pagination Navigation -->
             {% if is_paginated %}
-                <div class="mt-8 flex items-center justify-between border-t border-slate-200 pt-4 px-1">
-                    <div class="flex flex-1 justify-between sm:hidden">
-                        {% if page_obj.has_previous %}
-                            <a href="?page={{ page_obj.previous_page_number }}" class="inline-flex items-center px-4 py-2 border border-slate-300 text-xs font-bold rounded-xl text-slate-700 bg-white hover:bg-slate-50">Previous</a>
-                        {% else %}
-                            <span class="opacity-40 inline-flex items-center px-4 py-2 border border-slate-200 text-xs font-bold rounded-xl text-slate-400 bg-slate-50 cursor-not-allowed">Previous</span>
+                <nav class="mt-8 flex items-center justify-center gap-1.5" aria-label="Pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}" class="btn-ghost !px-3.5 !py-2">&larr; Prev</a>
+                    {% else %}
+                        <span class="btn-disabled !px-3.5 !py-2">&larr; Prev</span>
+                    {% endif %}
+                    {% for num in paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <span class="chip-active !px-3.5 !py-2">{{ num }}</span>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <a href="?page={{ num }}" class="chip !px-3.5 !py-2">{{ num }}</a>
                         {% endif %}
-                        
-                        {% if page_obj.has_next %}
-                            <a href="?page={{ page_obj.next_page_number }}" class="inline-flex items-center px-4 py-2 border border-slate-300 text-xs font-bold rounded-xl text-slate-700 bg-white hover:bg-slate-50">Next</a>
-                        {% else %}
-                            <span class="opacity-40 inline-flex items-center px-4 py-2 border border-slate-200 text-xs font-bold rounded-xl text-slate-400 bg-slate-50 cursor-not-allowed">Next</span>
-                        {% endif %}
-                    </div>
-                    <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                        <div>
-                            <p class="text-xs text-slate-500">
-                                Showing page <span class="font-bold text-slate-900">{{ page_obj.number }}</span> of <span class="font-bold text-slate-900">{{ paginator.num_pages }}</span>
-                            </p>
-                        </div>
-                        <div>
-                            <nav class="inline-flex -space-x-px rounded-md gap-1" aria-label="Pagination">
-                                {% if page_obj.has_previous %}
-                                    <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 text-slate-600 bg-white hover:bg-slate-50">← Previous</a>
-                                {% endif %}
-                                
-                                {% for num in paginator.page_range %}
-                                    {% if page_obj.number == num %}
-                                        <span class="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-900 text-white">{{ num }}</span>
-                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                                        <a href="?page={{ num }}" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 text-slate-600 bg-white hover:bg-slate-50">{{ num }}</a>
-                                    {% endif %}
-                                {% endfor %}
-
-                                {% if page_obj.has_next %}
-                                    <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 text-slate-600 bg-white hover:bg-slate-50">Next →</a>
-                                {% endif %}
-                            </nav>
-                        </div>
-                    </div>
-                </div>
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" class="btn-ghost !px-3.5 !py-2">Next &rarr;</a>
+                    {% else %}
+                        <span class="btn-disabled !px-3.5 !py-2">Next &rarr;</span>
+                    {% endif %}
+                </nav>
             {% endif %}
 
         {% else %}
-            <!-- Fallback Empty State -->
-            <div class="text-center py-16 border-2 border-dashed border-slate-200 bg-white rounded-2xl max-w-xl mx-auto px-4">
-                <p class="font-bold text-slate-700 mb-1">Your tracking base contains no registered products.</p>
-                <p class="text-xs text-slate-400 mb-6">Create your initial inventory entry tracking record to populate this isolated window panel.</p>
-                <a href="{% url 'products:vendor_product_create' %}" class="px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-colors">Launch First Product</a>
+            <div class="card border-dashed text-center py-16 max-w-xl mx-auto px-4">
+                <p class="font-bold text-ink-900 mb-1">No products in your inventory yet.</p>
+                <p class="text-xs text-ink-900/45 mb-6">Add your first product to start tracking stock and availability.</p>
+                <a href="{% url 'products:vendor_product_create' %}" class="btn-primary inline-flex">Add your first product</a>
             </div>
         {% endif %}
     </div>
 </div>
 
-<!-- Native Vanilla Event Listeners for HTML5 Modals -->
 <script>
     function openModal(id) {
         const dialog = document.getElementById(id);
@@ -277,7 +233,6 @@
             document.body.classList.add('overflow-hidden');
         }
     }
-
     function closeModal(id) {
         const dialog = document.getElementById(id);
         if (dialog) {
@@ -285,8 +240,6 @@
             document.body.classList.remove('overflow-hidden');
         }
     }
-
-    // Dynamic bounding overlay click detector for closing matching dialog backdrops
     window.addEventListener('click', function(e) {
         if (e.target.classList.contains('modal-element')) {
             e.target.close();

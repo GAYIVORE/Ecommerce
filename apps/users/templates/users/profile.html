@@ -1,25 +1,22 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Profile - E-commerce Shop{% endblock %}
+{% block title %}Your profile — E Shop{% endblock %}
 
 {% block content %}
-<div class="w-full max-w-4xl mx-auto px-4 py-8 sm:py-12 flex items-center justify-center min-h-full-content">
-    <div style="background-color: #ffffff; border-color: #e2e8f0;" class="w-full rounded-2xl border shadow-xs p-6 sm:p-10 text-center">
-        
+<div class="w-full max-w-4xl mx-auto px-4 py-8 sm:py-12 flex items-center justify-center">
+    <div class="w-full card p-6 sm:p-10 text-center">
+
         <div class="relative w-24 h-24 mx-auto mb-6 group">
             {% if user.profile_picture %}
-                <img src="{{ user.profile_picture.url }}" 
-                     alt="Profile Picture" 
-                     class="w-full h-full rounded-full object-cover border-2 border-slate-200 shadow-sm">
+                <img src="{{ user.profile_picture.url }}" alt="Profile picture" class="w-full h-full rounded-full object-cover border-2 border-line shadow-card">
             {% else %}
-                <div style="background-color: #3B0AD1 !important; color: #FFFFFF !important; border-color: #e2e8f0;" 
-                     class="w-full h-full rounded-full border-2 flex items-center justify-center shadow-xs">
-                    <span class="text-3xl font-black uppercase tracking-tight">{{ user.username|slice:":2" }}</span>
+                <div class="w-full h-full rounded-full border-2 border-line bg-brand-500 text-white flex items-center justify-center shadow-card">
+                    <span class="text-3xl font-display font-bold uppercase tracking-tight">{{ user.username|slice:":2" }}</span>
                 </div>
             {% endif %}
-            
-            <label for="id_profile_picture" class="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center border-2 border-white cursor-pointer hover:bg-amber-500 transition-colors shadow-sm">
+
+            <label for="id_profile_picture" class="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-ink-900 text-white flex items-center justify-center border-2 border-white cursor-pointer hover:bg-marigold-500 hover:text-ink-900 transition-colors shadow-card">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" />
@@ -27,123 +24,94 @@
             </label>
         </div>
 
-        <h2 style="color: #0f172a;" class="text-2xl sm:text-3xl font-black tracking-tight mb-2">
-            Welcome back, {{ user.username }}!
+        <h2 class="text-2xl sm:text-3xl font-display font-bold tracking-tight mb-2">
+            Welcome back, {{ user.username }}
         </h2>
-        
+
         <div class="mb-8 flex justify-center">
             {% if user.is_vendor %}
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200/60">
-                    <span class="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                    Marketplace Merchant Partner
+                <span class="badge-brand !text-[11px] !px-3 !py-1">
+                    <span class="h-1.5 w-1.5 rounded-full bg-brand-500"></span>
+                    Merchant partner
                 </span>
             {% else %}
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                    Verified Customer Portal
+                <span class="badge-success !text-[11px] !px-3 !py-1">
+                    <span class="h-1.5 w-1.5 rounded-full bg-jade-500"></span>
+                    Verified customer
                 </span>
             {% endif %}
         </div>
 
-        <p style="color: #64748b;" class="text-sm font-medium mb-10 max-w-md mx-auto">
-            This is your account control panel. Track active order dispatches, manage workspace settings, or view storefront analytics keys.
+        <p class="text-sm font-medium text-ink-900/50 mb-10 max-w-md mx-auto">
+            This is your account control panel — track orders, manage your delivery details, or jump into your shop.
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left mb-8">
-            
-            <div style="background-color: #f8fafc; border-color: #f1f5f9;" class="p-6 rounded-xl border flex flex-col justify-between">
+
+            <div class="p-6 rounded-xl border border-line bg-paper flex flex-col justify-between">
                 <div>
-                    <h3 style="color: #0f172a;" class="text-sm font-bold uppercase tracking-wider mb-4 pb-2 border-b border-slate-200/60 flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                        </svg>
-                        <span>Account Information</span>
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-ink-900 mb-4 pb-2 border-b border-line flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>
+                        <span>Account information</span>
                     </h3>
                     <div class="space-y-4">
                         <div class="flex flex-col">
-                            <span style="color: #94a3b8;" class="text-[10px] font-bold uppercase tracking-wider">Registered Email</span>
-                            <span style="color: #334155;" class="text-sm font-bold break-all">{{ user.email }}</span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-ink-900/35">Email</span>
+                            <span class="text-sm font-bold break-all text-ink-900/80">{{ user.email }}</span>
                         </div>
                         {% if user.phone_number %}
                             <div class="flex flex-col">
-                                <span style="color: #94a3b8;" class="text-[10px] font-bold uppercase tracking-wider">Mobile Contact Parameters</span>
-                                <span style="color: #334155;" class="text-sm font-bold">{{ user.phone_number }}</span>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-ink-900/35">Phone</span>
+                                <span class="text-sm font-bold text-ink-900/80">{{ user.phone_number }}</span>
                             </div>
                         {% endif %}
                         <div class="flex flex-col">
-                            <span style="color: #94a3b8;" class="text-[10px] font-bold uppercase tracking-wider">Last Login Session</span>
-                            <span style="color: #475569;" class="text-xs font-semibold">{{ user.last_login|date:"F j, Y, P"|default:"Never" }}</span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-ink-900/35">Last login</span>
+                            <span class="text-xs font-semibold text-ink-900/60">{{ user.last_login|date:"F j, Y, P"|default:"Never" }}</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div style="background-color: #f8fafc; border-color: #f1f5f9;" class="p-6 rounded-xl border flex flex-col justify-between">
+            <div class="p-6 rounded-xl border border-line bg-paper flex flex-col justify-between">
                 <div>
                     {% if user.is_vendor %}
-                        <h3 style="color: #b45309;" class="text-sm font-bold uppercase tracking-wider mb-4 pb-2 border-b border-amber-200 flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" />
-                            </svg>
-                            <span>Merchant Operator Panel</span>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-marigold-700 mb-4 pb-2 border-b border-marigold-100 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" /></svg>
+                            <span>Merchant console</span>
                         </h3>
                         <div class="flex flex-col gap-2">
-                            <a href="{% url 'products:vendor_dashboard' %}" 
-                               style="background-color: #d97706; color: #ffffff;" 
-                               class="w-full inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-amber-700 transition-all shadow-sm text-center">
-                                Open Merchant Console
-                            </a>
-                            <a href="{% url 'products:product_create' %}" 
-                               style="background-color: #ffffff; color: #b45309; border: 1px solid #f59e0b;" 
-                               class="w-full inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-amber-50 transition-all text-center">
-                                + List New Product Record
-                            </a>
+                            <a href="{% url 'products:vendor_dashboard' %}" class="btn-accent w-full !text-center">Open dashboard</a>
+                            <a href="{% url 'products:product_create' %}" class="btn-ghost w-full !text-center !border-marigold-300 !text-marigold-700">+ List new product</a>
                         </div>
                     {% else %}
-                        <h3 style="color: #0f172a;" class="text-sm font-bold uppercase tracking-wider mb-4 pb-2 border-b border-slate-200/60 flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 5.25h16.5m-16.5-10.5h16.5" />
-                            </svg>
-                            <span>Quick Management</span>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-ink-900 mb-4 pb-2 border-b border-line flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 5.25h16.5m-16.5-10.5h16.5" /></svg>
+                            <span>Quick actions</span>
                         </h3>
                         <div class="flex flex-col gap-2">
-                            <a href="{% url 'orders:order_history' %}" 
-                               style="background-color: #0f172a; color: #ffffff;" 
-                               class="w-full inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-slate-800 transition-all shadow-xs text-center">
-                                View Orders
-                            </a>
-                            <a href="{% url 'orders:address_list' %}" 
-                               style="background-color: #ffffff; color: #475569; border: 1px solid #cbd5e1;" 
-                               class="w-full inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all text-center">
-                                Manage Delivery Addresses
-                            </a>
+                            <a href="{% url 'orders:order_history' %}" class="btn-primary w-full !text-center">View orders</a>
+                            <a href="{% url 'orders:address_list' %}" class="btn-ghost w-full !text-center">Manage addresses</a>
                         </div>
                     {% endif %}
                 </div>
-                
-                <div class="mt-4 pt-4 border-t border-slate-200/60">
-                    <form action="{% url 'users:profile' %}" method="post" enctype="multipart/form-data" class="m-0 space-y-2">
+
+                <div class="mt-4 pt-4 border-t border-line">
+                    <form action="{% url 'users:profile' %}" method="post" enctype="multipart/form-data" class="m-0">
                         {% csrf_token %}
                         <input type="file" name="profile_picture" id="id_profile_picture" class="hidden" onchange="this.form.submit()">
-                        <label for="id_profile_picture" 
-                               style="background-color: #0f172a; color: #ffffff;" 
-                               class="w-full inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl text-center shadow-xs hover:bg-slate-800 transition-all cursor-pointer">
-                            Upload New Picture
+                        <label for="id_profile_picture" class="btn-primary w-full !text-center cursor-pointer">
+                            Upload new picture
                         </label>
                     </form>
                 </div>
-
             </div>
         </div>
 
-        <div style="border-top: 1px solid #f1f5f9;" class="pt-6 mt-8 flex justify-center">
+        <div class="pt-6 mt-8 border-t border-line flex justify-center">
             <form action="{% url 'users:logout' %}" method="post" class="inline m-0">
                 {% csrf_token %}
-                <button type="submit" 
-                        style="background-color: #fef2f2; color: #991b1b; border: 1px solid #fecaca;" 
-                        class="inline-flex items-center px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-rose-100 hover:text-rose-800 transition-all active:scale-[0.98] cursor-pointer">
-                    Secure Logout
-                </button>
+                <button type="submit" class="btn-danger !text-[11px]">Log out</button>
             </form>
         </div>
 

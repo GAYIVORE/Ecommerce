@@ -1,25 +1,51 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit product{% else %}Add product{% endif %} — E Shop{% endblock %}
 
 {% block content %}
-<form method="post" enctype="multipart/form-data" class="space-y-4">
-    {% csrf_token %}
-    
-    {% for field in form %}
-    <div class="flex flex-col">
-        <label class="font-semibold text-gray-700 mb-1">{{ field.label }}</label>
-        {{ field }} {% if field.errors %}
-            <p class="text-red-500 text-sm mt-1">{{ field.errors.0 }}</p>
-        {% endif %}
+<div class="max-w-2xl mx-auto px-4 py-8 sm:py-12">
+    <div class="mb-6">
+        <a href="{% url 'products:vendor_dashboard' %}" class="text-xs font-bold uppercase tracking-wider text-ink-900/40 hover:text-brand-500 transition-colors">&larr; Back to dashboard</a>
+        <h1 class="text-2xl sm:text-3xl font-display font-bold tracking-tight mt-2">
+            {% if form.instance.pk %}Edit product{% else %}Add a new product{% endif %}
+        </h1>
+        <p class="text-sm text-ink-900/50 mt-1">Fields marked with an asterisk are required.</p>
     </div>
-    {% endfor %}
 
-    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-        Save Product
-    </button>
-</form>
+    <div class="card p-6 sm:p-8">
+        <form method="post" enctype="multipart/form-data" class="space-y-5">
+            {% csrf_token %}
+
+            {% for field in form %}
+            <div class="flex flex-col vendor-field-group">
+                <label for="{{ field.id_for_label }}" class="field-label">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <p class="text-[11px] mt-1 font-medium text-ink-900/45">{{ field.help_text }}</p>
+                {% endif %}
+                {% if field.errors %}
+                    <p class="text-xs font-bold mt-1.5 text-papaya-600">{{ field.errors.0 }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div class="pt-4 border-t border-line flex flex-col sm:flex-row justify-end gap-3">
+                <a href="{% url 'products:vendor_dashboard' %}" class="btn-ghost w-full sm:w-auto !normal-case !font-semibold !tracking-normal">Cancel</a>
+                <button type="submit" class="btn-primary w-full sm:w-auto !px-8">Save product</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('.vendor-field-group input, .vendor-field-group select, .vendor-field-group textarea').forEach(function (el) {
+            if (el.type !== 'file' && el.type !== 'checkbox') {
+                el.classList.add('field');
+            }
+        });
+
         const nameInput = document.getElementById("id_name");
         const slugInput = document.getElementById("id_slug");
 
@@ -28,14 +54,13 @@
                 let slugText = nameInput.value
                     .toLowerCase()
                     .trim()
-                    .replace(/[^a-z0-9\s-]/g, '') 
-                    .replace(/\s+/g, '-')         
-                    .replace(/-+/g, '-');         
+                    .replace(/[^a-z0-9\s-]/g, '')
+                    .replace(/\s+/g, '-')
+                    .replace(/-+/g, '-');
 
                 slugInput.value = slugText;
             });
         }
     });
 </script>
-
 {% endblock content %}

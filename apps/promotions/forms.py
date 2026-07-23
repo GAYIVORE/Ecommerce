@@ -14,7 +14,7 @@ class CouponApplyForm(forms.Form):
         label="Promo Code",
         widget=forms.TextInput(attrs={
             'placeholder': 'Enter coupon code',
-            'class': 'w-full px-4 py-2.5 text-sm font-medium text-slate-900 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 transition-all placeholder:text-slate-400'
+            'class': 'field'
         })
     )
 

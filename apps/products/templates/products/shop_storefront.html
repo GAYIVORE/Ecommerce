@@ -2,84 +2,63 @@
 {% load static %}
 
 {% block title %}
-    {% if query %}Search Results for "{{ query }}"{% elif category %}{{ category.name }} - Catalog{% else %}All Inventory Items{% endif %} - E-commerce Shop
+    {% if query %}Search results for "{{ query }}" — {{ shop.name }}{% elif category %}{{ category.name }} — {{ shop.name }}{% else %}{{ shop.name }}{% endif %} — E Shop
 {% endblock %}
 
 {% block content %}
-{% with primary_color="#EE7535DD"|default:"#d97706" text_dark="#0f172a" card_bg="#ffffff" image_bg="#f8fafc" border_color="#e2e8f0" %}
+<div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
 
-<div class="w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6" style="color: {{ text_dark }};">
-    <div class="mb-4 sm:mb-6 pb-4 border-b" style="border-color: {{ border_color }};">
-        <h1 class="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight">
-            Storefront: <span style="color: {{ primary_color }};">{{ shop.name }}</span>
-        </h1>
-        <div class="flex flex-wrap items-center gap-x-3 gap-y-2 mt-1">
-            <p class="text-sm font-medium opacity-60">
-                Managed directly by account operator: <span class="font-semibold">@{{ shop.owner.username }}</span>
-            </p>
-            
-            {% if shop.coupons.all %}
-                {% with active_coupon=shop.coupons.all.first %}
-                    <div class="inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-bold rounded-md border border-black/5 shadow-3xs cursor-pointer select-none transition-transform active:scale-95"
-                         style="background-color: {{ active_coupon.bg_color|default:'#f8fafc' }}; color: {{ active_coupon.text_color|default:'#0f172a' }};"
-                         title="Click to copy code: {{ active_coupon.code }}"
-                         onclick="
-                             navigator.clipboard.writeText('{{ active_coupon.code|escapejs }}');
-                             const oldText = this.innerHTML;
-                             this.innerHTML = '🏷️ Copied!';
-                             setTimeout(() => { this.innerHTML = oldText; }, 1500);
-                         ">
-                        🏷️ Use Code: <span class="font-mono tracking-wide underline font-black">{{ active_coupon.code }}</span> ({{ active_coupon.discount }}% Off)
-                    </div>
-                {% endwith %}
+    <div class="mb-6 pb-5 border-b border-line flex items-center gap-4">
+        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden bg-paper flex items-center justify-center font-display font-bold text-xl text-ink-900/70 border border-line shrink-0">
+            {% if shop.image %}
+                <img src="{{ shop.image.url }}" alt="{{ shop.name }} logo" class="w-full h-full object-cover">
+            {% else %}
+                {{ shop.name|slice:":1"|upper }}
             {% endif %}
+        </div>
+        <div>
+            <span class="text-xs font-black tracking-widest uppercase text-brand-500">Storefront</span>
+            <h1 class="text-xl sm:text-2xl lg:text-3xl font-display font-bold tracking-tight leading-tight">
+                {{ shop.name }}
+            </h1>
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-1">
+                <p class="text-xs sm:text-sm font-medium text-ink-900/45">
+                    Run by <span class="font-bold text-ink-900/70">@{{ shop.owner.username }}</span>
+                </p>
+                {% if shop.coupons.all %}
+                    {% with active_coupon=shop.coupons.all.first %}
+                        <button type="button"
+                             onclick="
+                                 navigator.clipboard.writeText('{{ active_coupon.code|escapejs }}');
+                                 const btn = this; const old = btn.innerHTML;
+                                 btn.innerHTML = 'Copied!';
+                                 setTimeout(() => { btn.innerHTML = old; }, 1500);
+                             "
+                             class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-full border border-marigold-100 bg-marigold-50 text-marigold-700 cursor-pointer select-none transition-transform active:scale-95">
+                            Use code <span class="font-mono tracking-wide underline font-black">{{ active_coupon.code }}</span> ({{ active_coupon.discount }}% off)
+                        </button>
+                    {% endwith %}
+                {% endif %}
+            </div>
         </div>
     </div>
 
     <div class="flex flex-col lg:flex-row w-full gap-6 sm:gap-8 items-start">
-        
-        <aside class="w-full lg:w-64 shrink-0 lg:rounded-2xl lg:border lg:p-4 lg:sticky lg:top-24 lg:shadow-xs lg:bg-transparent" 
-               style="border-color: {{ border_color }};">
-            
-            <h3 class="hidden lg:block text-[10px] font-black uppercase tracking-widest opacity-40 mb-2.5">Categories</h3>
-            
-            <div class="flex flex-row lg:flex-col gap-2 overflow-x-auto pb-3 pt-1 lg:py-0 scrollbar-none snap-x snap-mandatory -mx-2 px-2 sm:mx-0 sm:px-0">
-                
-                <div class="snap-start shrink-0 lg:w-full">
-                    {% if not category and not query %}
-                        <a href="{% url 'products:product_list' %}" 
-                           class="flex items-center justify-between px-4 py-2 text-xs sm:text-sm font-bold rounded-full lg:rounded-xl shadow-xs transition-all text-white"
-                           style="background-color: {{ text_dark }};">
-                            <span>All Products</span>
-                        </a>
-                    {% else %}
-                        <a href="{% url 'products:product_list' %}" 
-                           class="flex items-center justify-between px-4 py-2 text-xs sm:text-sm font-medium rounded-full lg:rounded-xl transition-all border hover:bg-white"
-                           style="color: {{ text_dark }}; border-color: {{ border_color }}; background-color: {{ card_bg }};"
-                           onmouseenter="this.style.borderColor='{{ text_dark }}'"
-                           onmouseleave="this.style.borderColor='{{ border_color }}'">
-                            <span>All Products</span>
-                        </a>
-                    {% endif %}
-                </div>
 
+        <aside class="w-full lg:w-56 shrink-0">
+            <h3 class="hidden lg:block text-[10px] font-black uppercase tracking-widest text-ink-900/40 mb-3">Categories</h3>
+            <div class="flex flex-row lg:flex-col gap-2 overflow-x-auto pb-2 lg:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
+                <div class="shrink-0 lg:w-full">
+                    <a href="{% url 'products:product_list' %}" class="{% if not category and not query %}chip-active{% else %}chip{% endif %} lg:w-full lg:justify-start">
+                        All products
+                    </a>
+                </div>
                 {% for cat in categories %}
-                    <div class="snap-start shrink-0 lg:w-full">
-                        {% if category and category.slug == cat.slug %}
-                            <a href="{% url 'products:product_list_by_category' category_slug=cat.slug %}" 
-                               class="flex items-center justify-between px-4 py-2 text-xs sm:text-sm font-bold rounded-full lg:rounded-xl shadow-xs transition-all text-white"
-                               style="background-color: {{ text_dark }};">
-                                <span class="whitespace-nowrap">{{ cat.name }}</span>
-                            </a>
-                        {% else %}
-                            <a href="{% url 'products:product_list_by_category' category_slug=cat.slug %}" 
-                               class="flex items-center justify-between px-4 py-2 text-xs sm:text-sm font-medium rounded-full lg:rounded-xl transition-all border hover:bg-white"
-                               style="color: {{ text_dark }}; border-color: {{ border_color }}; background-color: {{ card_bg }};"
-                               onmouseenter="this.style.borderColor='{{ text_dark }}'"
-                               onmouseleave="this.style.borderColor='{{ border_color }}'">
-                                <span class="whitespace-nowrap">{{ cat.name }}</span>
-                            </a>
-                        {% endif %}
+                    <div class="shrink-0 lg:w-full">
+                        <a href="{% url 'products:product_list_by_category' category_slug=cat.slug %}"
+                           class="{% if category and category.slug == cat.slug %}chip-active{% else %}chip{% endif %} lg:w-full lg:justify-start">
+                            {{ cat.name }}
+                        </a>
                     </div>
                 {% endfor %}
             </div>
@@ -87,147 +66,87 @@
 
         <section class="flex-1 w-full">
             {% if products %}
-                <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
+                <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5">
                     {% for product in products %}
-                        <div class="group rounded-xl border shadow-xs hover:shadow-md transition-all duration-200 p-3 flex flex-col justify-between relative overflow-hidden"
-                             style="background-color: {{ card_bg }}; border-color: {{ border_color }};">
-                            
+                        <div class="group card-hover p-3 flex flex-col justify-between relative overflow-hidden">
                             <a href="{{ product.get_absolute_url }}" class="block focus:outline-none mb-2">
-                                <div class="w-full h-32 sm:h-36 rounded-lg p-2 flex items-center justify-center mb-2 overflow-hidden relative"
-                                     style="background-color: {{ image_bg }};">
+                                <div class="w-full h-32 sm:h-40 rounded-xl bg-paper p-2 flex items-center justify-center mb-3 overflow-hidden relative">
                                     {% if product.stock <= 0 or not product.available %}
-                                        <div class="absolute top-1.5 left-1.5 z-10 text-[9px] font-black text-white px-1.5 py-0.5 uppercase tracking-wider rounded"
-                                             style="background-color: {{ text_dark }};">
-                                            Sold Out
-                                        </div>
+                                        <div class="absolute top-1.5 left-1.5 z-10 badge-neutral !bg-ink-900 !text-white !border-0">Sold out</div>
                                     {% endif %}
-                                    
                                     {% if product.image %}
-                                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="max-h-full max-w-full object-contain mix-blend-multiply group-hover:scale-102 transition-transform duration-300">
+                                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="max-h-full max-w-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300">
                                     {% else %}
-                                        <img src="https://placehold.co/400x400/F1F5F9/475569?text={{ product.name|urlencode }}" alt="No Snapshot Available" class="max-h-full max-w-full object-contain mix-blend-multiply">
+                                        <img src="https://placehold.co/400x400/F7F7F4/14151C?text={{ product.name|urlencode }}" alt="No image available" class="max-h-full max-w-full object-contain mix-blend-multiply">
                                     {% endif %}
                                 </div>
-                                
-                                {% if product.shop %}
-                                    <span class="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wide opacity-50 mb-0.5 transition-colors group-hover:opacity-80">
-                                        <svg class="w-2.5 h-2.5 opacity-60" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z"/></svg>
-                                        {{ product.shop.name }}
-                                    </span>
-                                {% endif %}
-
-                                <h2 class="text-xs sm:text-sm font-extrabold transition-colors line-clamp-2 min-h-[2rem] sm:min-h-[2.25rem] leading-tight"
-                                    style="color: {{ text_dark }};"
-                                    onmouseenter="this.style.color='{{ primary_color }}'"
-                                    onmouseleave="this.style.color='{{ text_dark }}'">
+                                <h2 class="text-xs sm:text-sm font-bold text-ink-900 group-hover:text-brand-500 transition-colors line-clamp-2 min-h-[2rem] sm:min-h-[2.25rem] leading-tight">
                                     {{ product.name }}
                                 </h2>
                             </a>
 
                             <div class="mt-auto">
-                                <p class="text-sm sm:text-base font-black mb-2" style="color: {{ text_dark }};">
-                                    GHS {{ product.price|floatformat:2 }}
-                                </p>
-                                
+                                <p class="price mb-2 text-sm sm:text-base">GHS {{ product.price|floatformat:2 }}</p>
                                 <div class="flex flex-col gap-1.5">
                                     {% if product.stock > 0 and product.available %}
                                         <form action="{% url 'cart:add_to_cart' product.id %}" method="post" class="w-full m-0">
                                             {% csrf_token %}
                                             <input type="hidden" name="quantity" value="1">
-                                            <button type="submit" 
-                                                    class="w-full inline-flex justify-center items-center px-3 py-2 text-[11px] font-black uppercase tracking-wider text-white rounded-lg transition-all active:scale-[0.98] cursor-pointer shadow-sm"
-                                                    style="background-color: {{ primary_color }};"
-                                                    onmouseenter="this.style.opacity='0.9'"
-                                                    onmouseleave="this.style.opacity='1'">
-                                                <svg class="w-3.5 h-3.5 mr-1.5 stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                                                </svg>
-                                                Add to Cart
+                                            <button type="submit" class="btn-brand w-full !text-[11px] !py-2">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" /></svg>
+                                                Add to cart
                                             </button>
                                         </form>
                                     {% else %}
-                                        <button class="w-full inline-flex justify-center items-center px-3 py-2 text-[11px] font-bold uppercase tracking-wider border rounded-lg cursor-not-allowed" 
-                                                style="color: {{ border_color }}; background-color: {{ image_bg }}; border-color: {{ border_color }};" disabled>
-                                            Sold Out
-                                        </button>
+                                        <button class="btn-disabled w-full !text-[11px] !py-2" disabled>Sold out</button>
                                     {% endif %}
 
                                     {% if user.is_authenticated %}
                                         <form action="{% url 'wishlist:add_to_wishlist' product.id %}" method="post" class="w-full m-0">
                                             {% csrf_token %}
-                                            <button type="submit" 
-                                                    class="w-full inline-flex justify-center items-center px-3 py-1.5 border text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all active:scale-[0.98] cursor-pointer"
-                                                    style="color: {{ text_dark }}; background-color: {{ card_bg }}; border-color: {{ border_color }};"
-                                                    onmouseenter="this.style.backgroundColor='{{ image_bg }}'"
-                                                    onmouseleave="this.style.backgroundColor='{{ card_bg }}'">
-                                                <svg class="w-3.5 h-3.5 mr-1.5 stroke-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                                                </svg>
+                                            <button type="submit" class="btn-ghost w-full !text-[10px] !py-1.5">
+                                                <svg class="w-3.5 h-3.5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" /></svg>
                                                 Wishlist
                                             </button>
                                         </form>
                                     {% endif %}
                                 </div>
                             </div>
-
                         </div>
                     {% endfor %}
                 </div>
 
                 {% if page_obj.has_other_pages %}
-                    <div class="mt-8 flex items-center justify-center gap-1">
+                    <nav class="mt-8 flex items-center justify-center gap-1.5" aria-label="Pagination">
                         {% if page_obj.has_previous %}
-                            <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}" 
-                               class="inline-flex items-center justify-center w-8 h-8 rounded-lg border transition-all active:scale-95"
-                               style="background-color: {{ card_bg }}; border-color: {{ border_color }}; color: {{ text_dark }};"
-                               onmouseenter="this.style.backgroundColor='{{ image_bg }}'"
-                               onmouseleave="this.style.backgroundColor='{{ card_bg }}'">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
-                            </a>
+                            <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}" class="btn-ghost !px-3.5 !py-2">&larr; Prev</a>
+                        {% else %}
+                            <span class="btn-disabled !px-3.5 !py-2">&larr; Prev</span>
                         {% endif %}
 
                         {% for num in page_obj.paginator.page_range %}
                             {% if page_obj.number == num %}
-                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-white text-xs font-bold shadow-xs"
-                                      style="background-color: {{ text_dark }};">
-                                    {{ num }}
-                                </span>
+                                <span class="chip-active !px-3.5 !py-2">{{ num }}</span>
                             {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                                <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}" 
-                                   class="inline-flex items-center justify-center w-8 h-8 rounded-lg border text-xs font-semibold transition-colors"
-                                   style="background-color: {{ card_bg }}; border-color: {{ border_color }}; color: {{ text_dark }};"
-                                   onmouseenter="this.style.backgroundColor='{{ image_bg }}'"
-                                   onmouseleave="this.style.backgroundColor='{{ card_bg }}'">
-                                    {{ num }}
-                                </a>
+                                <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}" class="chip !px-3.5 !py-2">{{ num }}</a>
                             {% endif %}
                         {% endfor %}
 
                         {% if page_obj.has_next %}
-                            <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}" 
-                               class="inline-flex items-center justify-center w-8 h-8 rounded-lg border transition-all active:scale-95"
-                               style="background-color: {{ card_bg }}; border-color: {{ border_color }}; color: {{ text_dark }};"
-                               onmouseenter="this.style.backgroundColor='{{ image_bg }}'"
-                               onmouseleave="this.style.backgroundColor='{{ card_bg }}'">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
-                            </a>
+                            <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}" class="btn-ghost !px-3.5 !py-2">Next &rarr;</a>
+                        {% else %}
+                            <span class="btn-disabled !px-3.5 !py-2">Next &rarr;</span>
                         {% endif %}
-                    </div>
+                    </nav>
                 {% endif %}
-
             {% else %}
-                <div class="rounded-2xl border border-dashed p-8 sm:p-12 text-center max-w-xl mx-auto mt-4"
-                     style="background-color: {{ card_bg }}; border-color: {{ border_color }};">
-                    <svg class="mx-auto h-12 w-12 mb-4 opacity-30" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
-                    <p class="text-sm sm:text-base font-semibold" style="color: {{ text_dark }};">
-                        No product results match execution filters.
-                    </p>
-                    <p class="text-xs opacity-50 mt-1.5">Adjust filters, look for alternative categories, or change your search parameters.</p>
+                <div class="card border-dashed p-8 sm:p-12 text-center max-w-xl mx-auto mt-4">
+                    <svg class="mx-auto h-12 w-12 mb-4 text-ink-900/25" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                    <p class="text-sm sm:text-base font-bold text-ink-900">No products match those filters</p>
+                    <p class="text-xs text-ink-900/45 mt-1.5">Try a different category or check back soon.</p>
                 </div>
             {% endif %}
         </section>
     </div>
 </div>
-
-{% endwith %}
 {% endblock %}

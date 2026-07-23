@@ -1,57 +1,57 @@
 {% extends "earn/base_earn.html" %}
 
-{% block title %}Earn Dashboard{% endblock %}
+{% block title %}Earn dashboard — E Shop{% endblock %}
 
 {% block earn_content %}
-<div class="earn-card p-8 mb-8">
-    <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-white">Welcome back, {{ request.user.first_name|default:request.user.username }}.</h1>
-    <p class="text-zinc-400 mt-2">You've earned <span class="text-emerald-400 font-semibold">₵{{ lifetime_earned|floatformat:2 }}</span> so far on Earn. Ready to grow more?</p>
+<div class="earn-card p-6 sm:p-8 mb-8">
+    <h1 class="text-2xl sm:text-4xl font-display font-bold tracking-tight text-white">Welcome back, {{ request.user.first_name|default:request.user.username }}.</h1>
+    <p class="text-white/50 mt-2 text-sm sm:text-base">You've earned <span class="text-jade-400 font-bold font-mono">GHS {{ lifetime_earned|floatformat:2 }}</span> so far on Earn. Ready to grow more?</p>
     <div class="flex flex-wrap gap-3 mt-6">
-        <a href="{% url 'earn:service_create' %}" class="earn-btn px-6 py-3 rounded-3xl font-semibold text-sm">+ Post a New Service</a>
-        <a href="{% url 'earn:quickcash' %}" class="px-6 py-3 rounded-3xl border border-zinc-700 font-semibold text-sm text-zinc-200 hover:bg-zinc-900">Browse Quick Cash</a>
-        <a href="{% url 'earn:marketplace' %}" class="px-6 py-3 rounded-3xl border border-zinc-700 font-semibold text-sm text-zinc-200 hover:bg-zinc-900">Explore Marketplace</a>
+        <a href="{% url 'earn:service_create' %}" class="earn-btn px-6 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider">+ Post a new service</a>
+        <a href="{% url 'earn:quickcash' %}" class="px-6 py-3 rounded-2xl border border-white/10 font-bold text-xs uppercase tracking-wider text-white/70 hover:bg-white/5 transition-colors">Browse quick cash</a>
+        <a href="{% url 'earn:marketplace' %}" class="px-6 py-3 rounded-2xl border border-white/10 font-bold text-xs uppercase tracking-wider text-white/70 hover:bg-white/5 transition-colors">Explore marketplace</a>
     </div>
 </div>
 
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-    <div class="earn-card p-5">
-        <div class="text-xs uppercase tracking-widest text-zinc-400">Your Services</div>
-        <div class="font-bold text-3xl text-white mt-1">{{ services_count }}</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-8">
+    <div class="earn-card p-4 sm:p-5">
+        <div class="text-[10px] sm:text-xs uppercase tracking-widest text-white/40 font-bold">Your services</div>
+        <div class="font-display font-bold text-2xl sm:text-3xl text-white mt-1">{{ services_count }}</div>
     </div>
-    <div class="earn-card p-5">
-        <div class="text-xs uppercase tracking-widest text-zinc-400">Completed Bookings</div>
-        <div class="font-bold text-3xl text-white mt-1">{{ bookings_count }}</div>
-        {% if pending_bookings_count %}<div class="text-xs text-amber-400 mt-1">{{ pending_bookings_count }} awaiting action</div>{% endif %}
+    <div class="earn-card p-4 sm:p-5">
+        <div class="text-[10px] sm:text-xs uppercase tracking-widest text-white/40 font-bold">Completed bookings</div>
+        <div class="font-display font-bold text-2xl sm:text-3xl text-white mt-1">{{ bookings_count }}</div>
+        {% if pending_bookings_count %}<div class="text-xs text-marigold-400 mt-1 font-semibold">{{ pending_bookings_count }} awaiting action</div>{% endif %}
     </div>
-    <div class="earn-card p-5">
-        <div class="text-xs uppercase tracking-widest text-zinc-400">Available Balance</div>
-        <div class="font-bold text-3xl text-emerald-400 mt-1">₵{{ balance|floatformat:2 }}</div>
+    <div class="earn-card p-4 sm:p-5">
+        <div class="text-[10px] sm:text-xs uppercase tracking-widest text-white/40 font-bold">Available balance</div>
+        <div class="font-display font-bold text-2xl sm:text-3xl text-jade-400 mt-1 font-mono">GHS {{ balance|floatformat:2 }}</div>
     </div>
-    <div class="earn-card p-5">
-        <div class="text-xs uppercase tracking-widest text-zinc-400">Avg. Earning / Booking</div>
-        <div class="font-bold text-3xl text-white mt-1">₵{{ avg_earning_per_booking|floatformat:2 }}</div>
+    <div class="earn-card p-4 sm:p-5">
+        <div class="text-[10px] sm:text-xs uppercase tracking-widest text-white/40 font-bold">Avg / booking</div>
+        <div class="font-display font-bold text-2xl sm:text-3xl text-white mt-1 font-mono">GHS {{ avg_earning_per_booking|floatformat:2 }}</div>
     </div>
 </div>
 
-<div class="earn-card p-6">
-    <div class="font-semibold text-white mb-4">Recent Activity</div>
+<div class="earn-card p-5 sm:p-6">
+    <div class="font-bold text-white mb-4 text-sm uppercase tracking-wider">Recent activity</div>
     {% for tx in recent_transactions %}
-        <div class="flex justify-between items-center px-4 py-3 bg-zinc-800 rounded-2xl mb-2">
+        <div class="flex justify-between items-center px-3 sm:px-4 py-3 bg-white/5 rounded-2xl mb-2">
             <div class="flex items-center gap-x-3">
-                <div class="w-9 h-9 flex-shrink-0 rounded-2xl flex items-center justify-center {% if tx.transaction_type == 'SERVICE' %}bg-emerald-900/30{% else %}bg-blue-900/30{% endif %}">
-                    <i class="fa-solid {% if tx.transaction_type == 'SERVICE' %}fa-briefcase text-emerald-400{% elif tx.transaction_type == 'WITHDRAWAL' %}fa-money-bill-transfer text-red-400{% else %}fa-bolt text-blue-400{% endif %}"></i>
+                <div class="w-9 h-9 flex-shrink-0 rounded-2xl flex items-center justify-center {% if tx.transaction_type == 'SERVICE' %}bg-jade-500/15{% else %}bg-brand-500/20{% endif %}">
+                    <i class="fa-solid {% if tx.transaction_type == 'SERVICE' %}fa-briefcase text-jade-400{% elif tx.transaction_type == 'WITHDRAWAL' %}fa-money-bill-transfer text-papaya-400{% else %}fa-bolt text-brand-300{% endif %}"></i>
                 </div>
                 <div>
                     <div class="font-medium text-sm text-white">{{ tx.description }}</div>
-                    <div class="text-xs text-zinc-400">{{ tx.created_at|date:"M j, Y" }}</div>
+                    <div class="text-xs text-white/40">{{ tx.created_at|date:"M j, Y" }}</div>
                 </div>
             </div>
-            <div class="font-bold {% if tx.amount >= 0 %}text-emerald-400{% else %}text-red-400{% endif %}">
-                {% if tx.amount >= 0 %}+{% endif %}₵{{ tx.amount|floatformat:2 }}
+            <div class="font-bold font-mono text-sm {% if tx.amount >= 0 %}text-jade-400{% else %}text-papaya-400{% endif %}">
+                {% if tx.amount >= 0 %}+{% endif %}GHS {{ tx.amount|floatformat:2 }}
             </div>
         </div>
     {% empty %}
-        <p class="text-zinc-400 text-sm">No activity yet. Post a service or add a Quick Cash link to get started.</p>
+        <p class="text-white/40 text-sm">No activity yet. Post a service or add a quick cash offer to get started.</p>
     {% endfor %}
 </div>
 {% endblock %}

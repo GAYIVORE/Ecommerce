@@ -1,42 +1,37 @@
 {% for product in recent_restocks %}
-<a href="{% url 'products:product_detail' product.slug %}" class="group bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md hover:border-slate-300 transition-all flex flex-col w-full animate-fade-in block text-left">
-    
-    <div class="h-40 bg-white relative overflow-hidden flex items-center justify-center p-2">
+<a href="{% url 'products:product_detail' product.slug %}" class="group card-hover overflow-hidden flex flex-col w-full text-left">
+
+    <div class="h-32 sm:h-40 bg-paper relative overflow-hidden flex items-center justify-center p-3">
         {% if product.is_newly_restocked %}
-            <span class="absolute top-2 left-2 z-10 text-[9px] font-black tracking-wider uppercase text-white bg-emerald-500 px-1.5 py-0.5 rounded-md shadow-xs">
+            <span class="absolute top-2 left-2 z-10 badge-success !bg-jade-500 !text-white !border-0">
                 Restocked
             </span>
         {% endif %}
-        
+
         {% if product.image %}
-            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="object-contain w-full h-full group-hover:scale-105 transition-transform duration-300">
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="object-contain w-full h-full mix-blend-multiply group-hover:scale-105 transition-transform duration-300">
         {% else %}
-            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+            <svg class="w-6 h-6 text-ink-900/25" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
         {% endif %}
     </div>
 
-    <div class="p-3 flex-1 flex flex-col justify-between bg-white">
+    <div class="p-3 flex-1 flex flex-col justify-between">
         <div>
-            <!-- UPDATED: Shop name transitions from Amber to Dark Slate Charcoal -->
-            <span class="text-[10px] font-black text-amber-600 group-hover:text-slate-900 transition-colors uppercase tracking-wider block">
+            <span class="text-[10px] font-black text-brand-500 group-hover:text-ink-900 transition-colors uppercase tracking-wider block truncate">
                 {{ product.shop.name }}
             </span>
-            
-            <!-- UPDATED: Product title is now static Dark Charcoal -->
-            <h4 class="text-xs font-black text-slate-900 truncate mt-0.5">
+            <h4 class="text-xs sm:text-sm font-bold text-ink-900 truncate mt-0.5">
                 {{ product.name }}
             </h4>
         </div>
-        <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100">
-            <!-- UPDATED: Price transitions from Amber to Dark Charcoal -->
-            <span class="text-xs font-black text-amber-600 group-hover:text-slate-900 transition-colors">
-                ¢{{ product.price }}
+        <div class="flex items-center justify-between mt-2 pt-2 border-t border-line">
+            <span class="text-xs sm:text-sm font-display font-bold text-ink-900">
+                GHS {{ product.price|floatformat:2 }}
             </span>
-            
-            <span class="w-6 h-6 text-xs rounded-md inline-flex items-center justify-center transition-colors border border-slate-200 text-amber-600 group-hover:bg-amber-50">→</span>
+            <span class="w-6 h-6 text-xs rounded-md inline-flex items-center justify-center transition-colors border border-line text-brand-500 group-hover:bg-brand-50">&rarr;</span>
         </div>
     </div>
 </a>
 {% empty %}
-<p class="text-xs text-slate-500 col-span-full text-center py-8">No recent restocks found matching engine protocols.</p>
+<p class="text-xs sm:text-sm font-semibold text-ink-900/40 col-span-full text-center py-8">No recent restocks yet — check back soon.</p>
 {% endfor %}

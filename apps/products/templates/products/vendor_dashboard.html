@@ -1,198 +1,184 @@
 {% extends 'base.html' %}
-{% block title %}Merchant Workspace - {{ shop.name }}{% endblock %}
+{% block title %}{{ shop.name }} — Vendor dashboard{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    
-    {% if messages %}
-        <div class="mb-6 space-y-2">
-            {% for message in messages %}
-                <div class="p-4 text-xs sm:text-sm font-semibold rounded-xl border {% if message.tags == 'success' %}bg-emerald-50 text-emerald-800 border-emerald-200{% elif message.tags == 'warning' %}bg-amber-50 text-amber-800 border-amber-200{% else %}bg-slate-50 text-slate-800 border-slate-200{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
 
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-5 border-b border-slate-200">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-5 border-b border-line">
         <div>
-            <h1 class="text-2xl font-black text-slate-900 tracking-tight">{{ shop.name }} Control Panel</h1>
-            <p class="text-sm text-slate-500 mt-1">Manage store inventory entries, monitoring key parameters, and listing lifecycles.</p>
+            <span class="text-xs font-black tracking-widest uppercase text-brand-500">Vendor console</span>
+            <h1 class="text-2xl font-display font-bold text-ink-900 tracking-tight mt-0.5">{{ shop.name }}</h1>
+            <p class="text-sm text-ink-900/50 mt-1">Manage inventory, monitor stock, and fulfill orders.</p>
         </div>
-        <a href="{% url 'products:vendor_product_create' %}" class="w-full sm:w-auto text-center inline-flex items-center justify-center px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-orange-600 hover:bg-orange-500 rounded-xl transition-all shadow-sm">
-            + Add New Product
+        <a href="{% url 'products:vendor_product_create' %}" class="btn-accent w-full sm:w-auto">
+            + Add new product
         </a>
     </div>
 
-    <!-- Stat Summary Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
-        <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-xs">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Catalog Footprint</span>
+        <div class="card p-5">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-ink-900/40 block mb-1">Catalog size</span>
             <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-black text-slate-900">{{ products|length }}</span>
-                <span class="text-xs font-medium text-slate-500">Tracked Records</span>
-            </div>
-        </div>
-        
-        <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-xs">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Pending Dispatches</span>
-            <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-black text-orange-600">{{ vendor_orders|length|default:"0" }}</span>
-                <span class="text-xs font-medium text-slate-500">Awaiting Action</span>
+                <span class="text-2xl font-display font-bold text-ink-900">{{ products|length }}</span>
+                <span class="text-xs font-medium text-ink-900/45">Tracked products</span>
             </div>
         </div>
 
-        <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-xs sm:col-span-2 lg:col-span-1">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Operational Alerts</span>
+        <div class="card p-5">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-ink-900/40 block mb-1">Pending dispatches</span>
             <div class="flex items-baseline gap-2">
-                <span class="text-2xl font-black text-rose-600">
-                    {{ low_stock_count|default:"0" }}
-                </span>
-                <span class="text-xs font-medium text-slate-500">Items Low on Stock</span>
+                <span class="text-2xl font-display font-bold text-marigold-600">{{ vendor_orders|length|default:"0" }}</span>
+                <span class="text-xs font-medium text-ink-900/45">Awaiting action</span>
+            </div>
+        </div>
+
+        <div class="card p-5 sm:col-span-2 lg:col-span-1">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-ink-900/40 block mb-1">Stock alerts</span>
+            <div class="flex items-baseline gap-2">
+                <span class="text-2xl font-display font-bold text-papaya-600">{{ low_stock_count|default:"0" }}</span>
+                <span class="text-xs font-medium text-ink-900/45">Items low on stock</span>
             </div>
         </div>
     </div>
 
-    <!-- Section: Recent Orders Awaiting Dispatch -->
     <div class="mb-10">
-        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-900 mb-4 flex items-center gap-2">
-            <span class="h-2 w-2 rounded-full bg-orange-500 {% if vendor_orders %}animate-pulse{% endif %}"></span>
-            Recent Orders Awaiting Dispatch
+        <h3 class="text-sm font-bold uppercase tracking-wider text-ink-900 mb-4 flex items-center gap-2">
+            <span class="h-2 w-2 rounded-full bg-marigold-500 {% if vendor_orders %}ping-dot{% endif %}"></span>
+            Recent orders awaiting dispatch
         </h3>
-        
+
         {% if vendor_orders %}
-            <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+            <div class="card overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse m-0 min-w-[900px]">
                         <thead>
-                            <tr class="bg-slate-50 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-200">
-                                <th class="p-4">SubOrder / Items Purchased</th>
-                                <th class="p-4">Customer Delivery Profile</th>
-                                <th class="p-4">Payment Verification</th>
-                                <th class="p-4">Fulfillment Status</th>
-                                <th class="p-4 text-right">Fulfillment Action</th>
+                            <tr class="bg-paper text-[10px] font-black uppercase tracking-wider text-ink-900/40 border-b border-line">
+                                <th class="p-4">Items purchased</th>
+                                <th class="p-4">Customer</th>
+                                <th class="p-4">Payment</th>
+                                <th class="p-4">Status</th>
+                                <th class="p-4 text-right">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100 text-sm text-slate-600">
+                        <tbody class="divide-y divide-line text-sm text-ink-900/60">
                             {% for sub_order in vendor_orders %}
-                                <tr class="hover:bg-slate-50/40 transition-colors align-middle">
+                                <tr class="hover:bg-paper/60 transition-colors align-middle">
                                     <td class="p-4">
-                                        <span class="font-mono text-[11px] text-slate-400 block mb-1">SubRef #{{ sub_order.id }}</span>
+                                        <span class="font-mono text-[11px] text-ink-900/40 block mb-1">SubRef #{{ sub_order.id }}</span>
                                         <div class="space-y-1 mb-1">
                                             {% for item in sub_order.items.all %}
-                                                <div class="font-bold text-slate-900 text-xs sm:text-sm">
-                                                    {{ item.product_name }} <span class="text-slate-400 font-mono font-normal">×{{ item.quantity }}</span>
+                                                <div class="font-bold text-ink-900 text-xs sm:text-sm">
+                                                    {{ item.product_name }} <span class="text-ink-900/40 font-mono font-normal">&times;{{ item.quantity }}</span>
                                                 </div>
                                             {% endfor %}
                                         </div>
-                                        <span class="text-[10px] text-slate-400 block font-medium">Placed: {{ sub_order.parent_order.created_at|date:"M d, Y - H:i" }}</span>
+                                        <span class="text-[10px] text-ink-900/40 block font-medium">Placed: {{ sub_order.parent_order.created_at|date:"M d, Y - H:i" }}</span>
                                     </td>
-                                    
+
                                     <td class="p-4">
                                         <div class="flex flex-col items-start gap-1">
-                                            <span class="font-bold text-slate-900 text-sm">
+                                            <span class="font-bold text-ink-900 text-sm">
                                                 {{ sub_order.parent_order.shipping_first_name }} {{ sub_order.parent_order.shipping_last_name }}
                                             </span>
-                                            <button type="button" onclick="openModal('order-modal-{{ sub_order.id }}')" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors cursor-pointer border border-orange-200/40">
-                                                🔍 View Dispatch Details
+                                            <button type="button" onclick="openModal('order-modal-{{ sub_order.id }}')" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold text-brand-500 bg-brand-50 hover:bg-brand-100 rounded-lg transition-colors cursor-pointer border border-brand-100">
+                                                View dispatch details
                                             </button>
                                         </div>
 
-                                        <!-- HTML5 Dialog Component for Order Details -->
-                                        <dialog id="order-modal-{{ sub_order.id }}" class="modal-element p-0 rounded-2xl border border-slate-200 shadow-2xl backdrop:bg-slate-900/60 backdrop:backdrop-blur-xs w-full max-w-md overflow-hidden bg-white">
-                                            <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                                        <dialog id="order-modal-{{ sub_order.id }}" class="modal-element p-0 rounded-2xl border border-line shadow-lift backdrop:bg-ink-900/60 backdrop:backdrop-blur-xs w-full max-w-md overflow-hidden bg-white">
+                                            <div class="p-5 border-b border-line flex items-center justify-between bg-paper">
                                                 <div>
-                                                    <h4 class="font-black text-slate-900 text-base">Dispatch Address File</h4>
-                                                    <p class="text-[11px] text-slate-400 font-mono mt-0.5">SubOrder Reference: #{{ sub_order.id }}</p>
+                                                    <h4 class="font-display font-bold text-ink-900 text-base">Dispatch details</h4>
+                                                    <p class="text-[11px] text-ink-900/40 font-mono mt-0.5">SubOrder #{{ sub_order.id }}</p>
                                                 </div>
-                                                <button type="button" onclick="closeModal('order-modal-{{ sub_order.id }}')" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1 cursor-pointer">✕</button>
+                                                <button type="button" onclick="closeModal('order-modal-{{ sub_order.id }}')" class="text-ink-900/40 hover:text-ink-900 text-lg font-bold p-1 cursor-pointer bg-transparent border-none">&times;</button>
                                             </div>
-                                            
+
                                             <div class="p-5 space-y-4 text-xs">
                                                 <div>
-                                                    <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block">Customer Name</span>
-                                                    <span class="text-sm font-bold text-slate-900">
+                                                    <span class="text-[9px] font-black uppercase tracking-wider text-ink-900/40 block">Customer name</span>
+                                                    <span class="text-sm font-bold text-ink-900">
                                                         {{ sub_order.parent_order.shipping_first_name }} {{ sub_order.parent_order.shipping_last_name }}
                                                     </span>
                                                     {% if sub_order.parent_order.user %}
-                                                        <span class="text-[10px] text-slate-400 font-mono block">Account User ID: @{{ sub_order.parent_order.user.username }}</span>
+                                                        <span class="text-[10px] text-ink-900/40 font-mono block">@{{ sub_order.parent_order.user.username }}</span>
                                                     {% endif %}
                                                 </div>
 
-                                                <div class="grid grid-cols-2 gap-4 pt-3 border-t border-slate-100">
+                                                <div class="grid grid-cols-2 gap-4 pt-3 border-t border-line">
                                                     <div>
-                                                        <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block">Mobile Phone Contact</span>
-                                                        <a href="tel:{{ sub_order.parent_order.shipping_phone_number }}" class="font-bold text-orange-600 hover:underline text-sm block mt-0.5">
+                                                        <span class="text-[9px] font-black uppercase tracking-wider text-ink-900/40 block">Phone</span>
+                                                        <a href="tel:{{ sub_order.parent_order.shipping_phone_number }}" class="font-bold text-brand-500 hover:underline text-sm block mt-0.5">
                                                             {{ sub_order.parent_order.shipping_phone_number }}
                                                         </a>
                                                     </div>
                                                     <div>
-                                                        <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block">Email Address</span>
-                                                            <span class="font-medium text-slate-700 block mt-0.5 break-all">
-                                                                {% if sub_order.parent_order.shipping_email %}
-                                                                    {{ sub_order.parent_order.shipping_email }}
-                                                                {% elif sub_order.parent_order.user %}
-                                                                    {{ sub_order.parent_order.user.email }}
-                                                                {% else %}
-                                                                    <span class="text-slate-400 italic">No email provided</span>
-                                                                {% endif %}
-                                                            </span>
+                                                        <span class="text-[9px] font-black uppercase tracking-wider text-ink-900/40 block">Email</span>
+                                                        <span class="font-medium text-ink-900/70 block mt-0.5 break-all">
+                                                            {% if sub_order.parent_order.shipping_email %}
+                                                                {{ sub_order.parent_order.shipping_email }}
+                                                            {% elif sub_order.parent_order.user %}
+                                                                {{ sub_order.parent_order.user.email }}
+                                                            {% else %}
+                                                                <span class="text-ink-900/35 italic">No email provided</span>
+                                                            {% endif %}
+                                                        </span>
                                                     </div>
                                                 </div>
 
-                                                <div class="pt-3 border-t border-slate-100">
-                                                    <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block mb-1">Physical Delivery Destination</span>
-                                                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                                                        <p class="text-slate-800 font-semibold leading-relaxed">
-                                                            <span class="text-slate-900 block font-bold mb-0.5">{{ sub_order.parent_order.shipping_street_address }}</span>
+                                                <div class="pt-3 border-t border-line">
+                                                    <span class="text-[9px] font-black uppercase tracking-wider text-ink-900/40 block mb-1">Delivery destination</span>
+                                                    <div class="bg-paper p-3 rounded-xl border border-line">
+                                                        <p class="text-ink-900/80 font-semibold leading-relaxed">
+                                                            <span class="text-ink-900 block font-bold mb-0.5">{{ sub_order.parent_order.shipping_street_address }}</span>
                                                             {{ sub_order.parent_order.shipping_city }}, {{ sub_order.parent_order.shipping_region }} Region
                                                         </p>
                                                         {% if sub_order.parent_order.shipping_digital_address %}
-                                                            <span class="inline-flex items-center gap-1 mt-2 font-mono text-[10px] font-black bg-slate-900 text-white px-2 py-0.5 rounded shadow-xs">
-                                                                🇬🇭 {{ sub_order.parent_order.shipping_digital_address }}
+                                                            <span class="inline-flex items-center gap-1 mt-2 font-mono text-[10px] font-black bg-ink-900 text-white px-2 py-0.5 rounded">
+                                                                {{ sub_order.parent_order.shipping_digital_address }}
                                                             </span>
                                                         {% endif %}
                                                     </div>
                                                 </div>
 
                                                 {% if sub_order.parent_order.delivery_notes %}
-                                                    <div class="pt-3 border-t border-slate-100">
-                                                        <span class="text-[9px] font-black uppercase tracking-wider text-amber-700 block">Special Delivery Notes</span>
-                                                        <p class="text-amber-900 font-medium italic mt-1 bg-amber-50 border border-amber-200/60 p-2.5 rounded-xl leading-normal">
-                                                            "{{ sub_order.parent_order.delivery_notes }}"
+                                                    <div class="pt-3 border-t border-line">
+                                                        <span class="text-[9px] font-black uppercase tracking-wider text-marigold-700 block">Delivery notes</span>
+                                                        <p class="text-marigold-800 font-medium italic mt-1 bg-marigold-50 border border-marigold-100 p-2.5 rounded-xl leading-normal">
+                                                            &ldquo;{{ sub_order.parent_order.delivery_notes }}&rdquo;
                                                         </p>
                                                     </div>
                                                 {% endif %}
                                             </div>
 
-                                            <div class="p-4 bg-slate-50 border-t border-slate-100 flex justify-end">
-                                                <button type="button" onclick="closeModal('order-modal-{{ sub_order.id }}')" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-xl transition-colors cursor-pointer">
-                                                    Close File
+                                            <div class="p-4 bg-paper border-t border-line flex justify-end">
+                                                <button type="button" onclick="closeModal('order-modal-{{ sub_order.id }}')" class="px-4 py-2 bg-line hover:bg-ink-900/15 text-ink-900/70 text-xs font-bold uppercase tracking-wider rounded-xl transition-colors cursor-pointer border-none">
+                                                    Close
                                                 </button>
                                             </div>
                                         </dialog>
                                     </td>
-                                    
+
                                     <td class="p-4">
-                                        <div class="font-bold text-slate-900 text-base mb-1">GHS {{ sub_order.sub_total|floatformat:2 }}</div>
+                                        <div class="font-bold text-ink-900 text-base mb-1">GHS {{ sub_order.sub_total|floatformat:2 }}</div>
                                         {% if sub_order.parent_order.payment_method == 'cod' %}
-                                            <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-bold rounded bg-amber-100 text-amber-800 border border-amber-200">💵 COD</span>
+                                            <span class="badge-neutral !bg-marigold-50 !text-marigold-700 !border-marigold-100">COD</span>
                                         {% else %}
-                                            <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-100 text-emerald-800 border border-emerald-200">💳 Paid</span>
+                                            <span class="badge-success">Paid</span>
                                         {% endif %}
                                     </td>
-                                    
+
                                     <td class="p-4">
-                                        <span class="px-2 py-0.5 text-[10px] font-bold rounded-md uppercase border block text-center {% if sub_order.status == 'Pending' %}bg-amber-50 text-amber-700 border-amber-200{% elif sub_order.status == 'Processing' %}bg-blue-50 text-blue-700 border-blue-200{% else %}bg-emerald-50 text-emerald-700 border-emerald-200{% endif %}">
+                                        <span class="badge {% if sub_order.status == 'Pending' %}bg-marigold-50 text-marigold-700 border-marigold-100{% elif sub_order.status == 'Processing' %}bg-brand-50 text-brand-600 border-brand-100{% else %}bg-jade-50 text-jade-700 border-jade-100{% endif %} block text-center">
                                             {{ sub_order.status }}
                                         </span>
                                     </td>
-                                    
+
                                     <td class="p-4 text-right">
                                         <form action="{% url 'products:update_order_status' sub_order.id %}" method="post" class="inline-block m-0">
                                             {% csrf_token %}
-                                            <button type="submit" class="px-3 py-1.5 bg-slate-900 text-white text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-orange-600 transition-colors cursor-pointer whitespace-nowrap shadow-xs">
-                                                Mark Shipped
+                                            <button type="submit" class="px-3 py-1.5 bg-ink-900 text-white text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-marigold-500 hover:text-ink-900 transition-colors cursor-pointer whitespace-nowrap shadow-card">
+                                                Mark shipped
                                             </button>
                                         </form>
                                     </td>
@@ -203,44 +189,32 @@
                 </div>
             </div>
         {% else %}
-            <div class="text-center py-8 border border-dashed border-slate-200 bg-slate-50/50 rounded-2xl text-xs font-semibold text-slate-400">
-                No active processing requests pending dispatch.
+            <div class="text-center py-8 border border-dashed border-line bg-paper rounded-2xl text-xs font-semibold text-ink-900/40">
+                No orders pending dispatch right now.
             </div>
         {% endif %}
     </div>
 
-    <!-- Section: Inventory Tracking Base -->
-    <!-- Replace the old Inventory Tracking Base section on the main dashboard with this clean redirection block -->
-<div class="mt-6 bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-    <div>
-        <h3 class="text-base font-black text-slate-900 tracking-tight">Inventory Tracking Base</h3>
-        <p class="text-xs text-slate-500 mt-0.5">Manage stock health records, item metadata, categories, and direct pricing metrics in an isolated portal.</p>
+    <div class="card p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+            <h3 class="text-base font-display font-bold text-ink-900 tracking-tight">Inventory management</h3>
+            <p class="text-xs text-ink-900/50 mt-0.5">Track stock levels, edit product details, and manage categories.</p>
+        </div>
+        <a href="{% url 'products:vendor_inventory_base' %}" class="btn-ghost w-full sm:w-auto !normal-case !font-semibold !tracking-normal">
+            Open inventory &rarr;
+        </a>
     </div>
-    <a href="{% url 'products:vendor_inventory_base' %}" class="w-full sm:w-auto text-center inline-flex items-center justify-center px-4 py-2 text-xs font-bold uppercase bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl transition-colors tracking-wider border border-slate-300/30">
-        Open Tracking Portal ↗
-    </a>
-</div>
 </div>
 
-<!-- Refactored, Unified Vanilla Script Handlers -->
 <script>
     function openModal(id) {
         const dialog = document.getElementById(id);
-        if (dialog) {
-            dialog.showModal();
-            document.body.classList.add('overflow-hidden');
-        }
+        if (dialog) { dialog.showModal(); document.body.classList.add('overflow-hidden'); }
     }
-
     function closeModal(id) {
         const dialog = document.getElementById(id);
-        if (dialog) {
-            dialog.close();
-            document.body.classList.remove('overflow-hidden');
-        }
+        if (dialog) { dialog.close(); document.body.classList.remove('overflow-hidden'); }
     }
-
-    // Dynamic bounding overlay click detector for closing all matching dialog layers
     window.addEventListener('click', function(e) {
         if (e.target.classList.contains('modal-element')) {
             e.target.close();

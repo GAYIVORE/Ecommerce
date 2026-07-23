@@ -92,6 +92,12 @@ class Product(TimeStampedModel):
         # Returns True if updated in the last 24 hours and is in stock
         return self.stock > 0 and self.updated_at >= timezone.now() - datetime.timedelta(hours=24)
 
+    @property
+    def average_rating(self):
+        agg = self.reviews.aggregate(models.Avg('rating'))
+        value = agg['rating__avg']
+        return round(value, 1) if value is not None else None
+
     class Meta:
         verbose_name = 'Product'
         verbose_name_plural = 'Products'

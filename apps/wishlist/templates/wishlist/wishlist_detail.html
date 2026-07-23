@@ -1,97 +1,84 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Your Wishlist - E-commerce Shop{% endblock %}
+{% block title %}Your wishlist — E Shop{% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto px-4 py-12">
-    <div class="mb-10 text-center sm:text-left">
-        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Your Saved Wishlist</h1>
-        <p class="mt-2 text-sm text-slate-500">
-            Keep track of items you love and move them directly into your shopping cart when you're ready.
+<div class="max-w-6xl mx-auto px-4 py-8 sm:py-12">
+    <div class="mb-8 text-center sm:text-left">
+        <span class="text-xs font-black tracking-widest uppercase text-papaya-600">Saved for later</span>
+        <h1 class="text-2xl sm:text-3xl font-display font-bold tracking-tight mt-0.5">Your wishlist</h1>
+        <p class="mt-2 text-sm font-medium text-ink-900/50">
+            Keep track of items you love, and move them into your cart when you're ready.
         </p>
     </div>
 
     {% if wishlist_items %}
-        <div class="bg-white border border-slate-200 shadow-sm rounded-2xl overflow-hidden">
+        <div class="card overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-200 border-b border-slate-200">
-                    <thead class="bg-slate-50">
+                <table class="min-w-full divide-y divide-line">
+                    <thead class="bg-paper">
                         <tr>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Product</th>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Price</th>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Availability</th>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Added On</th>
-                            <th scope="col" class="relative px-6 py-4">
-                                <span class="sr-only">Actions</span>
-                            </th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-ink-900/50">Product</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-ink-900/50">Price</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-ink-900/50">Availability</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-ink-900/50">Added</th>
+                            <th scope="col" class="relative px-6 py-4"><span class="sr-only">Actions</span></th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-slate-200/80">
+                    <tbody class="bg-white divide-y divide-line">
                         {% for item in wishlist_items %}
-                            <tr class="hover:bg-slate-50/50 transition-colors">
+                            <tr class="hover:bg-paper/60 transition-colors">
                                 <td class="px-6 py-5 whitespace-nowrap">
                                     <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-16 w-16 border border-slate-100 rounded-xl overflow-hidden bg-slate-50">
+                                        <div class="flex-shrink-0 h-16 w-16 border border-line rounded-xl overflow-hidden bg-paper">
                                             {% if item.product.images.all.0 %}
                                                 <img class="h-16 w-16 object-cover" src="{{ item.product.images.all.0.image.url }}" alt="{{ item.product.name }}">
                                             {% elif item.product.image %}
                                                 <img class="h-16 w-16 object-cover" src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
                                             {% else %}
-                                                <img class="h-16 w-16 object-cover" src="https://placehold.co/64x64/E2E8F0/4A5568?text=No+Image" alt="No image">
+                                                <img class="h-16 w-16 object-cover" src="https://placehold.co/64x64/F7F7F4/14151C?text=Item" alt="No image">
                                             {% endif %}
                                         </div>
                                         <div class="ml-4">
-                                            <div class="text-sm font-semibold text-slate-900">
-                                                <a href="{{ item.product.get_absolute_url }}" class="hover:text-amber-600 transition-colors">{{ item.product.name }}</a>
-                                            </div>
+                                            <a href="{{ item.product.get_absolute_url }}" class="text-sm font-bold text-ink-900 hover:text-brand-500 transition-colors">{{ item.product.name }}</a>
                                             {% if item.product.shop %}
-                                                <p class="text-xs text-slate-400 mt-0.5">Shop: {{ item.product.shop.name }}</p>
+                                                <p class="text-xs text-ink-900/40 mt-0.5">{{ item.product.shop.name }}</p>
                                             {% endif %}
                                         </div>
                                     </div>
                                 </td>
-                                
-                                <td class="px-6 py-5 whitespace-nowrap text-sm font-medium text-slate-900">
+
+                                <td class="px-6 py-5 whitespace-nowrap text-sm font-black text-ink-900">
                                     GHS {{ item.product.price|floatformat:2 }}
                                 </td>
 
                                 <td class="px-6 py-5 whitespace-nowrap text-sm">
                                     {% if item.product.available and item.product.stock > 0 %}
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
-                                            In Stock ({{ item.product.stock }})
-                                        </span>
+                                        <span class="badge-success">In stock ({{ item.product.stock }})</span>
                                     {% else %}
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-100">
-                                            Out of Stock
-                                        </span>
+                                        <span class="badge-danger">Out of stock</span>
                                     {% endif %}
                                 </td>
-                                
-                                <td class="px-6 py-5 whitespace-nowrap text-sm text-slate-500">
+
+                                <td class="px-6 py-5 whitespace-nowrap text-sm text-ink-900/45">
                                     {{ item.added_at|date:"M j, Y" }}
                                 </td>
-                                
+
                                 <td class="px-6 py-5 whitespace-nowrap text-right text-sm font-medium">
-                                    <div class="flex items-center justify-end space-x-3">
+                                    <div class="flex items-center justify-end gap-2">
                                         <form action="{% url 'wishlist:move_to_cart' item.id %}" method="post" class="inline m-0">
                                             {% csrf_token %}
                                             {% if item.product.available and item.product.stock > 0 %}
-                                                <button type="submit" class="inline-flex items-center justify-center py-2 px-4 border border-transparent rounded-xl shadow-sm text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 transition-all cursor-pointer">
-                                                    Move to Cart
-                                                </button>
+                                                <button type="submit" class="btn-primary !text-[11px] !py-2 !px-4">Move to cart</button>
                                             {% else %}
-                                                <button type="button" disabled class="inline-flex items-center justify-center py-2 px-4 border border-slate-200 rounded-xl text-xs font-semibold text-slate-400 bg-slate-50 cursor-not-allowed" title="This item cannot be purchased right now.">
-                                                    Unavailable
-                                                </button>
+                                                <button type="button" disabled class="btn-disabled !text-[11px] !py-2 !px-4" title="This item cannot be purchased right now.">Unavailable</button>
                                             {% endif %}
                                         </form>
-                                        
+
                                         <form action="{% url 'wishlist:remove_from_wishlist' item.id %}" method="post" class="inline m-0">
                                             {% csrf_token %}
-                                            <button type="submit" class="inline-flex items-center justify-center py-2 px-3 border border-slate-200 rounded-xl text-xs font-medium text-slate-600 bg-white hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 focus:outline-none transition-all cursor-pointer">
-                                                Remove
-                                            </button>
+                                            <button type="submit" class="btn-ghost !text-[11px] !py-2 !px-3 hover:!bg-papaya-50 hover:!text-papaya-700 hover:!border-papaya-100">Remove</button>
                                         </form>
                                     </div>
                                 </td>
@@ -101,30 +88,24 @@
                 </table>
             </div>
 
-            <div class="p-6 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <span class="text-xs text-slate-500 font-medium">
-                    You have {{ wishlist_items|length }} item{{ wishlist_items|length|pluralize }} saved in your listing container profile.
+            <div class="p-6 bg-paper border-t border-line flex flex-col sm:flex-row justify-between items-center gap-4">
+                <span class="text-xs text-ink-900/50 font-semibold">
+                    {{ wishlist_items|length }} item{{ wishlist_items|length|pluralize }} saved.
                 </span>
-                <div class="flex items-center space-x-3 w-full sm:w-auto">
-                    <a href="{% url 'products:product_list' %}" class="w-full sm:w-auto inline-flex items-center justify-center py-2.5 px-5 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 transition-all">
-                        Continue Shopping
-                    </a>
-                </div>
+                <a href="{% url 'products:product_list' %}" class="btn-ghost w-full sm:w-auto">Continue shopping</a>
             </div>
         </div>
     {% else %}
-        <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-12 text-center max-w-xl mx-auto mt-6">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-50 text-slate-400 mb-4 font-bold text-2xl">
-                ❤️
+        <div class="card p-8 sm:p-12 text-center max-w-xl mx-auto mt-6">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-papaya-50 text-papaya-500 mb-4">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" /></svg>
             </div>
-            <h3 class="text-xl font-bold text-slate-900 tracking-tight">Your wishlist is completely empty</h3>
-            <p class="mt-2 text-sm text-slate-500 max-w-xs mx-auto">
-                Explore our catalog to save items you're interested in purchasing later.
+            <h3 class="text-lg sm:text-xl font-display font-bold tracking-tight">Your wishlist is empty</h3>
+            <p class="mt-2 text-sm font-medium text-ink-900/50 max-w-xs mx-auto">
+                Explore the catalog and save items you're interested in for later.
             </p>
             <div class="mt-8">
-                <a href="{% url 'products:product_list' %}" class="inline-flex items-center justify-center py-3 px-6 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 focus:outline-none transition-all">
-                    Start Browsing Products
-                </a>
+                <a href="{% url 'products:product_list' %}" class="btn-primary inline-flex">Start browsing</a>
             </div>
         </div>
     {% endif %}

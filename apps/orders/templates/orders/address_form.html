@@ -1,33 +1,31 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ form_title }} - E-commerce Shop{% endblock %}
+{% block title %}{{ form_title }} — E Shop{% endblock %}
 
 {% block content %}
-<div class="min-h-full-content flex-col items-start w-full max-w-md">
-    <h1 class="text-4xl font-bold text-gray-900 mb-8 w-full text-center">{{ form_title }}</h1>
+<div class="w-full max-w-md mx-auto px-4 py-8 sm:py-12 flex flex-col items-center">
+    <h1 class="text-2xl sm:text-4xl font-display font-bold tracking-tight mb-8 w-full text-center">{{ form_title }}</h1>
 
-    <div class="w-full card p-8">
-        <form method="post" class="space-y-6">
+    <div class="w-full card p-6 sm:p-8">
+        <form method="post" class="space-y-5 m-0">
             {% csrf_token %}
             {% for field in form %}
-                <div class="form-group">
-                    <label for="{{ field.id_for_label }}" class="form-label">
-                        {{ field.label }}
-                    </label>
+                <div>
+                    <label for="{{ field.id_for_label }}" class="field-label">{{ field.label }}</label>
                     {{ field }}
                     {% if field.help_text %}
-                        <p class="form-help-text">{{ field.help_text }}</p>
+                        <p class="text-[11px] mt-1 font-medium text-ink-900/45">{{ field.help_text }}</p>
                     {% endif %}
                     {% for error in field.errors %}
-                        <p class="form-error">{{ error }}</p>
+                        <p class="text-xs font-bold mt-1.5 text-papaya-600">{{ error }}</p>
                     {% endfor %}
                 </div>
             {% endfor %}
-            <button type="submit" class="btn-primary w-full">Save Address</button>
+            <button type="submit" class="btn-primary w-full !py-3">Save address</button>
         </form>
         <div class="mt-6 text-center">
-            <a href="{% url 'orders:address_list' %}" class="text-blue-600 hover:underline font-semibold">Back to Address List</a>
+            <a href="{% url 'orders:address_list' %}" class="text-sm font-bold text-brand-500 hover:text-brand-600 transition-colors">&larr; Back to address list</a>
         </div>
     </div>
 </div>

@@ -2,24 +2,23 @@
 {% load static %}
 {% load socialaccount %}
 
-{% block title %}Login - E-commerce Shop{% endblock %}
+{% block title %}Log in — E Shop{% endblock %}
 
 {% block content %}
-<div class="w-full max-w-md mx-auto px-4 py-12 flex items-center justify-center min-h-full-content">
-    <div style="background-color: #ffffff; border-color: #e2e8f0;" class="w-full rounded-2xl border shadow-xs p-6 sm:p-10">
-        
+<div class="w-full max-w-md mx-auto px-4 py-12 flex items-center justify-center">
+    <div class="w-full card p-6 sm:p-10">
+
         <div class="text-center mb-8">
-            <h2 style="color: #0f172a;" class="text-3xl font-black tracking-tight mb-2">Welcome Back</h2>
-            <p style="color: #64748b;" class="text-xs font-semibold uppercase tracking-wider">Login to your account</p>
+            <span class="w-12 h-12 rounded-xl bg-brand-500 ring-2 ring-marigold-500 flex items-center justify-center font-display font-bold text-xl text-white mx-auto mb-4">E</span>
+            <h2 class="text-2xl sm:text-3xl font-display font-bold tracking-tight mb-1">Welcome back</h2>
+            <p class="text-xs font-bold uppercase tracking-wider text-ink-900/40">Log in to your account</p>
         </div>
 
         {% if form.non_field_errors %}
-            <div style="background-color: #fef2f2; border-color: #fecaca; color: #991b1b;" class="p-3.5 mb-6 text-xs font-bold rounded-xl border space-y-1">
+            <div class="p-3.5 mb-6 text-xs font-bold rounded-xl border border-papaya-100 bg-papaya-50 text-papaya-700 space-y-1">
                 {% for error in form.non_field_errors %}
                     <p class="flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                        </svg>
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
                         <span>{{ error }}</span>
                     </p>
                 {% endfor %}
@@ -28,57 +27,46 @@
 
         <form method="post" class="space-y-5 m-0">
             {% csrf_token %}
-            
             {% for field in form %}
-                <div class="form-group flex flex-col w-full">
-                    <label for="{{ field.id_for_label }}" style="color: #0f172a;" class="text-xs font-bold uppercase tracking-wider mb-1.5 block">
-                        {{ field.label }}
-                    </label>
-                    
-                    <div class="relative w-full authentication-input-wrapper">
-                        {{ field }}
-                    </div>
-                    
+                <div class="flex flex-col w-full auth-field-group">
+                    <label for="{{ field.id_for_label }}" class="field-label">{{ field.label }}</label>
+                    {{ field }}
                     {% for error in field.errors %}
-                        <p style="color: #ef4444;" class="text-xs font-bold mt-1.5 flex items-center gap-1">
-                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                            </svg>
+                        <p class="text-xs font-bold mt-1.5 flex items-center gap-1 text-papaya-600">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
                             <span>{{ error }}</span>
                         </p>
                     {% endfor %}
                 </div>
             {% endfor %}
 
-            <button type="submit" 
-                    style="background-color: #0f172a; color: #ffffff;" 
-                    class="w-full inline-flex items-center justify-center px-4 py-3 text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-slate-800 transition-all shadow-xs active:scale-[0.99] cursor-pointer mt-2">
-                Sign In
-            </button>
+            <div class="flex justify-end -mt-2">
+                <a href="{% url 'account_reset_password' %}" class="text-xs font-bold text-brand-500 hover:text-brand-600 transition-colors">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn-primary w-full !py-3.5 mt-2">Sign in</button>
         </form>
 
-        <div style="border-top: 1px solid #f1f5f9;" class="mt-8 pt-6 text-center">
-            <p style="color: #64748b;" class="text-sm font-medium">
-                Don't have an account? 
-                <a href="{% url 'users:register' %}" style="color: #d97706;" class="font-bold hover:underline ml-1">
+        <div class="mt-8 pt-6 border-t border-line text-center">
+            <p class="text-sm font-medium text-ink-900/50">
+                Don't have an account?
+                <a href="{% url 'users:register' %}" class="font-bold text-brand-500 hover:text-brand-600 transition-colors ml-1">
                     Register now
                 </a>
             </p>
         </div>
 
         <div class="relative flex py-2 items-center">
-            <div class="flex-grow border-t border-slate-100"></div>
-            <span class="flex-shrink mx-4 text-slate-300 text-[10px] font-bold uppercase tracking-widest">or</span>
-            <div class="flex-grow border-t border-slate-100"></div>
+            <div class="flex-grow border-t border-line"></div>
+            <span class="flex-shrink mx-4 text-ink-900/25 text-[10px] font-bold uppercase tracking-widest">or</span>
+            <div class="flex-grow border-t border-line"></div>
         </div>
 
         <div class="text-center">
             <form action="{% provider_login_url 'google' process='login' %}" method="post" class="w-full m-0">
                 {% csrf_token %}
-                <button type="submit" 
-                        style="border-color: #cbd5e1; background-color: #ffffff; color: #0f172a;"
-                        class="w-full border inline-flex items-center justify-center gap-2.5 px-4 py-3 text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-slate-50 transition-all shadow-xs active:scale-[0.99] cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-google shrink-0" viewBox="0 0 16 16">
+                <button type="submit" class="btn-ghost w-full !py-3.5 !normal-case !font-semibold !tracking-normal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="shrink-0" viewBox="0 0 16 16">
                         <path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0c2.158 0 4 .797 5.415 2.091l-2.161 2.161C10.22 3.302 9.242 3 8 3c-2.42 0-4.439 1.567-5.174 3.674A4.965 4.965 0 0 0 2.5 8c0 .354.038.696.101 1.026C3.335 11.139 5.355 12.7 8 12.7c1.47 0 2.698-.485 3.593-1.315C12.693 10.457 13.3 9.07 13.3 7.551c0-.34-.035-.67-.099-1H15.54z"/>
                     </svg>
                     <span>Continue with Google</span>
@@ -90,15 +78,9 @@
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const inputs = document.querySelectorAll('.authentication-input-wrapper input');
-        inputs.forEach(input => {
-            if (!input.classList.contains('w-full')) {
-                input.className = "w-full px-3.5 py-2.5 rounded-xl border font-medium text-sm transition-all focus:outline-none focus:bg-white focus:border-amber-500 focus:ring-4 focus:ring-amber-500/5";
-                input.style.borderColor = "#cbd5e1";
-                input.style.backgroundColor = "#f8fafc";
-                input.style.color = "#0f172a";
-            }
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('.auth-field-group input').forEach(input => {
+            input.classList.add('field');
         });
     });
 </script>

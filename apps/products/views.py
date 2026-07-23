@@ -53,6 +53,16 @@ class GlobalProductListView(ListView):
             queryset = queryset.filter(
                 Q(name__icontains=query) | Q(description__icontains=query)
             )
+
+        # Sort ordering
+        sort = self.request.GET.get('sort')
+        sort_map = {
+            'price_asc': 'price',
+            'price_desc': '-price',
+            'newest': '-created_at',
+            'name': 'name',
+        }
+        queryset = queryset.order_by(sort_map.get(sort, '-created_at'))
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -60,6 +70,7 @@ class GlobalProductListView(ListView):
         context['category'] = self.category
         context['categories'] = Category.objects.all()
         context['query'] = self.request.GET.get('q', '')
+        context['current_sort'] = self.request.GET.get('sort', '')
         return context
 
 

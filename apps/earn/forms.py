@@ -5,8 +5,8 @@ from django import forms
 from .models import QuickCashOffer, Service
 
 INPUT_CLASSES = (
-    'w-full px-5 py-3.5 bg-zinc-950 border border-zinc-700 focus:border-emerald-500 '
-    'focus:outline-none rounded-3xl text-sm text-zinc-100 placeholder-zinc-500'
+    'w-full px-5 py-3.5 bg-ink-900 border border-white/10 focus:border-jade-500 '
+    'focus:outline-none rounded-2xl text-sm text-white placeholder-white/30 transition-colors'
 )
 
 

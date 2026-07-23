@@ -1,81 +1,71 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Your Order History - E-commerce Shop{% endblock %}
+{% block title %}Your orders — E Shop{% endblock %}
 
 {% block content %}
 <div class="w-full max-w-5xl mx-auto px-4 py-8 sm:py-12 flex flex-col items-center">
-    <h1 style="color: #0f172a;" class="text-2xl sm:text-4xl font-black tracking-tight mb-8 text-center flex items-center justify-center gap-3 w-full">
-        <span>Your Order History</span>
-        <span style="background-color: #e2e8f0; color: #334155;" class="text-xs sm:text-sm font-bold px-3 py-1 rounded-full border border-slate-200">
-            {{ orders.count|default:"0" }}
-        </span>
+    <h1 class="text-2xl sm:text-4xl font-display font-bold tracking-tight mb-8 text-center flex items-center justify-center gap-3 w-full">
+        <span>Your orders</span>
+        <span class="badge-neutral !text-sm !px-3 !py-1">{{ orders.count|default:"0" }}</span>
     </h1>
 
     {% if orders %}
-        <div style="background-color: #ffffff; border-color: #e2e8f0;" class="w-full rounded-2xl border shadow-xs p-4 sm:p-8">
-            
+        <div class="w-full card p-4 sm:p-8">
+
             <div class="hidden md:block overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-100">
+                <table class="min-w-full divide-y divide-line">
                     <thead>
-                        <tr style="background-color: #f8fafc;">
-                            <th scope="col" style="color: #475569;" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider rounded-l-xl">ORDER CODE</th>
-                            <th scope="col" style="color: #475569;" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">PURCHASE DATE</th>
-                            <th scope="col" style="color: #475569;" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">TOTAL AMOUNT</th>
-                            <th scope="col" style="color: #475569;" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">ORDER STATUS</th>
-                            <th scope="col" style="color: #475569;" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">PAYMENT STATUS</th>
-                            <th scope="col" style="color: #475569;" class="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider rounded-r-xl">RECEIPT</th>
+                        <tr class="bg-paper">
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-ink-900/50 rounded-l-xl">Order</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-ink-900/50">Date</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-ink-900/50">Total</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-ink-900/50">Fulfillment</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-ink-900/50">Payment</th>
+                            <th scope="col" class="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-ink-900/50 rounded-r-xl">Receipt</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-slate-100">
+                    <tbody class="bg-white divide-y divide-line">
                         {% for order in orders %}
-                            <tr class="hover:bg-slate-50/50 transition-colors">
-                                <td style="color: #0f172a;" class="px-6 py-5 whitespace-nowrap text-sm font-bold tracking-tight">
+                            <tr class="hover:bg-paper/60 transition-colors">
+                                <td class="px-6 py-5 whitespace-nowrap text-sm font-bold tracking-tight text-ink-900 font-mono">
                                     #ORD-{{ order.id }}
                                 </td>
-                                <td style="color: #475569;" class="px-6 py-5 whitespace-nowrap text-sm font-medium">
+                                <td class="px-6 py-5 whitespace-nowrap text-sm font-medium text-ink-900/60">
                                     {{ order.order_date|date:"M j, Y" }}
                                 </td>
-                                <td style="color: #0f172a;" class="px-6 py-5 whitespace-nowrap text-sm font-black">
+                                <td class="px-6 py-5 whitespace-nowrap text-sm font-black text-ink-900">
                                     GHS {{ order.total_amount|floatformat:2 }}
                                 </td>
                                 <td class="px-6 py-5">
                                     <div class="flex flex-col gap-1.5 max-w-xs">
                                         {% for sub_order in order.sub_orders.all %}
-                                            <div class="flex items-center justify-between gap-4 text-xs bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-md">
-                                                <span class="font-bold text-slate-600 truncate">{{ sub_order.shop.name }}</span>
-                                                <span class="px-2 py-0.5 font-extrabold uppercase tracking-wide text-[10px] rounded-md border
-                                                    {% if sub_order.status == 'Delivered' %}bg-emerald-50 text-emerald-700 border-emerald-200
-                                                    {% elif sub_order.status == 'Shipped' %}bg-sky-50 text-sky-700 border-sky-200
-                                                    {% elif sub_order.status == 'Processing' %}bg-amber-50 text-amber-700 border-amber-200
-                                                    {% elif sub_order.status == 'Cancelled' or sub_order.status == 'Refunded' %}bg-rose-50 text-rose-700 border-rose-200
-                                                    {% else %}bg-slate-50 text-slate-700 border-slate-200{% endif %}">
+                                            <div class="flex items-center justify-between gap-4 text-xs bg-paper border border-line px-2.5 py-1 rounded-md">
+                                                <span class="font-bold text-ink-900/60 truncate">{{ sub_order.shop.name }}</span>
+                                                <span class="badge {% if sub_order.status == 'Delivered' %}bg-jade-50 text-jade-700 border-jade-100{% elif sub_order.status == 'Shipped' %}bg-brand-50 text-brand-600 border-brand-100{% elif sub_order.status == 'Processing' %}bg-marigold-50 text-marigold-700 border-marigold-100{% elif sub_order.status == 'Cancelled' or sub_order.status == 'Refunded' %}bg-papaya-50 text-papaya-700 border-papaya-100{% else %}bg-paper text-ink-900/60 border-line{% endif %}">
                                                     {{ sub_order.get_status_display }}
                                                 </span>
                                             </div>
                                         {% empty %}
-                                            <span class="text-xs text-slate-400 font-medium">No sub-orders tracked</span>
+                                            <span class="text-xs text-ink-900/35 font-medium">No sub-orders tracked</span>
                                         {% endfor %}
                                     </div>
                                 </td>
                                 <td class="px-6 py-5 whitespace-nowrap">
                                     {% if order.payment_status %}
-                                        <span class="px-2.5 py-1 inline-flex text-xs font-bold uppercase tracking-wider rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">Paid</span>
+                                        <span class="badge-success">Paid</span>
                                     {% else %}
-                                        <div class="flex flex-col gap-1 items-center">
-                                            <span class="px-2.5 py-1 inline-flex text-xs font-bold uppercase tracking-wider rounded-md bg-rose-50 text-rose-700 border border-rose-200">
-                                                Pending
-                                            </span>
-                                            <a href="{% url 'orders:process_payment' order.id %}" 
-                                               class="text-[10px] font-black uppercase text-indigo-600 hover:text-indigo-800 underline decoration-2 underline-offset-2">
-                                                Pay Now
+                                        <div class="flex flex-col gap-1 items-start">
+                                            <span class="badge-danger">Pending</span>
+                                            <a href="{% url 'orders:process_payment' order.id %}" class="text-[10px] font-black uppercase text-brand-500 hover:text-brand-600 underline decoration-2 underline-offset-2">
+                                                Pay now
                                             </a>
                                         </div>
                                     {% endif %}
                                 </td>
                                 <td class="px-6 py-5 whitespace-nowrap text-right text-sm">
-                                    <a href="{% url 'orders:order_confirmation' order.id %}" style="color: #d97706;" class="text-xs font-bold uppercase tracking-wider hover:underline">
-                                        View Details
+                                    <a href="{% url 'orders:order_confirmation' order.id %}" class="text-xs font-bold uppercase tracking-wider text-brand-500 hover:text-brand-600 transition-colors">
+                                        View details
                                     </a>
                                 </td>
                             </tr>
@@ -86,85 +76,70 @@
 
             <div class="block md:hidden space-y-4 w-full">
                 {% for order in orders %}
-                    <div style="border-color: #f1f5f9; background-color: #f8fafc;" class="p-4 rounded-xl border flex flex-col gap-3.5">
+                    <div class="p-4 rounded-xl border border-line bg-paper flex flex-col gap-3.5">
                         <div class="flex items-center justify-between">
-                            <span style="color: #0f172a;" class="text-sm font-bold tracking-tight">#ORD-{{ order.id }}</span>
-                            <span style="color: #64748b;" class="text-xs font-semibold">{{ order.order_date|date:"M j, Y" }}</span>
+                            <span class="text-sm font-bold tracking-tight text-ink-900 font-mono">#ORD-{{ order.id }}</span>
+                            <span class="text-xs font-semibold text-ink-900/50">{{ order.order_date|date:"M j, Y" }}</span>
                         </div>
 
-                        <div class="flex flex-col gap-2.5 bg-white p-3 rounded-lg border border-slate-100">
-                            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <div class="flex flex-col gap-2.5 bg-white p-3 rounded-lg border border-line">
+                            <div class="flex items-center justify-between pb-2 border-b border-line">
                                 <div class="flex flex-col">
-                                    <span style="color: #94a3b8;" class="text-[10px] font-bold uppercase tracking-wider">Total Value</span>
-                                    <span style="color: #0f172a;" class="text-sm font-black">GHS {{ order.total_amount|floatformat:2 }}</span>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-ink-900/35">Total</span>
+                                    <span class="text-sm font-black text-ink-900">GHS {{ order.total_amount|floatformat:2 }}</span>
                                 </div>
                             </div>
-                            
+
                             <div class="flex flex-col gap-2 pt-1">
-                                <span style="color: #94a3b8;" class="text-[10px] font-bold uppercase tracking-wider">Fulfillment Status By Shop</span>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-ink-900/35">Fulfillment by shop</span>
                                 {% for sub_order in order.sub_orders.all %}
-                                    <div class="flex items-center justify-between text-xs py-1 px-1.5 bg-slate-50 rounded border border-slate-100">
-                                        <span class="font-bold text-slate-600 truncate max-w-[150px]">{{ sub_order.shop.name }}</span>
-                                        <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded
-                                            {% if sub_order.status == 'Delivered' %}bg-emerald-50 text-emerald-700
-                                            {% elif sub_order.status == 'Shipped' %}bg-sky-50 text-sky-700
-                                            {% elif sub_order.status == 'Processing' %}bg-amber-50 text-amber-700
-                                            {% elif sub_order.status == 'Cancelled' or sub_order.status == 'Refunded' %}bg-rose-50 text-rose-700
-                                            {% else %}bg-slate-50 text-slate-700{% endif %}">
+                                    <div class="flex items-center justify-between text-xs py-1 px-1.5 bg-paper rounded border border-line">
+                                        <span class="font-bold text-ink-900/60 truncate max-w-[150px]">{{ sub_order.shop.name }}</span>
+                                        <span class="badge {% if sub_order.status == 'Delivered' %}bg-jade-50 text-jade-700 border-jade-100{% elif sub_order.status == 'Shipped' %}bg-brand-50 text-brand-600 border-brand-100{% elif sub_order.status == 'Processing' %}bg-marigold-50 text-marigold-700 border-marigold-100{% elif sub_order.status == 'Cancelled' or sub_order.status == 'Refunded' %}bg-papaya-50 text-papaya-700 border-papaya-100{% else %}bg-paper text-ink-900/60 border-line{% endif %}">
                                             {{ sub_order.get_status_display }}
                                         </span>
                                     </div>
                                 {% empty %}
-                                    <span class="text-xs text-slate-400 font-medium">No tracking information available</span>
+                                    <span class="text-xs text-ink-900/35 font-medium">No tracking info yet</span>
                                 {% endfor %}
                             </div>
                         </div>
 
                         <div class="flex items-end justify-between pt-1 gap-4">
                             <div class="flex flex-col gap-1">
-                                <span style="color: #94a3b8;" class="text-[10px] font-bold uppercase tracking-wider">Payment Status</span>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-ink-900/35">Payment</span>
                                 {% if order.payment_status %}
-                                    <span style="color: #10b981;" class="text-xs font-bold bg-emerald-50 px-2 py-0.5 rounded w-fit">Paid</span>
+                                    <span class="badge-success">Paid</span>
                                 {% else %}
-                                    <span style="color: #f43f5e;" class="text-xs font-bold bg-rose-50 px-2 py-0.5 rounded w-fit mb-1">Pending</span>
-                                    <a href="{% url 'orders:process_payment' order.id %}" 
-                                       class="bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold px-3 py-1.5 rounded transition-colors uppercase text-center w-fit">
-                                        Pay Now
-                                    </a>
+                                    <span class="badge-danger mb-1">Pending</span>
+                                    <a href="{% url 'orders:process_payment' order.id %}" class="btn-accent !text-[10px] !py-1.5 !px-3 w-fit">Pay now</a>
                                 {% endif %}
                             </div>
-                            
-                            <a href="{% url 'orders:order_confirmation' order.id %}" style="color: #d97706;" class="text-xs font-bold uppercase tracking-wider hover:underline flex items-center">
-                                View Details →
+                            <a href="{% url 'orders:order_confirmation' order.id %}" class="text-xs font-bold uppercase tracking-wider text-brand-500 hover:text-brand-600 transition-colors flex items-center">
+                                View details &rarr;
                             </a>
                         </div>
                     </div>
                 {% endfor %}
             </div>
 
-            <div class="mt-8 flex justify-start w-full border-t border-slate-100 pt-5">
-                <a href="{% url 'users:profile' %}" 
-                   style="background-color: #ffffff; color: #475569; border: 1px solid #cbd5e1;" 
-                   class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all text-center">
-                    ← Back To Dashboard
+            <div class="mt-8 flex justify-start w-full border-t border-line pt-5">
+                <a href="{% url 'users:profile' %}" class="btn-ghost w-full sm:w-auto !normal-case !font-semibold !tracking-normal">
+                    &larr; Back to dashboard
                 </a>
             </div>
 
         </div>
     {% else %}
-        <div style="background-color: #ffffff; border-color: #e2e8f0;" class="w-full max-w-md text-center rounded-2xl border shadow-xs p-8 sm:p-12">
-            <div style="background-color: #fffbeb;" class="w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-4 text-amber-600">
+        <div class="w-full max-w-md text-center card p-8 sm:p-12">
+            <div class="w-14 h-14 rounded-xl bg-marigold-50 flex items-center justify-center mx-auto mb-4 text-marigold-600">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.25 2.25 0 0 1 10.5 2.25h4.5a2.25 2.25 0 0 1 2.241 2.048m-9.696.741c1.033.058 2.122.089 3.22.091M3.83 5.805a2.25 2.25 0 0 0-1.33 3.11l1.378 2.755a2.25 2.25 0 0 0 2.747 1.115l.3-.1M12 9.75h.008v.008H12V9.75Z" />
                 </svg>
             </div>
-            <h3 style="color: #0f172a;" class="text-lg font-black mb-1 tracking-tight">No orders placed</h3>
-            <p style="color: #64748b;" class="text-xs font-semibold mb-6 max-w-xs mx-auto">Looks like you haven't placed any premium orders on our store catalog yet.</p>
-            <a href="{% url 'products:product_list' %}" 
-               style="background-color: #0f172a; color: #ffffff;" 
-               class="inline-flex items-center px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-slate-800 transition-all shadow-xs">
-                Start Shopping
-            </a>
+            <h3 class="text-lg font-display font-bold mb-1 tracking-tight">No orders yet</h3>
+            <p class="text-xs font-semibold text-ink-900/50 mb-6 max-w-xs mx-auto">Looks like you haven't placed any orders yet.</p>
+            <a href="{% url 'products:product_list' %}" class="btn-primary inline-flex">Start shopping</a>
         </div>
     {% endif %}
 </div>

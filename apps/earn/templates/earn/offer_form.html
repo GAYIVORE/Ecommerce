@@ -1,22 +1,22 @@
 {% extends "earn/base_earn.html" %}
 
-{% block title %}Add Quick Cash Link{% endblock %}
+{% block title %}Add quick cash link — Earn{% endblock %}
 
 {% block earn_content %}
-<div class="earn-card p-8 max-w-xl mx-auto">
-    <div class="font-semibold text-2xl text-white mb-1">Add Your Link</div>
-    <div class="text-xs text-emerald-400 mb-6">Shared with every user browsing Quick Cash offers.</div>
+<div class="earn-card p-6 sm:p-8 max-w-xl mx-auto">
+    <div class="font-display font-bold text-xl sm:text-2xl text-white mb-1">Add your link</div>
+    <div class="text-xs text-jade-400 mb-6 font-semibold">Shared with every user browsing Quick Cash offers.</div>
 
     <form method="post" class="space-y-4">
         {% csrf_token %}
         {% for field in form %}
         <div>
-            <label class="text-xs font-medium text-zinc-400 block mb-1.5 uppercase">{{ field.label }}</label>
+            <label class="text-xs font-bold text-white/40 block mb-1.5 uppercase tracking-wider">{{ field.label }}</label>
             {{ field }}
-            {% if field.errors %}<p class="text-red-400 text-xs mt-1">{{ field.errors|striptags }}</p>{% endif %}
+            {% if field.errors %}<p class="text-papaya-400 text-xs mt-1.5 font-semibold">{{ field.errors|striptags }}</p>{% endif %}
         </div>
         {% endfor %}
-        <button type="submit" class="earn-btn w-full py-4 text-lg font-semibold rounded-3xl">Add Link</button>
+        <button type="submit" class="earn-btn w-full py-4 text-sm font-bold uppercase tracking-wider rounded-2xl">Add link</button>
     </form>
 </div>
 {% endblock %}

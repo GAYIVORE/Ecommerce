@@ -3,131 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}E-commerce Shop{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <meta name="theme-color" content="#28338A">
+    <meta name="description" content="{% block meta_description %}E Shop — a multi-vendor marketplace to buy from local shops, and a side-hustle hub to earn extra income.{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}E Shop{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Shop local vendors. Earn on the side. All in one place.{% endblock %}">
+    <meta property="og:type" content="website">
+    <title>{% block title %}E Shop — Marketplace & Earn{% endblock %}</title>
+
+    {% load static %}
+    <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <script src="https://unpkg.com/htmx.org@2.0.0"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    {% load static %} {# Load the staticfiles tag library #}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}"> {# Link to our custom CSS file #}
     {% block extra_head %}{% endblock %}
 </head>
-<body class="flex flex-col min-h-screen custom-bg">
- 
-<header style="background-color: #3B0AD1 !important; border-bottom: 1px solid #383B0C !important; box-shadow: 0 1px 2px 0 rgba(240, 41, 41, 0.05) !important;" class="w-full sticky top-0 z-50 py-3.5">
-    <nav class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 px-4">
-        
-        <a href="{% url 'core:home' %}" style="color: #0f172a !important;" class="text-2xl font-black tracking-tighter hover:opacity-80 transition-opacity flex items-center gap-2 shrink-0">
-            <span style="background-color: #000000 !important; color: #FFFFFF !important;" class="px-2.5 py-1 rounded-lg text-lg font-black tracking-normal">E</span>
-            <span style="color: #050606 !important;">SHOP</span>
-        </a>
-        
-        <div class="w-full md:flex-grow max-w-md mx-0 md:mx-8">
-            <form action="{% url 'products:product_list' %}" method="get" class="w-full m-0">
-                <div class="relative w-full">
-                    <input type="search" name="q" placeholder="Search products..."
-                           style="border-color: #cbd5e1 !important; background-color: #f8fafc !important; color: #0f172a !important;"
-                           class="w-full pl-11 pr-4 py-2.5 rounded-xl border font-medium text-sm transition-all placeholder-slate-400 focus:outline-none focus:bg-white focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10"
-                           value="{{ request.GET.q|default:'' }}">
-                    
-                    <button type="submit" style="color: #64748b !important;" class="absolute left-3.5 top-1/2 transform -translate-y-1/2 hover:text-amber-600 transition-colors cursor-pointer bg-transparent border-none p-0">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
-                        </svg>
-                    </button>
-                </div>
-            </form>
-        </div>
-        
-        <div class="flex items-center gap-x-6 gap-y-2 flex-wrap justify-center shrink-0">
-            <a href="{% url 'core:home' %}" style="color: #000000 !important; background-color: #ECC940A1 !important; border: 2px solid #e2e8f0 !important;" class="text-xs font-bold uppercase tracking-wider px-2 py-2 rounded-full hover:bg-slate-200/80 transition-all active:scale-[0.98]">Home</a>
-            <a href="{% url 'products:product_list' %}" style="color: #000000 !important; background-color: #ECC940A1 !important; border: 2px solid #e2e8f0 !important;" class="text-xs font-bold uppercase tracking-wider px-2 py-2 rounded-full hover:bg-slate-200/80 transition-all active:scale-[0.98]">Products</a>
-            <a href="{% url 'cart:cart_detail' %}" style="color: #000000 !important; background-color: #ECC940A1 !important; border: 2px solid #e2e8f0 !important;" class="text-xs font-bold uppercase tracking-wider px-2 py-2 rounded-full hover:bg-slate-200/80 transition-all active:scale-[0.98]">Cart</a>
-            {% if user.is_authenticated %}
-                <a href="{% url 'earn:dashboard' %}" style="color: #ffffff !important; background-color: #00c853 !important; border: 2px solid #00c853 !important;" class="text-xs font-bold uppercase tracking-wider px-2 py-2 rounded-full hover:opacity-90 transition-all active:scale-[0.98] flex items-center gap-1">
-                    <i class="fa-solid fa-coins"></i> Earn
-                </a>
-            {% endif %}
+<body class="flex flex-col min-h-screen bg-paper">
 
-            {% if user.is_authenticated %}
-                <a href="{% url 'wishlist:wishlist_detail' %}" 
-                   style="color: #CA0E0E !important;" 
-                   class="relative p-1.5 hover:opacity-80 transition-all active:scale-[0.95] flex items-center justify-center shrink-0">
-                    <svg class="w-6 h-6 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                    </svg>
-                    
-                    {% if wishlist_count > 0 %}
-                        <span style="background-color: #000000 !important;" class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[8px] font-black leading-none text-white rounded-full min-w-[16px] transform translate-x-1/3 -translate-y-1/4">
-                            {{ wishlist_count }}
-                        </span>
-                    {% endif %}
-                </a>
-            {% endif %}
+<header class="w-full sticky top-0 z-50 bg-ink-900">
+    <div class="awning-stripe"></div>
+    <nav class="max-w-7xl mx-auto px-4 py-3">
+        <div class="flex items-center justify-between gap-4">
 
-            <span style="background-color: #000000 !important;" class="h-4 w-px hidden sm:inline-block"></span>
+            <a href="{% url 'core:home' %}" class="flex items-center gap-2 shrink-0 group">
+                <span class="w-9 h-9 rounded-lg bg-brand-500 ring-2 ring-marigold-500 flex items-center justify-center font-display font-bold text-lg text-white group-hover:bg-brand-400 transition-colors">E</span>
+                <span class="font-display font-bold text-lg tracking-tight text-white hidden sm:inline">SHOP</span>
+            </a>
 
-            {% if user.is_authenticated %}
-                <a href="{% url 'users:profile' %}" class="block group shrink-0" title="View Profile">
-                    {% if user.profile_picture %}
-                        <img src="{{ user.profile_picture.url }}" 
-                             alt="Profile" 
-                             class="w-8 h-8 rounded-full object-cover border-2 border-slate-200 group-hover:border-amber-500 transition-all active:scale-95">
-                    {% else %}
-                        <div style="background-color: #000000 !important; border: 2px solid #e2e8f0 !important;" 
-                             class="w-8 h-8 rounded-full flex items-center justify-center text-white group-hover:border-amber-500 transition-all active:scale-95">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+            <div class="hidden md:block flex-grow max-w-xl mx-4">
+                <form action="{% url 'products:product_list' %}" method="get" class="w-full m-0">
+                    <div class="relative w-full">
+                        <input type="search" name="q" placeholder="Search products, shops, categories…"
+                               class="field !bg-white/95 !border-transparent !py-2.5 pl-11 focus:!ring-marigold-500/30 focus:!border-marigold-500"
+                               value="{{ request.GET.q|default:'' }}">
+                        <button type="submit" aria-label="Search" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-900/40 hover:text-brand-500 transition-colors bg-transparent border-none p-0 cursor-pointer">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
                             </svg>
-                        </div>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="hidden md:flex items-center gap-6 shrink-0">
+                <a href="{% url 'core:home' %}" class="nav-link">Home</a>
+                <a href="{% url 'products:product_list' %}" class="nav-link">Products</a>
+                <a href="{% url 'shops:shop_directory' %}" class="nav-link">Shops</a>
+
+                {% if user.is_authenticated %}
+                    <a href="{% url 'earn:dashboard' %}" class="btn-earn !py-2 !px-3.5">
+                        <i class="fa-solid fa-coins"></i> Earn
+                    </a>
+                {% endif %}
+
+                <a href="{% url 'cart:cart_detail' %}" class="relative text-white/80 hover:text-white transition-colors" aria-label="Cart">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"></path>
+                    </svg>
+                    {% if cart_item_count > 0 %}
+                        <span class="absolute -top-2 -right-2 inline-flex items-center justify-center px-1.5 py-0.5 text-[9px] font-black leading-none text-ink-900 bg-marigold-500 rounded-full min-w-[16px]">{{ cart_item_count }}</span>
                     {% endif %}
-                </a> <form action="{% url 'users:logout' %}" method="post" class="inline m-0">
+                </a>
+
+                {% if user.is_authenticated %}
+                    <a href="{% url 'wishlist:wishlist_detail' %}" class="relative text-white/80 hover:text-white transition-colors" aria-label="Wishlist">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                        </svg>
+                        {% if wishlist_count > 0 %}
+                            <span class="absolute -top-2 -right-2 inline-flex items-center justify-center px-1.5 py-0.5 text-[9px] font-black leading-none text-white bg-papaya-500 rounded-full min-w-[16px]">{{ wishlist_count }}</span>
+                        {% endif %}
+                    </a>
+                {% endif %}
+
+                <span class="h-5 w-px bg-white/15"></span>
+
+                {% if user.is_authenticated %}
+                    <a href="{% url 'users:profile' %}" class="block group shrink-0" title="View profile">
+                        {% if user.profile_picture %}
+                            <img src="{{ user.profile_picture.url }}" alt="Profile" class="w-8 h-8 rounded-full object-cover ring-2 ring-white/20 group-hover:ring-marigold-500 transition-all">
+                        {% else %}
+                            <div class="w-8 h-8 rounded-full bg-white/10 ring-2 ring-white/20 flex items-center justify-center text-white group-hover:ring-marigold-500 transition-all">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                                </svg>
+                            </div>
+                        {% endif %}
+                    </a>
+                    <form action="{% url 'users:logout' %}" method="post" class="inline m-0">
+                        {% csrf_token %}
+                        <button type="submit" class="text-xs font-bold uppercase tracking-wider text-white/60 hover:text-papaya-400 transition-colors cursor-pointer bg-transparent border-none">Log out</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'users:login' %}" class="nav-link">Log in</a>
+                    <a href="{% url 'users:register' %}" class="btn-accent !py-2">Register</a>
+                {% endif %}
+            </div>
+
+            <button id="mobile-menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" class="md:hidden text-white p-2 -mr-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
+                </svg>
+            </button>
+        </div>
+
+        <form action="{% url 'products:product_list' %}" method="get" class="md:hidden w-full mt-3 m-0">
+            <div class="relative w-full">
+                <input type="search" name="q" placeholder="Search products…" class="field !bg-white/95 !border-transparent pl-11" value="{{ request.GET.q|default:'' }}">
+                <button type="submit" aria-label="Search" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-900/40 bg-transparent border-none p-0 cursor-pointer">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path></svg>
+                </button>
+            </div>
+        </form>
+    </nav>
+
+    <div id="mobile-menu" class="md:hidden hidden border-t border-white/10 bg-ink-800">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-1">
+            <a href="{% url 'core:home' %}" class="block px-3 py-2.5 rounded-lg text-sm font-bold text-white/85 hover:bg-white/5">Home</a>
+            <a href="{% url 'products:product_list' %}" class="block px-3 py-2.5 rounded-lg text-sm font-bold text-white/85 hover:bg-white/5">Products</a>
+            <a href="{% url 'shops:shop_directory' %}" class="block px-3 py-2.5 rounded-lg text-sm font-bold text-white/85 hover:bg-white/5">Shops</a>
+            <a href="{% url 'cart:cart_detail' %}" class="block px-3 py-2.5 rounded-lg text-sm font-bold text-white/85 hover:bg-white/5">Cart{% if cart_item_count > 0 %} ({{ cart_item_count }}){% endif %}</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'earn:dashboard' %}" class="block px-3 py-2.5 rounded-lg text-sm font-bold text-jade-400 hover:bg-white/5"><i class="fa-solid fa-coins mr-1.5"></i>Earn</a>
+                <a href="{% url 'wishlist:wishlist_detail' %}" class="block px-3 py-2.5 rounded-lg text-sm font-bold text-white/85 hover:bg-white/5">Wishlist{% if wishlist_count > 0 %} ({{ wishlist_count }}){% endif %}</a>
+                <a href="{% url 'users:profile' %}" class="block px-3 py-2.5 rounded-lg text-sm font-bold text-white/85 hover:bg-white/5">Profile</a>
+                <form action="{% url 'users:logout' %}" method="post" class="m-0">
                     {% csrf_token %}
-                    <button type="submit" 
-                            style="background-color: #fef2f2 !important; color: #F31010 !important; border: 1px solid #fecaca !important;" 
-                            class="inline-flex items-center px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-rose-100 hover:text-rose-800 transition-all active:scale-[0.98] cursor-pointer">
-                        Logout
-                    </button>
+                    <button type="submit" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-bold text-papaya-400 hover:bg-white/5 cursor-pointer bg-transparent border-none">Log out</button>
                 </form>
             {% else %}
-                <a href="{% url 'users:login' %}" style="color: #F9F6F6 !important; background-color: transparent !important;" class="text-xs font-bold uppercase tracking-wider hover:text-amber-600 transition-colors">Login</a>
-                
-                <a href="{% url 'users:register' %}" 
-                   style="background-color: #0D8075 !important; color: #ffffff !important;" 
-                   class="inline-flex items-center px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-slate-800 transition-all shadow-xs active:scale-[0.98]">
-                    Register
-                </a>
+                <a href="{% url 'users:login' %}" class="block px-3 py-2.5 rounded-lg text-sm font-bold text-white/85 hover:bg-white/5">Log in</a>
+                <a href="{% url 'users:register' %}" class="block px-3 py-2.5 rounded-lg text-sm font-bold text-marigold-400 hover:bg-white/5">Register</a>
             {% endif %}
         </div>
-        
-    </nav>
+    </div>
 </header>
 
-<main class="flex-grow container mx-auto p-4">
+<main class="flex-grow w-full">
     {% if messages %}
-        <ul class="mb-4">
-            {% for message in messages %}
-                <li class="message-item {{ message.tags }}">{{ message }}</li>
-            {% endfor %}
-        </ul>
+        <div class="max-w-7xl mx-auto px-4 pt-4">
+            <ul class="messages flex flex-col gap-2">
+                {% for message in messages %}
+                    <li class="message-item {{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
     {% endif %}
 
     {% block content %}
     {% endblock %}
 </main>
 
-<footer class="bg-gray-900 text-white py-6 mt-auto">
-    <div class="container mx-auto text-center px-4">
-        <p>&copy; 2026 E-commerce Shop. All rights reserved.</p>
-        <div class="mt-3 text-sm text-gray-400 space-x-4">
-            <a href="#" class="hover:text-blue-300 transition duration-300">Privacy Policy</a>
-            <span class="text-gray-600">|</span>
-            <a href="#" class="hover:text-blue-300 transition duration-300">Terms of Service</a>
+<footer class="mt-auto bg-ink-900 text-white/70">
+    <div class="awning-stripe"></div>
+    <div class="max-w-7xl mx-auto px-4 py-12 grid grid-cols-2 sm:grid-cols-4 gap-8">
+        <div class="col-span-2 sm:col-span-1">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="w-8 h-8 rounded-lg bg-brand-500 ring-2 ring-marigold-500 flex items-center justify-center font-display font-bold text-white">E</span>
+                <span class="font-display font-bold text-white">SHOP</span>
+            </div>
+            <p class="text-xs leading-relaxed text-white/50">A marketplace for local shops, and a place to earn — services, quick cash, and every cedi tracked.</p>
+        </div>
+        <div>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-white/40 mb-3">Shop</h4>
+            <ul class="space-y-2 text-sm">
+                <li><a href="{% url 'products:product_list' %}" class="text-white/70 hover:text-marigold-400 transition-colors">All products</a></li>
+                <li><a href="{% url 'shops:shop_directory' %}" class="text-white/70 hover:text-marigold-400 transition-colors">Shop directory</a></li>
+                <li><a href="{% url 'cart:cart_detail' %}" class="text-white/70 hover:text-marigold-400 transition-colors">Your cart</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-white/40 mb-3">Earn</h4>
+            <ul class="space-y-2 text-sm">
+                <li><a href="{% url 'earn:marketplace' %}" class="text-white/70 hover:text-jade-400 transition-colors">Find services</a></li>
+                <li><a href="{% url 'earn:quickcash' %}" class="text-white/70 hover:text-jade-400 transition-colors">Quick cash offers</a></li>
+                <li><a href="{% url 'shops:create_shop' %}" class="text-white/70 hover:text-jade-400 transition-colors">Open a shop</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-white/40 mb-3">Company</h4>
+            <ul class="space-y-2 text-sm">
+                <li><a href="#" class="text-white/70 hover:text-white transition-colors">Privacy policy</a></li>
+                <li><a href="#" class="text-white/70 hover:text-white transition-colors">Terms of service</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-4 py-5 text-xs text-white/40 text-center">
+            &copy; {% now "Y" %} E Shop. All rights reserved.
         </div>
     </div>
 </footer>
+
+<script>
+    (function () {
+        var toggle = document.getElementById('mobile-menu-toggle');
+        var menu = document.getElementById('mobile-menu');
+        if (!toggle || !menu) return;
+        toggle.addEventListener('click', function () {
+            var isHidden = menu.classList.contains('hidden');
+            menu.classList.toggle('hidden');
+            toggle.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+        });
+    })();
+</script>
 {% block extra_scripts %}{% endblock %}
 </body>
 </html>

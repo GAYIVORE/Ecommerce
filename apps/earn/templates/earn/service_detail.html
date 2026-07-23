@@ -1,37 +1,37 @@
 {% extends "earn/base_earn.html" %}
 
-{% block title %}{{ service.title }}{% endblock %}
+{% block title %}{{ service.title }} — Earn{% endblock %}
 
 {% block earn_content %}
-<div class="earn-card p-8 max-w-2xl mx-auto">
+<div class="earn-card p-6 sm:p-8 max-w-2xl mx-auto">
     <div class="flex justify-between items-start mb-4 gap-4">
         <div>
-            <h2 class="text-2xl sm:text-3xl font-bold text-white">{{ service.title }}</h2>
-            <span class="inline-block mt-2 px-3 py-1 bg-emerald-900/30 text-emerald-400 rounded-xl text-xs">{{ service.get_category_display }}</span>
+            <h2 class="text-xl sm:text-3xl font-display font-bold text-white">{{ service.title }}</h2>
+            <span class="inline-block mt-2 px-3 py-1 bg-jade-500/15 text-jade-400 rounded-xl text-xs font-bold">{{ service.get_category_display }}</span>
         </div>
-        <div class="text-3xl font-bold text-white shrink-0">₵{{ service.price }}</div>
+        <div class="text-2xl sm:text-3xl font-display font-bold text-white shrink-0 font-mono">GHS {{ service.price }}</div>
     </div>
 
-    <p class="text-zinc-300 mb-6">{{ service.description }}</p>
+    <p class="text-white/60 mb-6 text-sm sm:text-base leading-relaxed">{{ service.description }}</p>
 
-    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-zinc-400 mb-6">
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/40 mb-6">
         <span>Provider: {{ service.provider.username }}</span>
         <span>{{ service.bookings_count }} completed bookings</span>
-        {% if service.average_rating %}<span>★ {{ service.average_rating }} average rating</span>{% endif %}
+        {% if service.average_rating %}<span class="text-marigold-400">&#9733; {{ service.average_rating }} average rating</span>{% endif %}
     </div>
 
     {% if service.provider_id == request.user.id %}
-        <p class="earn-card p-4 text-sm text-zinc-400">This is your own listing — customers who visit this page can book and message you here.</p>
+        <p class="bg-white/5 rounded-xl p-4 text-sm text-white/50">This is your own listing — customers who visit this page can book and message you here.</p>
     {% else %}
         <form method="post" action="{% url 'earn:book_service' service.pk %}" class="space-y-3">
             {% csrf_token %}
             <textarea name="notes" rows="2" placeholder="Any notes for the provider (optional)"
-                      class="w-full px-4 py-3 bg-zinc-950 border border-zinc-700 rounded-2xl text-sm"></textarea>
-            <button type="submit" class="earn-btn w-full py-3.5 rounded-3xl font-semibold">Book this service — ₵{{ service.price }}</button>
+                      class="w-full px-4 py-3 bg-ink-900 border border-white/10 rounded-2xl text-sm text-white placeholder-white/30 focus:outline-none focus:border-jade-500 transition-colors"></textarea>
+            <button type="submit" class="earn-btn w-full py-3.5 rounded-2xl font-bold text-sm uppercase tracking-wider">Book this service — GHS {{ service.price }}</button>
         </form>
         {% if service.contact_phone %}
         <a href="https://wa.me/{{ service.contact_phone|cut:' '|cut:'+' }}" target="_blank"
-           class="block text-center mt-3 text-sm text-emerald-400 hover:text-emerald-300">
+           class="block text-center mt-3 text-sm font-semibold text-jade-400 hover:text-jade-300 transition-colors">
             <i class="fa-brands fa-whatsapp"></i> Message provider on WhatsApp
         </a>
         {% endif %}

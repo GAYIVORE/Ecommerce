@@ -1,0 +1,173 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   E SHOP design system
+   Concept: a market grid — the energy of a bustling stall-lined marketplace,
+   rendered as clean modern commerce UI. The "awning stripe" (a thin four-
+   colour diagonal band) is the one signature flourish, used only at a
+   handful of structural seams: hero card, section dividers, footer top edge.
+   ========================================================================== */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-body text-ink-900 bg-paper antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight text-ink-900;
+  }
+
+  a {
+    @apply text-brand-500;
+  }
+
+  ::selection {
+    @apply bg-marigold-400/40;
+  }
+
+  :focus-visible {
+    outline: 2px solid theme('colors.brand.500');
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Signature element: the awning stripe */
+  .awning-stripe {
+    height: 6px;
+    background-image: repeating-linear-gradient(
+      -45deg,
+      theme('colors.brand.500') 0 18px,
+      theme('colors.marigold.500') 18px 36px,
+      theme('colors.jade.500') 36px 54px,
+      theme('colors.papaya.500') 54px 72px
+    );
+  }
+
+  /* Buttons */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5
+           text-xs font-bold uppercase tracking-wider transition-all duration-150
+           active:scale-[0.98] cursor-pointer disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-ink-900 text-white hover:bg-ink-800 shadow-card;
+  }
+  .btn-accent {
+    @apply btn bg-marigold-500 text-ink-900 hover:bg-marigold-400 shadow-card;
+  }
+  .btn-brand {
+    @apply btn bg-brand-500 text-white hover:bg-brand-600 shadow-card;
+  }
+  .btn-earn {
+    @apply btn bg-jade-500 text-white hover:bg-jade-600 shadow-card;
+  }
+  .btn-ghost {
+    @apply btn bg-white text-ink-900 border border-line hover:bg-paper;
+  }
+  .btn-danger {
+    @apply btn bg-papaya-50 text-papaya-700 border border-papaya-100 hover:bg-papaya-100;
+  }
+  .btn-disabled {
+    @apply btn bg-paper text-ink-900/30 border border-line cursor-not-allowed;
+  }
+
+  /* Cards */
+  .card {
+    @apply bg-white border border-line rounded-2xl shadow-card;
+  }
+  .card-hover {
+    @apply card transition-all duration-200 hover:shadow-lift hover:-translate-y-0.5;
+  }
+
+  /* Inputs */
+  .field {
+    @apply w-full rounded-xl border border-line bg-white px-4 py-2.5 text-sm font-medium
+           text-ink-900 placeholder-ink-900/35 transition-all
+           focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10;
+  }
+  .field-label {
+    @apply block text-xs font-bold uppercase tracking-wider text-ink-900/50 mb-2;
+  }
+
+  /* Chips / pills used for categories, filters */
+  .chip {
+    @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-line
+           bg-white px-4 py-2 text-xs sm:text-sm font-bold text-ink-900/70 transition-all
+           hover:border-brand-400 hover:text-ink-900;
+  }
+  .chip-active {
+    @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-ink-900 px-4 py-2
+           text-xs sm:text-sm font-bold text-white shadow-card;
+  }
+
+  /* Badges */
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-bold border;
+  }
+  .badge-success { @apply badge bg-jade-50 text-jade-700 border-jade-100; }
+  .badge-danger  { @apply badge bg-papaya-50 text-papaya-700 border-papaya-100; }
+  .badge-neutral { @apply badge bg-paper text-ink-900/60 border-line; }
+  .badge-brand   { @apply badge bg-brand-50 text-brand-600 border-brand-100; }
+
+  /* Nav link (desktop) */
+  .nav-link {
+    @apply relative text-xs font-bold uppercase tracking-wider text-white/80 hover:text-white
+           transition-colors py-2;
+  }
+  .nav-link::after {
+    content: '';
+    @apply absolute left-0 -bottom-0.5 h-0.5 w-0 bg-marigold-500 transition-all duration-200;
+  }
+  .nav-link:hover::after {
+    @apply w-full;
+  }
+
+  /* Toast / message alerts */
+  .message-item {
+    @apply rounded-xl border px-4 py-3 text-sm font-semibold shadow-card;
+    animation: fadeOut .4s ease-out 5s forwards;
+  }
+  .message-item.success { @apply bg-jade-50 border-jade-100 text-jade-700; }
+  .message-item.info    { @apply bg-brand-50 border-brand-100 text-brand-600; }
+  .message-item.warning { @apply bg-marigold-50 border-marigold-100 text-marigold-700; }
+  .message-item.error   { @apply bg-papaya-50 border-papaya-100 text-papaya-700; }
+
+  /* Price display */
+  .price {
+    @apply font-display font-bold text-ink-900;
+  }
+  .price-lg {
+    @apply price text-3xl sm:text-4xl;
+  }
+
+  /* Earn module (dark sub-theme) */
+  .earn-card {
+    @apply bg-ink-800 border border-white/10 rounded-3xl;
+  }
+  .earn-btn {
+    @apply inline-flex items-center justify-center bg-jade-500 text-ink-900 shadow-card transition-transform duration-150 hover:-translate-y-0.5;
+  }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; transform: translateY(-4px); visibility: hidden; }
+}
+
+@keyframes pingRing {
+  75%, 100% { transform: scale(2.2); opacity: 0; }
+}
+.ping-dot { position: relative; display: inline-block; }
+.ping-dot::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: 9999px;
+  background-color: inherit;
+  animation: pingRing 1.6s cubic-bezier(0,0,0.2,1) infinite;
+}

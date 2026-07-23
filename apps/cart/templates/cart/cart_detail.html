@@ -1,94 +1,81 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Your Shopping Cart - E-commerce Shop{% endblock %}
+{% block title %}Your cart — E Shop{% endblock %}
 
 {% block content %}
 <div class="w-full max-w-5xl mx-auto px-4 py-8 sm:py-12 flex flex-col items-center">
-    <h1 style="color: #0f172a;" class="text-2xl sm:text-4xl font-black tracking-tight mb-8 text-center flex items-center justify-center gap-3 w-full">
-        <span>Your Shopping Cart</span>
-        <span style="background-color: #e2e8f0; color: #334155;" class="text-xs sm:text-sm font-bold px-3 py-1 rounded-full border border-slate-200">
-            {{ cart.get_total_items|default:"0" }}
-        </span>
+    <h1 class="text-2xl sm:text-4xl font-display font-bold tracking-tight mb-8 text-center flex items-center justify-center gap-3 w-full">
+        <span>Your cart</span>
+        <span class="badge-neutral !text-sm !px-3 !py-1">{{ cart.get_total_items|default:"0" }}</span>
     </h1>
 
     {% if cart and cart.items.all %}
-        <div class="w-full space-y-8">
-            
-            {# ⚡ Multi-Vendor Loop: Group items by their parent Shop #}
+        <div class="w-full space-y-6">
+
             {% for shop, items in cart.get_items_grouped_by_shop.items %}
-                <div style="background-color: #ffffff; border-color: #e2e8f0;" class="w-full rounded-2xl border shadow-xs p-4 sm:p-6">
-                    
-                    {# Vendor Header Banner #}
-                    <div style="background-color: #f8fafc; border-color: #e2e8f0;" class="flex items-center justify-between p-4 mb-4 rounded-xl border">
+                <div class="w-full card p-4 sm:p-6">
+
+                    <div class="flex items-center justify-between p-4 mb-4 rounded-xl bg-paper border border-line">
                         <div class="flex items-center gap-2">
-                            <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-ink-900/50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" />
                             </svg>
-                            <span style="color: #0f172a;" class="text-sm font-black uppercase tracking-wider">
-                                Items from: <span class="text-amber-600">{{ shop.name }}</span>
+                            <span class="text-sm font-black uppercase tracking-wider">
+                                From <span class="text-brand-500">{{ shop.name }}</span>
                             </span>
                         </div>
-                        <span style="color: #64748b;" class="text-xs font-bold bg-slate-200/60 px-2.5 py-1 rounded-md">
-                            {{ items|length }} item{{ items|length|pluralize }}
-                        </span>
+                        <span class="badge-neutral">{{ items|length }} item{{ items|length|pluralize }}</span>
                     </div>
 
-                    {# Desktop View Table per Vendor #}
                     <div class="hidden md:block overflow-x-auto">
-                        <table class="min-w-full divide-y divide-slate-100">
+                        <table class="min-w-full divide-y divide-line">
                             <thead>
-                                <tr style="background-color: #f8fafc;">
-                                    <th scope="col" style="color: #475569;" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider rounded-l-xl">Product Details</th>
-                                    <th scope="col" style="color: #475569;" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Unit Price</th>
-                                    <th scope="col" style="color: #475569;" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Quantity</th>
-                                    <th scope="col" style="color: #475569;" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Subtotal</th>
-                                    <th scope="col" style="color: #475569;" class="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider rounded-r-xl">Actions</th>
+                                <tr>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-ink-900/40">Product</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-ink-900/40">Unit price</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-ink-900/40">Quantity</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-ink-900/40">Subtotal</th>
+                                    <th scope="col" class="px-4 py-3 text-right text-xs font-bold uppercase tracking-wider text-ink-900/40">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-slate-100">
+                            <tbody class="divide-y divide-line">
                                 {% for item in items %}
-                                    <tr class="hover:bg-slate-50/50 transition-colors">
-                                        <td class="px-6 py-4 whitespace-nowrap">
+                                    <tr class="hover:bg-paper/60 transition-colors">
+                                        <td class="px-4 py-4 whitespace-nowrap">
                                             <div class="flex items-center gap-4">
-                                                <div style="border-color: #e2e8f0;" class="flex-shrink-0 h-16 w-16 rounded-xl border overflow-hidden bg-slate-50">
+                                                <div class="flex-shrink-0 h-16 w-16 rounded-xl border border-line overflow-hidden bg-paper">
                                                     {% if item.product.image %}
                                                         <img class="h-full w-full object-cover" src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
                                                     {% else %}
-                                                        <img class="h-full w-full object-cover" src="https://placehold.co/80x80/f1f5f9/94a3b8?text=Product" alt="No image">
+                                                        <img class="h-full w-full object-cover" src="https://placehold.co/80x80/F7F7F4/14151C?text=Item" alt="No image">
                                                     {% endif %}
                                                 </div>
                                                 <div class="flex flex-col">
-                                                    <a href="{{ item.product.get_absolute_url }}" style="color: #0f172a;" class="text-sm font-bold hover:text-amber-600 transition-colors tracking-tight">
+                                                    <a href="{{ item.product.get_absolute_url }}" class="text-sm font-bold text-ink-900 hover:text-brand-500 transition-colors tracking-tight">
                                                         {{ item.product.name }}
                                                     </a>
-                                                    <span style="color: #94a3b8;" class="text-[11px] font-medium mt-0.5">SKU: #00{{ item.product.id }}</span>
+                                                    <span class="text-[11px] font-mono font-medium text-ink-900/40 mt-0.5">SKU #{{ item.product.id|stringformat:"05d" }}</span>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td style="color: #334155;" class="px-6 py-4 whitespace-nowrap text-sm font-semibold">
+                                        <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-ink-900/70">
                                             GHS {{ item.product.price|floatformat:2 }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
+                                        <td class="px-4 py-4 whitespace-nowrap">
                                             <form action="{% url 'cart:update_cart' item.id %}" method="post" class="flex items-center gap-2 m-0">
                                                 {% csrf_token %}
-                                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}"
-                                                       style="border-color: #cbd5e1; color: #0f172a; background-color: #ffffff;"
-                                                       class="w-16 px-2 py-1.5 text-center text-sm font-bold rounded-lg focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 transition-all">
-                                                <button type="submit" style="background-color: #6AA9F6; color: #ffffff; border: 1px solid #6AA9F6;" class="px-2.5 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-600 transition-colors cursor-pointer">
-                                                    Update
-                                                </button>
+                                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" class="field !w-16 !py-1.5 text-center">
+                                                <button type="submit" class="btn-ghost !px-2.5 !py-1.5 !text-[11px]">Update</button>
                                             </form>
                                         </td>
-                                        <td style="color: #0f172a;" class="px-6 py-4 whitespace-nowrap text-sm font-black">
+                                        <td class="px-4 py-4 whitespace-nowrap text-sm font-black text-ink-900">
                                             GHS {{ item.get_total_item_price|floatformat:2 }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                                        <td class="px-4 py-4 whitespace-nowrap text-right text-sm">
                                             <form action="{% url 'cart:remove_from_cart' item.id %}" method="post" class="inline m-0">
                                                 {% csrf_token %}
-                                                <button type="submit" style="color: #F32A0B;" class="text-xs font-bold uppercase tracking-wider hover:text-rose-600 transition-colors cursor-pointer bg-transparent border-none p-0">
-                                                    Remove
-                                                </button>
+                                                <button type="submit" class="text-xs font-bold uppercase tracking-wider text-papaya-600 hover:text-papaya-700 transition-colors cursor-pointer bg-transparent border-none">Remove</button>
                                             </form>
                                         </td>
                                     </tr>
@@ -97,49 +84,42 @@
                         </table>
                     </div>
 
-                    {# Mobile View Blocks per Vendor #}
                     <div class="block md:hidden space-y-4">
                         {% for item in items %}
-                            <div style="border-color: #f1f5f9; background-color: #f8fafc;" class="p-4 rounded-xl border flex flex-col gap-4">
+                            <div class="p-4 rounded-xl border border-line bg-paper flex flex-col gap-4">
                                 <div class="flex items-start gap-3">
-                                    <div style="border-color: #e2e8f0;" class="h-16 w-16 rounded-lg border overflow-hidden bg-white shrink-0">
+                                    <div class="h-16 w-16 rounded-lg border border-line overflow-hidden bg-white shrink-0">
                                         {% if item.product.image %}
                                             <img class="h-full w-full object-cover" src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
                                         {% else %}
-                                            <img class="h-full w-full object-cover" src="https://placehold.co/80x80/f1f5f9/94a3b8?text=Product" alt="No image">
+                                            <img class="h-full w-full object-cover" src="https://placehold.co/80x80/F7F7F4/14151C?text=Item" alt="No image">
                                         {% endif %}
                                     </div>
                                     <div class="flex-grow">
-                                        <a href="{{ item.product.get_absolute_url }}" style="color: #0f172a;" class="text-sm font-bold line-clamp-2 hover:text-amber-600">
+                                        <a href="{{ item.product.get_absolute_url }}" class="text-sm font-bold text-ink-900 line-clamp-2 hover:text-brand-500">
                                             {{ item.product.name }}
                                         </a>
                                         <div class="flex items-center gap-2 mt-1 text-xs">
-                                            <span style="color: #475569;" class="font-semibold">GHS {{ item.product.price|floatformat:2 }}</span>
-                                            <span style="color: #cbd5e1;">•</span>
-                                            <span style="color: #94a3b8;">SKU: #00{{ item.product.id }}</span>
+                                            <span class="font-semibold text-ink-900/70">GHS {{ item.product.price|floatformat:2 }}</span>
+                                            <span class="text-line">&bull;</span>
+                                            <span class="font-mono text-ink-900/40">SKU #{{ item.product.id|stringformat:"05d" }}</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div style="border-top: 1px solid #e2e8f0;" class="pt-3 flex items-center justify-between flex-wrap gap-2">
+                                <div class="pt-3 border-t border-line flex items-center justify-between flex-wrap gap-2">
                                     <form action="{% url 'cart:update_cart' item.id %}" method="post" class="flex items-center gap-1.5 m-0">
                                         {% csrf_token %}
-                                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}"
-                                               style="border-color: #cbd5e1; color: #0f172a;"
-                                               class="w-12 px-1 py-1 text-center text-xs font-bold rounded-md bg-white">
-                                        <button type="submit" style="background-color: #94E3B7; color: #475569; border: 1px solid #cbd5e1;" class="px-2 py-1 rounded-md text-xs font-bold hover:bg-slate-100">
-                                            Update
-                                        </button>
+                                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" class="field !w-14 !py-1 !px-1 text-center text-xs">
+                                        <button type="submit" class="btn-ghost !px-2 !py-1 !text-[10px]">Update</button>
                                     </form>
 
                                     <div class="flex items-center gap-3">
-                                        <span style="color: #0f172a;" class="text-sm font-black">GHS {{ item.get_total_item_price|floatformat:2 }}</span>
-                                        <span style="color: #cbd5e1;">|</span>
+                                        <span class="text-sm font-black text-ink-900">GHS {{ item.get_total_item_price|floatformat:2 }}</span>
+                                        <span class="text-line">|</span>
                                         <form action="{% url 'cart:remove_from_cart' item.id %}" method="post" class="inline m-0">
                                             {% csrf_token %}
-                                            <button type="submit" style="color: #FF4D4D;" class="text-xs font-bold uppercase hover:text-rose-600 transition-colors cursor-pointer bg-transparent border-none p-0">
-                                                Remove
-                                            </button>
+                                            <button type="submit" class="text-xs font-bold uppercase text-papaya-600 hover:text-papaya-700 transition-colors cursor-pointer bg-transparent border-none">Remove</button>
                                         </form>
                                     </div>
                                 </div>
@@ -150,46 +130,32 @@
                 </div>
             {% endfor %}
 
-            {# Sticky Order Global Summary Card #}
-            <div style="background-color: #ffffff; border-color: #e2e8f0;" class="w-full rounded-2xl border shadow-xs p-6">
-                <div style="border-bottom: 2px dashed #e2e8f0;" class="pb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <span style="color: #475569;" class="text-xs sm:text-sm font-bold uppercase tracking-wider">Estimated order summary total ({{ cart.unique_shops_count }} Vendor{{ cart.unique_shops_count|pluralize }})</span>
+            <div class="w-full card p-6">
+                <div class="pb-6 border-b-2 border-dashed border-line flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <span class="text-xs sm:text-sm font-bold uppercase tracking-wider text-ink-900/50">Order total ({{ cart.unique_shops_count }} shop{{ cart.unique_shops_count|pluralize }})</span>
                     <div class="flex items-baseline gap-2">
-                        <span style="color: #0f172a;" class="text-sm font-medium">Total:</span>
-                        <span style="color: #0f172a;" class="text-2xl sm:text-3xl font-black tracking-tight">GHS {{ cart.get_total_price|floatformat:2 }}</span>
+                        <span class="text-sm font-medium text-ink-900/60">Total:</span>
+                        <span class="price-lg">GHS {{ cart.get_total_price|floatformat:2 }}</span>
                     </div>
                 </div>
 
                 <div class="mt-6 flex flex-col sm:flex-row justify-end items-center gap-3 w-full">
-                    <a href="{% url 'products:product_list' %}" 
-                       style="background-color: #BFF5CC; color: #475569; border: 1px solid #cbd5e1;" 
-                       class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all text-center order-2 sm:order-1">
-                        Continue Shopping
-                    </a>
-                    <a href="{% url 'orders:checkout_shipping' %}" 
-                       style="background-color: #0f172a; color: #ffffff;" 
-                       class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-slate-800 transition-all shadow-sm text-center order-1 sm:order-2">
-                        Proceed to Checkout
-                    </a>
+                    <a href="{% url 'products:product_list' %}" class="btn-ghost w-full sm:w-auto order-2 sm:order-1">Continue shopping</a>
+                    <a href="{% url 'orders:checkout_shipping' %}" class="btn-primary w-full sm:w-auto order-1 sm:order-2 !px-6">Proceed to checkout</a>
                 </div>
             </div>
 
         </div>
     {% else %}
-        {# Empty State Block #}
-        <div style="background-color: #ffffff; border-color: #e2e8f0;" class="w-full max-w-md text-center rounded-2xl border shadow-xs p-8 sm:p-12">
-            <div style="background-color: #fffbeb;" class="w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-4 text-amber-600">
+        <div class="w-full max-w-md text-center card p-8 sm:p-12">
+            <div class="w-14 h-14 rounded-xl bg-marigold-50 flex items-center justify-center mx-auto mb-4 text-marigold-600">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                 </svg>
             </div>
-            <h3 style="color: #0f172a;" class="text-lg font-black mb-1 tracking-tight">Your cart is empty</h3>
-            <p style="color: #64748b;" class="text-xs font-semibold mb-6 max-w-xs mx-auto">Looks like you haven't added any products to your cart yet.</p>
-            <a href="{% url 'products:product_list' %}" 
-               style="background-color: #0f172a; color: #ffffff;" 
-               class="inline-flex items-center px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-slate-800 transition-all shadow-xs">
-                Start Shopping
-            </a>
+            <h3 class="text-lg font-display font-bold mb-1 tracking-tight">Your cart is empty</h3>
+            <p class="text-xs font-semibold text-ink-900/50 mb-6 max-w-xs mx-auto">Looks like you haven't added anything yet — go find something worth carrying home.</p>
+            <a href="{% url 'products:product_list' %}" class="btn-primary inline-flex">Start shopping</a>
         </div>
     {% endif %}
 </div>

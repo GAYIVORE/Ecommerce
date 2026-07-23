@@ -1,60 +1,60 @@
 {% extends "earn/base_earn.html" %}
 
-{% block title %}My Bookings{% endblock %}
+{% block title %}My bookings — E Shop{% endblock %}
 
 {% block earn_content %}
-<h2 class="text-2xl sm:text-3xl font-semibold tracking-tight text-white mb-6">Bookings</h2>
+<h2 class="text-xl sm:text-3xl font-display font-bold tracking-tight text-white mb-6">Bookings</h2>
 
-<h3 class="text-sm font-bold uppercase tracking-widest mb-3 text-emerald-400">Incoming — services you provide</h3>
+<h3 class="text-xs sm:text-sm font-bold uppercase tracking-widest mb-3 text-jade-400">Incoming — services you provide</h3>
 <div class="space-y-3 mb-10">
 {% for b in incoming %}
     <div class="earn-card p-5 flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
-            <div class="font-semibold text-white">{{ b.service.title }}</div>
-            <div class="text-xs text-zinc-400 mt-1">From {{ b.customer.username }} &middot; ₵{{ b.amount }} &middot; <span class="font-semibold">{{ b.get_status_display }}</span></div>
-            {% if b.notes %}<div class="text-xs text-zinc-500 mt-1 italic">"{{ b.notes }}"</div>{% endif %}
+            <div class="font-bold text-white">{{ b.service.title }}</div>
+            <div class="text-xs text-white/45 mt-1">From {{ b.customer.username }} &middot; <span class="font-mono">GHS {{ b.amount }}</span> &middot; <span class="font-semibold text-white/70">{{ b.get_status_display }}</span></div>
+            {% if b.notes %}<div class="text-xs text-white/35 mt-1 italic">&ldquo;{{ b.notes }}&rdquo;</div>{% endif %}
         </div>
         <div class="flex gap-x-2 shrink-0">
             {% if b.status == 'PENDING' %}
-            <form method="post" action="{% url 'earn:booking_confirm' b.pk %}">{% csrf_token %}<button class="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-2xl text-xs font-semibold">Confirm</button></form>
+            <form method="post" action="{% url 'earn:booking_confirm' b.pk %}" class="m-0">{% csrf_token %}<button class="px-4 py-2 bg-white/10 hover:bg-white/15 rounded-xl text-xs font-bold text-white transition-colors">Confirm</button></form>
             {% endif %}
             {% if b.status == 'CONFIRMED' %}
-            <form method="post" action="{% url 'earn:booking_complete' b.pk %}">{% csrf_token %}<button class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-emerald-950 rounded-2xl text-xs font-semibold">Mark Completed</button></form>
+            <form method="post" action="{% url 'earn:booking_complete' b.pk %}" class="m-0">{% csrf_token %}<button class="px-4 py-2 bg-jade-500 hover:bg-jade-600 text-ink-900 rounded-xl text-xs font-bold transition-colors">Mark completed</button></form>
             {% endif %}
             {% if b.status == 'PENDING' or b.status == 'CONFIRMED' %}
-            <form method="post" action="{% url 'earn:booking_cancel' b.pk %}">{% csrf_token %}<button class="px-4 py-2 border border-zinc-700 hover:bg-zinc-800 rounded-2xl text-xs">Cancel</button></form>
+            <form method="post" action="{% url 'earn:booking_cancel' b.pk %}" class="m-0">{% csrf_token %}<button class="px-4 py-2 border border-white/10 hover:bg-white/5 rounded-xl text-xs text-white/70 transition-colors">Cancel</button></form>
             {% endif %}
         </div>
     </div>
 {% empty %}
-    <p class="text-zinc-400 text-sm">No bookings received yet. <a href="{% url 'earn:service_create' %}" class="text-emerald-400">Post a service</a> to start getting booked.</p>
+    <p class="text-white/40 text-sm">No bookings received yet. <a href="{% url 'earn:service_create' %}" class="text-jade-400 hover:text-jade-300">Post a service</a> to start getting booked.</p>
 {% endfor %}
 </div>
 
-<h3 class="text-sm font-bold uppercase tracking-widest mb-3 text-emerald-400">Your Bookings — as a customer</h3>
+<h3 class="text-xs sm:text-sm font-bold uppercase tracking-widest mb-3 text-jade-400">Your bookings — as a customer</h3>
 <div class="space-y-3">
 {% for b in outgoing %}
     <div class="earn-card p-5 flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
-            <div class="font-semibold text-white">{{ b.service.title }}</div>
-            <div class="text-xs text-zinc-400 mt-1">Provider: {{ b.service.provider.username }} &middot; ₵{{ b.amount }} &middot; <span class="font-semibold">{{ b.get_status_display }}</span></div>
+            <div class="font-bold text-white">{{ b.service.title }}</div>
+            <div class="text-xs text-white/45 mt-1">Provider: {{ b.service.provider.username }} &middot; <span class="font-mono">GHS {{ b.amount }}</span> &middot; <span class="font-semibold text-white/70">{{ b.get_status_display }}</span></div>
         </div>
         <div class="shrink-0">
         {% if b.status == 'COMPLETED' and not b.rating %}
-        <form method="post" action="{% url 'earn:booking_review' b.pk %}" class="flex items-center gap-x-2">
+        <form method="post" action="{% url 'earn:booking_review' b.pk %}" class="flex items-center gap-x-2 m-0">
             {% csrf_token %}
-            <select name="rating" class="bg-zinc-950 border border-zinc-700 rounded-xl text-xs px-2 py-1.5">
-                {% for i in "54321" %}<option value="{{ i }}">{{ i }} ★</option>{% endfor %}
+            <select name="rating" class="bg-ink-900 border border-white/10 rounded-xl text-xs px-2 py-1.5 text-white">
+                {% for i in "54321" %}<option value="{{ i }}">{{ i }} &#9733;</option>{% endfor %}
             </select>
-            <button class="px-3 py-1.5 bg-zinc-700 hover:bg-zinc-600 rounded-2xl text-xs font-semibold">Rate</button>
+            <button class="px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded-xl text-xs font-bold text-white transition-colors">Rate</button>
         </form>
         {% elif b.rating %}
-        <span class="text-xs text-emerald-400">You rated this {{ b.rating }} ★</span>
+        <span class="text-xs text-jade-400 font-semibold">You rated this {{ b.rating }} &#9733;</span>
         {% endif %}
         </div>
     </div>
 {% empty %}
-    <p class="text-zinc-400 text-sm">You haven't booked any services yet. <a href="{% url 'earn:marketplace' %}" class="text-emerald-400">Browse the marketplace</a>.</p>
+    <p class="text-white/40 text-sm">You haven't booked any services yet. <a href="{% url 'earn:marketplace' %}" class="text-jade-400 hover:text-jade-300">Browse the marketplace</a>.</p>
 {% endfor %}
 </div>
 {% endblock %}

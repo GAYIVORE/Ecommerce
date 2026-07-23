@@ -45,12 +45,10 @@ class ShippingAddressForm(forms.ModelForm):
             
         for field_name, field in self.fields.items():
             if field_name != 'is_default':
-                field.widget.attrs.update({
-                    'class': 'w-full px-4 py-2.5 text-sm font-medium text-slate-900 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 transition-all placeholder:text-slate-400'
-                })
+                field.widget.attrs.update({'class': 'field'})
             else:
                 field.widget.attrs.update({
-                    'class': 'h-4 w-4 rounded-sm border-slate-300 text-amber-600 focus:ring-amber-500 transition-colors cursor-pointer'
+                    'class': 'h-4 w-4 rounded-sm border-line text-brand-500 focus:ring-brand-500 transition-colors cursor-pointer'
                 })
 
 

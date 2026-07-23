@@ -1,238 +1,225 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Home - Elite Multi-Vendor Marketplace{% endblock %}
+{% block title %}E Shop — Shop local vendors, earn on the side{% endblock %}
 
 {% block content %}
-<div class="w-full bg-slate-50 min-h-screen pb-16">
-    
-    <div class="relative bg-white overflow-hidden mb-6 border-b border-gray-100 rounded-b-2xl sm:rounded-b-3xl shadow-xs">
-        <div class="absolute inset-0 opacity-40 mix-blend-overlay pointer-events-none bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:16px_16px]"></div>
-        
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 relative z-20 flex flex-col items-center text-center">
-            
-            {% if user.is_authenticated %}
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-800 text-xs font-bold tracking-wide uppercase mb-4 animate-fade-in">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 ping"></span>
-                    Welcome back, {{ user.username }}
-                </div>
-            {% endif %}
 
-            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-950 tracking-tight leading-tight max-w-3xl mb-4">
-                Curated Premium Goods.
-                <span class="block sm:inline sm:ml-2 text-emerald-500">Fast Delivery.</span>
-            </h1>
-            
-            <p class="text-sm sm:text-base text-slate-600 max-w-2xl font-medium leading-relaxed mb-6">
-                Discover authentic selections directly verified across specialized community hubs. Experience multi-vendor parcel tracking with elite marketplace security protocols.
-            </p>
-            
-            <div class="w-full max-w-md sm:max-w-xl flex flex-col sm:flex-row justify-center items-center gap-3">
-                
-                <!-- Start Shopping Button: Replaced #10B981 with bg-emerald-500 -->
-                <a href="{% url 'shops:shop_directory' %}" 
-                   class="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 text-sm font-bold uppercase tracking-wider text-white bg-emerald-500 hover:bg-emerald-600 transition-all rounded-xl shadow-md transform hover:-translate-y-0.5 duration-150">
-                     Start Shopping (All Malls)
-                </a>
+<section class="relative overflow-hidden bg-ink-900">
+    <div class="absolute inset-0 opacity-[0.04] pointer-events-none bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px]"></div>
 
-                {% if user.is_authenticated %}
-                    {% if user.shop %}
-                        <!-- Dashboard Button: Replaced #EEF2F6 with bg-slate-100 and #4F46E5 with text-indigo-600 -->
-                        <a href="{% url 'shops:vendor_dashboard' %}" 
-                           class="w-full sm:w-auto inline-flex justify-center items-center px-5 py-3 text-sm font-bold uppercase tracking-wider bg-slate-100 text-indigo-600 transition-all rounded-xl border border-slate-200 shadow-sm hover:bg-slate-200">
-                             Dashboard ({{ user.shop.name }})
-                        </a>
-                    {% else %}
-                        <!-- Apply Shop Button: Replaced #FEF3C7 with bg-amber-100 and #92400E with text-amber-800 -->
-                        <a href="{% url 'shops:create_shop' %}" 
-                           class="w-full sm:w-auto inline-flex justify-center items-center px-6 py-3 text-sm font-bold uppercase tracking-wider bg-amber-100 text-amber-800 transition-all rounded-xl shadow-md hover:opacity-95 transform hover:-translate-y-0.5 duration-150">
-                            APPLY FOR A SHOP →
-                        </a>
-                    {% endif %}
-                {% endif %}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-10 sm:pt-16 sm:pb-14 relative z-10 flex flex-col items-center text-center">
+
+        {% if user.is_authenticated %}
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 text-white/80 text-xs font-bold tracking-wide uppercase mb-5">
+                <span class="w-2 h-2 rounded-full bg-jade-500 ping-dot"></span>
+                Welcome back, {{ user.username }}
             </div>
+        {% endif %}
+
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-white tracking-tight leading-tight max-w-3xl mb-4">
+            Every stall in the market.
+            <span class="block sm:inline sm:ml-2 text-marigold-500">One address.</span>
+        </h1>
+
+        <p class="text-sm sm:text-base text-white/60 max-w-2xl font-medium leading-relaxed mb-8">
+            Buy directly from verified local vendors with real-time stock, tracked delivery per shop, and secure checkout — or flip to the Earn side and turn your own time into income.
+        </p>
+
+        <div class="w-full max-w-md sm:max-w-xl flex flex-col sm:flex-row justify-center items-center gap-3">
+            <a href="{% url 'shops:shop_directory' %}" class="btn-accent w-full sm:w-auto !py-3.5 !px-7">
+                Start shopping
+            </a>
+
+            {% if user.is_authenticated %}
+                {% if user.shop %}
+                    <a href="{% url 'shops:vendor_dashboard' %}" class="btn-ghost w-full sm:w-auto !py-3.5 !px-6 !bg-white/10 !text-white !border-white/15 hover:!bg-white/15">
+                        Dashboard — {{ user.shop.name }}
+                    </a>
+                {% else %}
+                    <a href="{% url 'shops:create_shop' %}" class="btn-ghost w-full sm:w-auto !py-3.5 !px-6 !bg-white/10 !text-white !border-white/15 hover:!bg-white/15">
+                        Open your own shop &rarr;
+                    </a>
+                {% endif %}
+            {% endif %}
         </div>
     </div>
 
-    {% if user.is_authenticated %}
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-        <div class="rounded-3xl p-6 sm:p-8 flex flex-col lg:flex-row items-center justify-between gap-5"
-             style="background-color: #09090b !important;">
+    <div class="awning-stripe"></div>
+</section>
+
+{% if user.is_authenticated %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-px">
+    <div class="bg-jade-500 py-5 sm:py-6">
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-5 px-2">
             <div class="flex items-center gap-x-4 text-center lg:text-left flex-col lg:flex-row">
-                <div class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style="background-color: #00c853 !important;">
-                    <i class="fa-solid fa-coins text-lg" style="color:#052e16 !important;"></i>
+                <div class="w-12 h-12 rounded-2xl bg-ink-900/15 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-coins text-lg text-white"></i>
                 </div>
                 <div>
-                    <div class="font-black text-xl sm:text-2xl tracking-tight" style="color:#ffffff !important;">Earn money on E SHOP</div>
-                    <p class="text-sm" style="color:#a1a1aa !important;">Post local services, browse quick cash offers, and track every cedi you make — right from your account.</p>
+                    <div class="font-display font-bold text-xl sm:text-2xl tracking-tight text-white">Earn money on E Shop</div>
+                    <p class="text-sm text-white/85">Post local services, browse quick cash offers, and track every cedi you make.</p>
                 </div>
             </div>
-            <a href="{% url 'earn:dashboard' %}"
-               class="shrink-0 inline-flex items-center gap-x-2 px-6 py-3 rounded-3xl text-sm font-bold uppercase tracking-wider transition-all hover:opacity-90 active:scale-[0.98]"
-               style="background-color: #00c853 !important; color: #052e16 !important;">
+            <a href="{% url 'earn:dashboard' %}" class="shrink-0 inline-flex items-center gap-x-2 px-6 py-3 rounded-xl text-sm font-bold uppercase tracking-wider bg-ink-900 text-white hover:bg-ink-800 transition-all active:scale-[0.98]">
                 Open Earn <i class="fa-solid fa-arrow-right"></i>
             </a>
         </div>
     </div>
-    {% endif %}
+</div>
+{% endif %}
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
-        <div class="flex justify-between items-end mb-6">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    <div class="flex justify-between items-end mb-6">
+        <div>
+            <span class="text-xs font-black tracking-widest uppercase text-jade-600">Live feed</span>
+            <h2 class="text-xl sm:text-2xl font-display font-bold tracking-tight mt-0.5">Recently restocked</h2>
+        </div>
+        <a href="{% url 'shops:shop_directory' %}" class="text-xs font-bold uppercase tracking-wider text-ink-900/50 hover:text-ink-900 transition-colors">
+            Explore feed &rarr;
+        </a>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"
+         hx-get="{% url 'shops:recent_restocks_api' %}"
+         hx-trigger="load, every 15s"
+         hx-swap="innerHTML">
+
+        <div class="animate-pulse card h-64 flex flex-col justify-between p-4">
+            <div class="bg-paper rounded-lg aspect-square w-full"></div>
+            <div class="h-4 bg-paper rounded w-2/3 mt-3"></div>
+            <div class="h-4 bg-paper rounded w-1/3 mt-2"></div>
+        </div>
+        <div class="animate-pulse card h-64 flex flex-col justify-between p-4">
+            <div class="bg-paper rounded-lg aspect-square w-full"></div>
+            <div class="h-4 bg-paper rounded w-2/3 mt-3"></div>
+            <div class="h-4 bg-paper rounded w-1/3 mt-2"></div>
+        </div>
+        <div class="animate-pulse card h-64 flex-col justify-between p-4 hidden sm:flex">
+            <div class="bg-paper rounded-lg aspect-square w-full"></div>
+            <div class="h-4 bg-paper rounded w-2/3 mt-3"></div>
+            <div class="h-4 bg-paper rounded w-1/3 mt-2"></div>
+        </div>
+        <div class="animate-pulse card h-64 flex-col justify-between p-4 hidden lg:flex">
+            <div class="bg-paper rounded-lg aspect-square w-full"></div>
+            <div class="h-4 bg-paper rounded w-2/3 mt-3"></div>
+            <div class="h-4 bg-paper rounded w-1/3 mt-2"></div>
+        </div>
+    </div>
+</div>
+
+<div hx-get="{% url 'shops:sectors_showcase_api' %}"
+    hx-trigger="load"
+    hx-swap="outerHTML"
+    class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
+
+    <div class="w-full space-y-8 animate-pulse">
+        <div class="flex justify-between items-end">
+            <div class="space-y-2 w-1/3">
+                <div class="h-3 bg-line rounded-sm w-1/4"></div>
+                <div class="h-7 bg-line rounded-md w-full"></div>
+            </div>
+            <div class="h-4 bg-line rounded-sm w-32"></div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="h-44 bg-white rounded-2xl border border-line"></div>
+            <div class="h-44 bg-white rounded-2xl border border-line"></div>
+            <div class="h-44 bg-white rounded-2xl border border-line sm:col-span-2 lg:col-span-1"></div>
+        </div>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
+    <div class="card grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-line p-2">
+        <div class="flex items-center gap-4 p-5 sm:p-6">
+            <div class="w-12 h-12 rounded-xl bg-jade-50 text-jade-600 flex items-center justify-center shrink-0">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"/></svg>
+            </div>
             <div>
-                <!-- Live Feed Header Tag: Replaced #10B981 with text-emerald-500 -->
-                <span class="text-xs font-black tracking-widest uppercase text-emerald-500">Live Feed</span>
-                <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-0.5">Recently Restocked</h2>
+                <h4 class="text-sm font-black tracking-tight uppercase">Escrow settlement</h4>
+                <p class="text-xs font-semibold text-ink-900/50 mt-0.5">Payments split automatically across every vendor in your order.</p>
             </div>
-            <a href="{% url 'shops:shop_directory' %}" class="text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-slate-900 transition-colors">
-                Explore Feed →
-            </a>
         </div>
-
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"
-             hx-get="{% url 'shops:recent_restocks_api' %}" 
-             hx-trigger="load, every 15s" 
-             hx-swap="innerHTML">
-            
-            <div class="animate-pulse bg-white border border-slate-200 rounded-xl h-64 flex flex-col justify-between p-4">
-                <div class="bg-slate-200 rounded-lg aspect-square w-full"></div>
-                <div class="h-4 bg-slate-200 rounded w-2/3 mt-3"></div>
-                <div class="h-4 bg-slate-200 rounded w-1/3 mt-2"></div>
+        <div class="flex items-center gap-4 p-5 sm:p-6">
+            <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-500 flex items-center justify-center shrink-0">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.864 4.243A7.5 7.5 0 0 1 19.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 0 0 4.5 10.5a7.5 7.5 0 0 0 5.25 7.193m7.864-14.434l-1.568 8.268M5.742 6.364l5.25 7.193m0 0A7.52 7.52 0 0 1 12 18c-.83 0-1.636-.134-2.392-.382M9.608 17.618L4.5 21l1.242-6.577"/></svg>
             </div>
-            <div class="animate-pulse bg-white border border-slate-200 rounded-xl h-64 flex flex-col justify-between p-4">
-                <div class="bg-slate-200 rounded-lg aspect-square w-full"></div>
-                <div class="h-4 bg-slate-200 rounded w-2/3 mt-3"></div>
-                <div class="h-4 bg-slate-200 rounded w-1/3 mt-2"></div>
+            <div>
+                <h4 class="text-sm font-black tracking-tight uppercase">Per-shop tracking</h4>
+                <p class="text-xs font-semibold text-ink-900/50 mt-0.5">Follow every vendor's portion of your order, on any device.</p>
             </div>
-            <div class="animate-pulse bg-white border border-slate-200 rounded-xl h-64 flex flex-col justify-between p-4 hidden sm:flex">
-                <div class="bg-slate-200 rounded-lg aspect-square w-full"></div>
-                <div class="h-4 bg-slate-200 rounded w-2/3 mt-3"></div>
-                <div class="h-4 bg-slate-200 rounded w-1/3 mt-2"></div>
-            </div>
-            <div class="animate-pulse bg-white border border-slate-200 rounded-xl h-64 flex flex-col justify-between p-4 hidden lg:flex">
-                <div class="bg-slate-200 rounded-lg aspect-square w-full"></div>
-                <div class="h-4 bg-slate-200 rounded w-2/3 mt-3"></div>
-                <div class="h-4 bg-slate-200 rounded w-1/3 mt-2"></div>
-            </div>
-            
         </div>
-    </div>
-
-    <div hx-get="{% url 'shops:sectors_showcase_api' %}" 
-        hx-trigger="load" 
-        hx-swap="outerHTML"
-        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
-        
-        <div class="w-full space-y-8 animate-pulse">
-            <div class="flex justify-between items-end">
-                <div class="space-y-2 w-1/3">
-                    <div class="h-3 bg-slate-200 rounded-sm w-1/4"></div>
-                    <div class="h-7 bg-slate-200 rounded-md w-full"></div>
-                </div>
-                <div class="h-4 bg-slate-200 rounded-sm w-32"></div>
+        <div class="flex items-center gap-4 p-5 sm:p-6">
+            <div class="w-12 h-12 rounded-xl bg-marigold-50 text-marigold-600 flex items-center justify-center shrink-0">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.25 2.25 0 0 1 10.5 2.25h4.5a2.25 2.25 0 0 1 2.241 2.048m-9.696.741c1.033.058 2.122.089 3.22.091M3.83 5.805a2.25 2.25 0 0 0-1.33 3.11l1.378 2.755a2.25 2.25 0 0 0 2.747 1.115l.3-.1M12 9.75h.008v.008H12V9.75Z"/></svg>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="h-44 bg-slate-100 rounded-2xl border border-slate-200/50"></div>
-                <div class="h-44 bg-slate-100 rounded-2xl border border-slate-200/50"></div>
-                <div class="h-44 bg-slate-100 rounded-2xl border border-slate-200/50 sm:col-span-2 lg:col-span-1"></div>
+            <div>
+                <h4 class="text-sm font-black tracking-tight uppercase">One account, two sides</h4>
+                <p class="text-xs font-semibold text-ink-900/50 mt-0.5">Shop, sell, and earn from the same balance and dashboard.</p>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 relative z-30">
-        <div class="bg-white border border-slate-200 rounded-2xl shadow-xs grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100 p-2">
-            <div class="flex items-center gap-4 p-5 sm:p-6">
-                <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"/></svg>
-                </div>
-                <div>
-                    <h4 class="text-sm font-black text-slate-900 tracking-tight uppercase">Escrow Settlement</h4>
-                    <p class="text-xs font-semibold text-slate-500 mt-0.5">Secure payments split automatically across fulfillment providers.</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-4 p-5 sm:p-6">
-                <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.864 4.243A7.5 7.5 0 0 1 19.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 0 0 4.5 10.5a7.5 7.5 0 0 0 5.25 7.193m7.864-14.434l-1.568 8.268M5.742 6.364l5.25 7.193m0 0A7.52 7.52 0 0 1 12 18c-.83 0-1.636-.134-2.392-.382M9.608 17.618L4.5 21l1.242-6.577"/></svg>
-                </div>
-                <div>
-                    <h4 class="text-sm font-black text-slate-900 tracking-tight uppercase">Granular Delivery Tracking</h4>
-                    <p class="text-xs font-semibold text-slate-500 mt-0.5">Track multi-vendor sub-orders effortlessly on phone or desktop views.</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-4 p-5 sm:p-6">
-                <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.25 2.25 0 0 1 10.5 2.25h4.5a2.25 2.25 0 0 1 2.241 2.048m-9.696.741c1.033.058 2.122.089 3.22.091M3.83 5.805a2.25 2.25 0 0 0-1.33 3.11l1.378 2.755a2.25 2.25 0 0 0 2.747 1.115l.3-.1M12 9.75h.008v.008H12V9.75Z"/></svg>
-                </div>
-                <div>
-                    <h4 class="text-sm font-black text-slate-900 tracking-tight uppercase">Unified Management</h4>
-                    <p class="text-xs font-semibold text-slate-500 mt-0.5">Centralize outstanding payments, balance records, and vouchers easily.</p>
-                </div>
-            </div>
-        </div>
-    </div>
+{% if coupon %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
+    <div class="w-full rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 border border-line"
+        style="background-color: {{ coupon.banner_bg_color }}; color: {{ coupon.banner_text_color }};">
 
-    {% if coupon %}
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 animate-fade-in">
-        <div class="w-full rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 border border-slate-200"
-            style="background-color: {{ coupon.banner_bg_color }}; color: {{ coupon.banner_text_color }};">
-            
-            <div class="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-                <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center font-black text-lg shadow-xs shrink-0 select-none"
-                    style="color: {{ coupon.banner_text_color }}; border: 1px solid {{ coupon.banner_bg_color }};">
-                    %
-                </div>
-                <div>
-                    <h3 class="text-base font-black tracking-tight" style="color: {{ coupon.banner_text_color }};">
-                        Launch Celebration Discount Token
-                    </h3>
-                    <p class="text-xs font-semibold mt-0.5 opacity-80">
-                        Apply code 
-                        <span class="font-mono font-bold bg-white px-1.5 py-0.5 rounded border border-slate-300 text-slate-800">{{ coupon.code }}</span> 
-                        at checkout to clear {{ coupon.discount }}% off processing fees.
-                    </p>
-                </div>
+        <div class="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+            <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center font-display font-bold text-lg shadow-card shrink-0 select-none"
+                style="color: {{ coupon.banner_text_color }}; border: 1px solid {{ coupon.banner_bg_color }};">
+                %
             </div>
-            
-            <button 
-                type="button"
-                onclick="
-                    navigator.clipboard.writeText('{{ coupon.code|escapejs }}');
-                    const btn = this;
-                    const originalText = btn.innerHTML;
-                    const originalBg = btn.style.backgroundColor;
-                    btn.innerHTML = 'Copied!';
-                    btn.style.backgroundColor = '#059669';
-                    setTimeout(() => {
-                        btn.innerHTML = originalText;
-                        btn.style.backgroundColor = originalBg;
-                    }, 2000);
-                " 
-                aria-label="Copy promotion discount code {{ coupon.code }}"
-                class="w-full sm:w-auto text-xs font-bold uppercase tracking-wider px-5 py-3 rounded-xl transition-all duration-200 shadow-xs shrink-0 cursor-pointer active:scale-[0.98]"
-                style="background-color: {{ coupon.button_bg_color }}; color: {{ coupon.button_text_color }};"
-            >
-                Copy Code
-            </button>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Footer Banner Block: Replaced inline background-color #0F172A with bg-slate-900 -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="w-full bg-slate-900 rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-md">
-            <div class="max-w-xl text-center md:text-left">
-                <h3 class="text-white text-lg font-black tracking-tight mb-1">Architecture Integration Status: Live</h3>
-                <p class="text-xs font-semibold text-slate-400 leading-relaxed">
-                    Our marketplace platform operates on high-efficiency atomic transaction engines. Multi-vendor order splitting calculations and secure cryptographic procedures run successfully in real time.
+            <div>
+                <h3 class="text-base font-display font-bold tracking-tight" style="color: {{ coupon.banner_text_color }};">
+                    Limited-time discount
+                </h3>
+                <p class="text-xs font-semibold mt-0.5 opacity-80">
+                    Apply code
+                    <span class="font-mono font-bold bg-white px-1.5 py-0.5 rounded border border-line text-ink-900">{{ coupon.code }}</span>
+                    at checkout for {{ coupon.discount }}% off.
                 </p>
             </div>
-            <div class="flex items-center gap-3 shrink-0 bg-slate-950 px-5 py-3 rounded-xl border border-slate-800">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 relative flex">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                </span>
-                <span class="text-slate-200 text-xs font-bold tracking-wider uppercase">Catalogs Fully Operational</span>
-            </div>
+        </div>
+
+        <button
+            type="button"
+            onclick="
+                navigator.clipboard.writeText('{{ coupon.code|escapejs }}');
+                const btn = this;
+                const originalText = btn.innerHTML;
+                const originalBg = btn.style.backgroundColor;
+                btn.innerHTML = 'Copied!';
+                btn.style.backgroundColor = '#0E9F6E';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.backgroundColor = originalBg;
+                }, 2000);
+            "
+            aria-label="Copy promotion discount code {{ coupon.code }}"
+            class="w-full sm:w-auto text-xs font-bold uppercase tracking-wider px-5 py-3 rounded-xl transition-all duration-200 shadow-card shrink-0 cursor-pointer active:scale-[0.98]"
+            style="background-color: {{ coupon.button_bg_color }}; color: {{ coupon.button_text_color }};"
+        >
+            Copy code
+        </button>
+    </div>
+</div>
+{% endif %}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+    <div class="w-full bg-brand-500 rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="max-w-xl text-center md:text-left">
+            <h3 class="text-white text-lg font-display font-bold tracking-tight mb-1">Every order, every vendor, tracked in real time</h3>
+            <p class="text-xs font-semibold text-white/70 leading-relaxed">
+                Multi-vendor orders split automatically and settle securely — you always know exactly where your money and your package are.
+            </p>
+        </div>
+        <div class="flex items-center gap-3 shrink-0 bg-ink-900/30 px-5 py-3 rounded-xl">
+            <span class="w-2.5 h-2.5 rounded-full bg-jade-500 ping-dot"></span>
+            <span class="text-white text-xs font-bold tracking-wider uppercase">All systems operational</span>
         </div>
     </div>
-
 </div>
+
 {% endblock %}

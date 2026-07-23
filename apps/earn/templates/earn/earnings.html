@@ -1,18 +1,18 @@
 {% extends "earn/base_earn.html" %}
 
-{% block title %}Earnings Overview{% endblock %}
+{% block title %}Earnings overview — E Shop{% endblock %}
 
 {% block earn_content %}
 <div class="flex justify-between items-center mb-8 flex-wrap gap-3">
     <div>
-        <h2 class="text-2xl sm:text-3xl font-semibold tracking-tight text-white">Earnings Overview</h2>
-        <p class="text-zinc-400 text-sm">Track your income and payouts</p>
+        <h2 class="text-xl sm:text-3xl font-display font-bold tracking-tight text-white">Earnings overview</h2>
+        <p class="text-white/50 text-sm">Track your income and payouts.</p>
     </div>
     <div class="flex gap-x-3">
-        <a href="{% url 'earn:log_earning' %}" class="px-5 py-3 bg-zinc-800 border border-zinc-700 hover:bg-zinc-700 text-sm font-medium rounded-3xl flex items-center gap-x-2">
-            <i class="fa-solid fa-plus"></i> <span>Log Earning</span>
+        <a href="{% url 'earn:log_earning' %}" class="px-5 py-3 bg-ink-800 border border-white/10 hover:bg-white/5 text-sm font-bold rounded-2xl flex items-center gap-x-2 text-white/80 transition-colors">
+            <i class="fa-solid fa-plus"></i> <span>Log earning</span>
         </a>
-        <a href="{% url 'earn:withdraw' %}" class="earn-btn px-6 py-3 text-sm font-semibold rounded-3xl flex items-center gap-x-2">
+        <a href="{% url 'earn:withdraw' %}" class="earn-btn px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl flex items-center gap-x-2">
             <i class="fa-solid fa-money-bill-transfer"></i> <span>Withdraw</span>
         </a>
     </div>
@@ -20,56 +20,56 @@
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
     <div class="earn-card p-6">
-        <div class="text-xs uppercase tracking-widest text-emerald-400">Total Lifetime Earnings</div>
-        <div class="text-4xl sm:text-5xl font-bold text-white mt-2">₵{{ lifetime_earned|floatformat:2 }}</div>
+        <div class="text-xs uppercase tracking-widest text-jade-400 font-bold">Total lifetime earnings</div>
+        <div class="text-3xl sm:text-5xl font-display font-bold text-white mt-2 font-mono">GHS {{ lifetime_earned|floatformat:2 }}</div>
     </div>
     <div class="earn-card p-6">
-        <div class="text-xs uppercase tracking-widest text-emerald-400">This Month</div>
-        <div class="text-4xl sm:text-5xl font-bold text-white mt-2">₵{{ this_month|floatformat:2 }}</div>
-        <div class="mt-2 text-emerald-400 text-sm">{{ this_month_count }} transaction{{ this_month_count|pluralize }}</div>
+        <div class="text-xs uppercase tracking-widest text-jade-400 font-bold">This month</div>
+        <div class="text-3xl sm:text-5xl font-display font-bold text-white mt-2 font-mono">GHS {{ this_month|floatformat:2 }}</div>
+        <div class="mt-2 text-jade-400 text-sm font-semibold">{{ this_month_count }} transaction{{ this_month_count|pluralize }}</div>
     </div>
     <div class="earn-card p-6">
-        <div class="text-xs uppercase tracking-widest text-emerald-400">Available Balance</div>
-        <div class="text-4xl sm:text-5xl font-bold text-white mt-2">₵{{ balance|floatformat:2 }}</div>
-        <div class="mt-2 text-zinc-400 text-sm">Avg ₵{{ avg_per_day }}/day (last 30 days)</div>
+        <div class="text-xs uppercase tracking-widest text-jade-400 font-bold">Available balance</div>
+        <div class="text-3xl sm:text-5xl font-display font-bold text-white mt-2 font-mono">GHS {{ balance|floatformat:2 }}</div>
+        <div class="mt-2 text-white/40 text-sm">Avg GHS {{ avg_per_day }}/day (last 30 days)</div>
     </div>
 </div>
 
-<div class="earn-card p-7 mb-8">
-    <div class="font-semibold text-white mb-5">Earnings Trend (Last 30 days)</div>
-    <div class="h-72"><canvas id="earnings-chart"></canvas></div>
+<div class="earn-card p-5 sm:p-7 mb-8">
+    <div class="font-bold text-white mb-5 text-sm uppercase tracking-wider">Earnings trend (last 30 days)</div>
+    <div class="h-64 sm:h-72"><canvas id="earnings-chart"></canvas></div>
 </div>
 
 <div class="earn-card overflow-hidden">
-    <div class="px-6 pt-6 pb-3 flex justify-between items-center">
-        <div class="font-semibold text-white">Transaction History</div>
-        <div class="text-xs bg-zinc-700 px-3 py-1 rounded-2xl text-zinc-300">Showing {{ transactions|length }} most recent</div>
+    <div class="px-4 sm:px-6 pt-6 pb-3 flex justify-between items-center">
+        <div class="font-bold text-white text-sm uppercase tracking-wider">Transaction history</div>
+        <div class="text-xs bg-white/10 px-3 py-1 rounded-xl text-white/60">Showing {{ transactions|length }} most recent</div>
     </div>
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
             <thead>
-                <tr class="border-b border-zinc-700 text-xs text-zinc-400">
-                    <th class="text-left px-6 py-4 font-medium">Date</th>
-                    <th class="text-left px-6 py-4 font-medium">Description</th>
-                    <th class="text-left px-6 py-4 font-medium">Type</th>
-                    <th class="text-right px-6 py-4 font-medium">Amount</th>
+                <tr class="border-b border-white/10 text-xs text-white/40">
+                    <th class="text-left px-4 sm:px-6 py-4 font-bold uppercase tracking-wider">Date</th>
+                    <th class="text-left px-4 sm:px-6 py-4 font-bold uppercase tracking-wider">Description</th>
+                    <th class="text-left px-4 sm:px-6 py-4 font-bold uppercase tracking-wider">Type</th>
+                    <th class="text-right px-4 sm:px-6 py-4 font-bold uppercase tracking-wider">Amount</th>
                 </tr>
             </thead>
             <tbody>
             {% for tx in transactions %}
-                <tr class="border-b border-zinc-800">
-                    <td class="px-6 py-4 text-zinc-400">{{ tx.created_at|date:"M j" }}</td>
-                    <td class="px-6 py-4">{{ tx.description }}</td>
-                    <td class="px-6 py-4 text-zinc-400">
+                <tr class="border-b border-white/5">
+                    <td class="px-4 sm:px-6 py-4 text-white/40">{{ tx.created_at|date:"M j" }}</td>
+                    <td class="px-4 sm:px-6 py-4 text-white/80">{{ tx.description }}</td>
+                    <td class="px-4 sm:px-6 py-4 text-white/40">
                         {{ tx.get_transaction_type_display }}
-                        {% if tx.status == 'PENDING' %}<span class="text-amber-400 text-xs">(pending)</span>{% endif %}
+                        {% if tx.status == 'PENDING' %}<span class="text-marigold-400 text-xs font-semibold">(pending)</span>{% endif %}
                     </td>
-                    <td class="px-6 py-4 text-right font-semibold {% if tx.amount >= 0 %}text-emerald-400{% else %}text-red-400{% endif %}">
-                        {% if tx.amount >= 0 %}+{% endif %}₵{{ tx.amount|floatformat:2 }}
+                    <td class="px-4 sm:px-6 py-4 text-right font-bold font-mono {% if tx.amount >= 0 %}text-jade-400{% else %}text-papaya-400{% endif %}">
+                        {% if tx.amount >= 0 %}+{% endif %}GHS {{ tx.amount|floatformat:2 }}
                     </td>
                 </tr>
             {% empty %}
-                <tr><td colspan="4" class="text-center py-10 text-zinc-400">No transactions yet.</td></tr>
+                <tr><td colspan="4" class="text-center py-10 text-white/40">No transactions yet.</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -97,10 +97,10 @@ document.addEventListener('DOMContentLoaded', function () {
         data: {
             labels: labels,
             datasets: [{
-                label: 'Earnings (₵)',
+                label: 'Earnings (GHS)',
                 data: values,
-                borderColor: '#00c853',
-                backgroundColor: 'rgba(0,200,83,0.15)',
+                borderColor: '#0E9F6E',
+                backgroundColor: 'rgba(14,159,110,0.15)',
                 fill: true,
                 tension: 0.35,
                 pointRadius: 0,
@@ -109,8 +109,8 @@ document.addEventListener('DOMContentLoaded', function () {
         options: {
             plugins: { legend: { display: false } },
             scales: {
-                x: { ticks: { color: '#a1a1aa', maxTicksLimit: 8 }, grid: { color: '#27272a' } },
-                y: { ticks: { color: '#a1a1aa' }, grid: { color: '#27272a' } }
+                x: { ticks: { color: '#9a9aa5', maxTicksLimit: 8 }, grid: { color: 'rgba(255,255,255,0.06)' } },
+                y: { ticks: { color: '#9a9aa5' }, grid: { color: 'rgba(255,255,255,0.06)' } }
             }
         }
     });
