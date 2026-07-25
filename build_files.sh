@@ -4,7 +4,7 @@
 set -e
 
 echo "Installing Python dependencies..."
-pip install -r requirements.txt
+pip install --break-system-packages -r requirements.txt
 
 echo "Installing Node dependencies and building Tailwind CSS..."
 npm install
