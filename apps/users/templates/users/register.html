@@ -64,6 +64,7 @@
             </p>
         </div>
 
+        {% if google_oauth_enabled %}
         <div class="relative flex py-2 items-center">
             <div class="flex-grow border-t border-line"></div>
             <span class="flex-shrink mx-4 text-ink-900/25 text-[10px] font-bold uppercase tracking-widest">or</span>
@@ -81,6 +82,7 @@
                 </button>
             </form>
         </div>
+        {% endif %}
 
     </div>
 </div>

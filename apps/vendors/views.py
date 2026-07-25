@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
-from apps.products.models import Shop
+from apps.shops.models import Shop
 from .forms import VendorOnboardingForm
 from .decorators import vendor_required
 
@@ -19,10 +19,10 @@ def onboard_vendor_shop(request):
     Only accessible to admin-approved accounts.
     """
     # Defensive Check: Block users who have already linked their payout information
-    existing_shop = Shop.objects.filter(user=request.user).first()
+    existing_shop = Shop.objects.filter(owner=request.user).first()
     if existing_shop and existing_shop.paystack_subaccount_code:
         messages.info(request, "Your merchant payout profile is already verified and active.")
-        return redirect('vendors:dashboard')
+        return redirect('shops:vendor_dashboard')
 
     if request.method == 'POST':
         form = VendorOnboardingForm(request.POST)
@@ -50,13 +50,13 @@ def onboard_vendor_shop(request):
                     subaccount_code = res_data['data']['subaccount_code']
                     
                     # Store or update the vendor's Shop profile model instance
-                    shop, created = Shop.objects.get_or_create(user=request.user)
+                    shop, created = Shop.objects.get_or_create(owner=request.user)
                     shop.name = form.cleaned_data['business_name']
                     shop.paystack_subaccount_code = subaccount_code
                     shop.save()
                     
                     messages.success(request, "Payout gateway activated! Your store can now receive customer payouts.")
-                    return redirect('vendors:dashboard')
+                    return redirect('shops:vendor_dashboard')
                 else:
                     error_msg = res_data.get('message', 'Invalid banking credentials provided.')
                     messages.error(request, f"Paystack Activation Failed: {error_msg}")

@@ -4,12 +4,16 @@ __pycache__/
 *.pyo
 *.pyd
 
+# Node / frontend build tooling
+node_modules/
+
 # Django environment & databases
 .env
 *.env
 db.sqlite3
 media/
 static/collected/
+staticfiles/
 
 # Sensitive credential backups
 secrets.txt
