@@ -71,6 +71,10 @@ else:
     }
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
+# Legacy alias: django-cloudinary-storage's collectstatic command reads
+# settings.STATICFILES_STORAGE directly instead of the new STORAGES dict.
+STATICFILES_STORAGE = STORAGES['staticfiles']['BACKEND']
+
 # ==============================================================================
 # Email settings for development.
 # If EMAIL_HOST is not configured, emails print to the console instead of

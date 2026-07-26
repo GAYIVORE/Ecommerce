@@ -17,8 +17,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'cloudinary_storage',
     'django.contrib.staticfiles',
+    'cloudinary_storage',
 
     # My custom apps
     'apps.users', # This is correct for INSTALLED_APPS as it's the Python import path

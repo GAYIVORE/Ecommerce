@@ -32,10 +32,19 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'  # Collected static files for deployment
 
 
 STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+# Legacy aliases: django-cloudinary-storage's collectstatic command reads
+# settings.STATICFILES_STORAGE directly (old Django <4.2 style) instead of
+# the new STORAGES dict, so it crashes with AttributeError if only STORAGES
+# is defined. Keep both in sync.
+STATICFILES_STORAGE = STORAGES['staticfiles']['BACKEND']
+DEFAULT_FILE_STORAGE = STORAGES['default']['BACKEND']
 # Media files (user-uploaded content) for production
 # These should be served by a web server or cloud storage (e.g., S3)
 MEDIA_URL = '/media/'
@@ -90,7 +99,7 @@ CLOUDINARY_STORAGE = {
 }
 if config('CLOUDINARY_CLOUD_NAME', default=''):
     STORAGES['default'] = {"BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"}
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    DEFAULT_FILE_STORAGE = STORAGES['default']['BACKEND']
 
 # Security settings
 SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', cast=bool, default=True)
