@@ -23,9 +23,7 @@ DATABASES = {
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',  # Global static files
-]
+# STATICFILES_DIRS now defined once in base.py, shared with production.
 
 # Required for Vercel deployment build process compilation
 STATIC_ROOT = BASE_DIR / 'staticfiles'

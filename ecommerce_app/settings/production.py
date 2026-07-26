@@ -28,7 +28,11 @@ DATABASES = {
 # Static files (CSS, JavaScript, Images) for production
 # These should be served by a web server (Nginx/Apache) or CDN
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # Collected static files for deployment
+# NOTE: nested one level deeper than Vercel's static-build distDir ("staticfiles").
+# Vercel publishes the *contents* of distDir directly at the site root with no
+# added prefix, so files must already sit under a "static/" folder here in
+# order to end up served at /static/... to match STATIC_URL and {% static %}.
+STATIC_ROOT = BASE_DIR / 'staticfiles' / 'static'  # Collected static files for deployment
 
 
 STORAGES = {

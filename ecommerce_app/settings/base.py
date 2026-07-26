@@ -132,3 +132,12 @@ AUTH_USER_MODEL = 'users.User' # Points to our custom User model in the 'users' 
 LOGIN_URL = 'users:login' # Assuming a 'login' URL in the 'users' app
 LOGIN_REDIRECT_URL = '/' # Redirect to homepage after login
 LOGOUT_REDIRECT_URL = '/' # Redirect to homepage after logout
+
+# Static files shared source directory (project-level css/js/img, e.g. the
+# compiled Tailwind stylesheet). Defined here (not per-environment) so both
+# development and production collect the exact same source files — this was
+# previously only defined in development.py, so `collectstatic` in production
+# silently skipped the whole project static/ folder (css, images, etc).
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
