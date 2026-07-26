@@ -1,5 +1,13 @@
 {
   "version": 2,
+  "env": {
+    "DJANGO_SETTINGS_MODULE": "ecommerce_app.settings.production"
+  },
+  "build": {
+    "env": {
+      "DJANGO_SETTINGS_MODULE": "ecommerce_app.settings.production"
+    }
+  },
   "builds": [
     {
       "src": "ecommerce_app/wsgi.py",
