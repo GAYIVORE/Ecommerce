@@ -124,7 +124,7 @@ class ProductDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        product = self.get_object()
+        product = self.object
         
         review_form = ReviewForm()
         user_review = None
@@ -223,10 +223,11 @@ class VendorDashboardView(VendorRequiredMixin, ListView):
         # 📊 Injected Dashboard Metrics to satisfy your dashboard template requirements
         if shop:
             # 1. Only orders actually awaiting vendor action, most recent first, capped —
-            # the full history lives in the CSV export, not this table.
+            # the full history lives in the CSV export, not this table. 'Shipped' is
+            # included so the vendor can confirm final delivery, not just dispatch.
             context['vendor_orders'] = SubOrder.objects.filter(
-                shop=shop, status__in=['Pending', 'Processing']
-            ).select_related('parent_order').order_by('-created_at')[:15]
+                shop=shop, status__in=['Pending', 'Processing', 'Shipped']
+            ).select_related('parent_order').prefetch_related('items').order_by('-created_at')[:15]
             
             # 2. Derive low stock counts dynamically (e.g., threshold <= 5 units)
             context['low_stock_count'] = Product.objects.filter(
@@ -379,8 +380,6 @@ class VendorInventoryBaseView(VendorRequiredMixin, ListView):
 
 @login_required
 @require_POST
-@login_required
-@require_POST
 def bulk_update_order_status(request):
     """
     Lets a vendor mark several pending/processing sub-orders as Shipped in one
@@ -399,9 +398,17 @@ def bulk_update_order_status(request):
 
     # Scope strictly to this vendor's own sub-orders — a vendor can never touch
     # another shop's orders even if IDs were tampered with in the request.
-    updated = SubOrder.objects.filter(
+    # save() is called per-row (not .update()) so the post_save signal fires and
+    # rolls each parent Order's status up correctly.
+    targets = SubOrder.objects.filter(
         id__in=sub_order_ids, shop=shop, status__in=['Pending', 'Processing']
-    ).update(status='Shipped')
+    )
+    updated = 0
+    for sub_order in targets:
+        sub_order.status = 'Shipped'
+        sub_order.shipped_at = timezone.now()
+        sub_order.save(update_fields=['status', 'shipped_at', 'updated_at'])
+        updated += 1
 
     if updated:
         messages.success(request, f"{updated} order{'s' if updated != 1 else ''} marked as shipped.")
@@ -476,6 +483,8 @@ def export_products_csv(request):
     return response
 
 
+@login_required
+@require_POST
 def update_order_status(request, sub_order_id):
     """
     Fulfillment Engine: Shifts specific vendor SubOrder slices to 'Shipped' status.
@@ -492,11 +501,38 @@ def update_order_status(request, sub_order_id):
     
     if sub_order.status in ['Pending', 'Processing']:
         sub_order.status = 'Shipped'
-        sub_order.save()
+        sub_order.shipped_at = timezone.now()
+        sub_order.save(update_fields=['status', 'shipped_at', 'updated_at'])
         messages.success(request, f"SubOrder #{sub_order.id} updated to Shipped status.")
     else:
         messages.warning(request, f"SubOrder #{sub_order.id} is already processed as {sub_order.status}.")
         
+    return redirect('products:vendor_dashboard')
+
+
+@login_required
+@require_POST
+def mark_order_delivered(request, sub_order_id):
+    """
+    Lets a vendor confirm final hand-off to the customer. Once every vendor slice
+    of a parent Order reaches 'Delivered', the SubOrder post_save signal rolls
+    the whole Order up to 'Completed' automatically.
+    """
+    if not hasattr(request.user, 'shop'):
+        messages.error(request, "Unauthorized vendor management profile context.")
+        return redirect('core:home')
+
+    shop = request.user.shop
+    sub_order = get_object_or_404(SubOrder, id=sub_order_id, shop=shop)
+
+    if sub_order.status == 'Shipped':
+        sub_order.status = 'Delivered'
+        sub_order.delivered_at = timezone.now()
+        sub_order.save(update_fields=['status', 'delivered_at', 'updated_at'])
+        messages.success(request, f"SubOrder #{sub_order.id} marked as delivered.")
+    else:
+        messages.warning(request, f"SubOrder #{sub_order.id} must be Shipped before it can be marked Delivered.")
+
     return redirect('products:vendor_dashboard')
 
 

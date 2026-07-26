@@ -90,6 +90,12 @@
                             {% endif %}
                         </span>
                     </div>
+                    {% if product.shop %}
+                    <div class="flex items-center justify-between py-1 border-b border-line/60 last:border-0">
+                        <span class="font-medium text-ink-900/40">Estimated delivery</span>
+                        <span class="font-bold text-ink-900">{{ product.shop.delivery_window_text }}</span>
+                    </div>
+                    {% endif %}
                     <div class="flex items-center justify-between py-1 last:border-0">
                         <span class="font-medium text-ink-900/40">Last updated</span>
                         <span class="font-mono text-ink-900/70 font-medium">{{ product.updated_at|date:"F j, Y" }}</span>

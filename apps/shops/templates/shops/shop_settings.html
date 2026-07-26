@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Shop settings — E Shop{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto my-8 sm:my-12 px-4">
+    <div class="card p-6 sm:p-8">
+        <a href="{% url 'products:vendor_dashboard' %}" class="text-xs font-bold uppercase tracking-wider text-ink-900/40 hover:text-brand-500 transition-colors">&larr; Back to dashboard</a>
+
+        <span class="text-xs font-black tracking-widest uppercase text-brand-500 block mt-4">Vendor console</span>
+        <h2 class="text-xl sm:text-2xl font-display font-bold tracking-tight mt-1 mb-2">Shop settings</h2>
+        <p class="text-sm font-medium text-ink-900/50 mb-6">
+            Your delivery estimate is shown to customers on every product, at checkout, and on their order confirmation —
+            keeping it honest and up to date is one of the biggest things you can do to earn buyer trust.
+        </p>
+
+        {% if form.non_field_errors %}
+            <div class="mb-4 p-3 rounded-lg border border-papaya-100 bg-papaya-50 text-papaya-700 text-xs font-bold">
+                {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data" class="space-y-5">
+            {% csrf_token %}
+
+            <div>
+                <label for="{{ form.name.id_for_label }}" class="field-label">Shop name *</label>
+                {{ form.name }}
+                {% for error in form.name.errors %}<p class="text-xs font-bold mt-1 text-papaya-600">{{ error }}</p>{% endfor %}
+            </div>
+
+            <div>
+                <label for="{{ form.phone_number.id_for_label }}" class="field-label">Contact phone number</label>
+                {{ form.phone_number }}
+            </div>
+
+            <div>
+                <label for="{{ form.description.id_for_label }}" class="field-label">Description</label>
+                {{ form.description }}
+            </div>
+
+            <div>
+                <label for="{{ form.image.id_for_label }}" class="field-label">Shop logo / banner</label>
+                {{ form.image }}
+                {% if shop.image %}<p class="text-[11px] text-ink-900/40 mt-1">Current: {{ shop.image.name }}</p>{% endif %}
+            </div>
+
+            <div class="pt-4 border-t border-line">
+                <span class="field-label block mb-2">Delivery estimate shown to customers</span>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="{{ form.min_delivery_days.id_for_label }}" class="text-[11px] font-semibold text-ink-900/50 block mb-1">Fastest (days)</label>
+                        {{ form.min_delivery_days }}
+                        {% for error in form.min_delivery_days.errors %}<p class="text-xs font-bold mt-1 text-papaya-600">{{ error }}</p>{% endfor %}
+                    </div>
+                    <div>
+                        <label for="{{ form.max_delivery_days.id_for_label }}" class="text-[11px] font-semibold text-ink-900/50 block mb-1">Slowest (days)</label>
+                        {{ form.max_delivery_days }}
+                        {% for error in form.max_delivery_days.errors %}<p class="text-xs font-bold mt-1 text-papaya-600">{{ error }}</p>{% endfor %}
+                    </div>
+                </div>
+                <p class="text-[11px] text-ink-900/40 mt-2">Currently shown as: <span class="font-bold text-ink-900/70">{{ shop.delivery_window_text }}</span></p>
+            </div>
+
+            <div class="flex items-center justify-end gap-4 border-t border-line pt-5">
+                <a href="{% url 'products:vendor_dashboard' %}" class="text-sm font-bold text-ink-900/50 hover:text-ink-900 transition-colors">Cancel</a>
+                <button type="submit" class="btn-primary">Save settings</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

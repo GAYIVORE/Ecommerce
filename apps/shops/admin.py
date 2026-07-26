@@ -7,7 +7,7 @@ class ShopAdmin(admin.ModelAdmin):
     # Force Django Admin to use your cleanly styled form from forms.py
     form = ShopForm
 
-    list_display = ('name', 'owner', 'status', 'is_active', 'is_deleted', 'created_at')
+    list_display = ('name', 'owner', 'status', 'is_active', 'is_deleted', 'min_delivery_days', 'max_delivery_days', 'created_at')
     list_filter = ('status', 'is_active', 'is_deleted', 'created_at')
     search_fields = ('name', 'owner__username', 'owner__email', 'description')
     

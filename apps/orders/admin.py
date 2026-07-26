@@ -75,11 +75,13 @@ class SubOrderAdmin(admin.ModelAdmin):
     """
     ⚡ Added: Dedicated panel for managing localized shop fulfillment workflows.
     """
-    list_display = ['id', 'parent_order', 'get_customer', 'shop', 'status', 'sub_total', 'shipping_cost', 'tracking_number', 'updated_at']
+    list_display = ['id', 'parent_order', 'get_customer', 'shop', 'status', 'sub_total', 'shipping_cost',
+                     'tracking_number', 'estimated_delivery_start', 'estimated_delivery_end', 'updated_at']
     list_filter = ['status', 'created_at', 'shop']
     search_fields = ['id', 'parent_order__id', 'shop__name', 'tracking_number', 'parent_order__user__username']
     list_editable = ['status', 'tracking_number'] # Fast tracking pipeline updates right from the dashboard grid
     raw_id_fields = ['parent_order', 'shop']
+    readonly_fields = ['shipped_at', 'delivered_at', 'created_at', 'updated_at']
     inlines = [OrderItemInline]
 
     def get_queryset(self, request):

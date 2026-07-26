@@ -3,6 +3,7 @@
 import json
 import hashlib
 import hmac
+import datetime
 import requests
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render, redirect, get_object_or_404
@@ -331,13 +332,20 @@ def place_order(request):
 
             vendor_final_subtotal = max(0, vendor_raw_subtotal - vendor_proportional_discount)
 
-            # Create localized child partition container row
+            # Create localized child partition container row. The delivery window is
+            # snapshotted from this vendor's current settings right now — every buyer
+            # gets a concrete, vendor-specific timeframe instead of a vague "processing"
+            # status with no ETA (a big reason people mistake slow multi-vendor orders
+            # for scams).
+            today = timezone.now().date()
             sub_order = SubOrder.objects.create(
                 parent_order=order,
                 shop=shop,
                 status='Pending' if payment_method == 'paystack' else 'Processing',
                 sub_total=vendor_final_subtotal,
-                shipping_cost=0.00
+                shipping_cost=0.00,
+                estimated_delivery_start=today + datetime.timedelta(days=shop.min_delivery_days),
+                estimated_delivery_end=today + datetime.timedelta(days=shop.max_delivery_days),
             )
 
             # Write matching line item structures
@@ -572,7 +580,10 @@ def paystack_webhook(request):
 @login_required
 def order_confirmation(request, order_id):
     """Validates the transaction status on final redirect landings."""
-    order = get_object_or_404(Order, id=order_id, user=request.user)
+    order = get_object_or_404(
+        Order.objects.prefetch_related('sub_orders__shop', 'sub_orders__items'),
+        id=order_id, user=request.user
+    )
     reference = request.GET.get('ref')
     
     if order.payment_method == 'paystack' and not order.payment_status:

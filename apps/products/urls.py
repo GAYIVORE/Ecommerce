@@ -26,6 +26,7 @@ urlpatterns = [
     # Core Vendor Dashboard landing engine
     path('dashboard/', views.VendorDashboardView.as_view(), name='vendor_dashboard'),
     path('sub-order/<int:sub_order_id>/ship/', views.update_order_status, name='update_order_status'),
+    path('sub-order/<int:sub_order_id>/deliver/', views.mark_order_delivered, name='mark_order_delivered'),
     path('dashboard/orders/bulk-ship/', views.bulk_update_order_status, name='bulk_update_order_status'),
     path('dashboard/orders/export/', views.export_orders_csv, name='export_orders_csv'),
     path('dashboard/products/export/', views.export_products_csv, name='export_products_csv'),

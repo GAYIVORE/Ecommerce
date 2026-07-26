@@ -39,7 +39,21 @@ class Shop(models.Model):
         max_length=100, blank=True, null=True,
         help_text="The merchant's unique Paystack Subaccount ID."
     )
-    
+
+    # Delivery expectations — shown to customers at checkout and on every order so
+    # they know roughly when to expect their package instead of guessing (and
+    # suspecting the store is a scam because nobody told them a timeframe).
+    min_delivery_days = models.PositiveSmallIntegerField(
+        default=2,
+        verbose_name="Fastest delivery (days)",
+        help_text="Soonest a customer could realistically receive an order after you ship it."
+    )
+    max_delivery_days = models.PositiveSmallIntegerField(
+        default=5,
+        verbose_name="Slowest delivery (days)",
+        help_text="Worst-case delivery time to set with customers, including packing time."
+    )
+
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -63,3 +77,11 @@ class Shop(models.Model):
 
     def get_absolute_url(self):
         return reverse('products:shop_storefront', args=[self.slug])
+
+    @property
+    def delivery_window_text(self):
+        """Human-readable delivery promise, e.g. '2-5 business days' or '3 business days'."""
+        lo, hi = self.min_delivery_days, self.max_delivery_days
+        if lo == hi:
+            return f"{lo} business day{'s' if lo != 1 else ''}"
+        return f"{lo}-{hi} business days"

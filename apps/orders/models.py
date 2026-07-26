@@ -99,6 +99,39 @@ class Order(models.Model):
     def __str__(self):
         return f"Order Group {self.id} by {self.user.username if self.user else 'Guest'}"
 
+    def recompute_status(self):
+        """
+        ⚡ Vendor-aware status rollup: each vendor only controls their own SubOrder,
+        but the customer-facing parent Order status should always reflect what ALL
+        of those vendors are collectively doing, so a shopper never sees "Processing"
+        after every single item has actually been delivered (or the whole thing
+        cancelled). Called whenever any SubOrder changes state.
+        """
+        if not self.payment_status and self.payment_method != 'cod':
+            return  # Unpaid Paystack orders stay Pending until payment clears
+
+        statuses = list(self.sub_orders.values_list('status', flat=True))
+        if not statuses:
+            return
+
+        new_status = self.status
+        if all(s == 'Delivered' for s in statuses):
+            new_status = 'Completed'
+        elif all(s in ('Cancelled', 'Refunded') for s in statuses):
+            new_status = 'Cancelled'
+        elif self.status in ('Completed', 'Cancelled') and not (
+            all(s == 'Delivered' for s in statuses) or all(s in ('Cancelled', 'Refunded') for s in statuses)
+        ):
+            # A sub-order changed after the order previously closed out (e.g. a refund
+            # request reopened one shop's slice) — fall back to Processing.
+            new_status = 'Processing'
+        else:
+            new_status = 'Processing'
+
+        if new_status != self.status:
+            self.status = new_status
+            self.save(update_fields=['status'])
+
 
 class SubOrder(models.Model):
     """
@@ -123,6 +156,18 @@ class SubOrder(models.Model):
     shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, verbose_name="Vendor Shipping Fee")
     
     tracking_number = models.CharField(max_length=100, blank=True, null=True, verbose_name="Courier Air Waybill / Tracking")
+
+    # Snapshot of the vendor's delivery promise at the moment of purchase (so a later
+    # change to the shop's settings never silently rewrites a delivery date a customer
+    # was already shown). Populated by place_order() from Shop.min/max_delivery_days.
+    estimated_delivery_start = models.DateField(null=True, blank=True, verbose_name="Estimated Delivery — Earliest")
+    estimated_delivery_end = models.DateField(null=True, blank=True, verbose_name="Estimated Delivery — Latest")
+
+    # Fulfillment timeline, set as the vendor actually moves the sub-order along —
+    # gives customers a real paper trail instead of a single opaque status label.
+    shipped_at = models.DateTimeField(null=True, blank=True, verbose_name="Shipped At")
+    delivered_at = models.DateTimeField(null=True, blank=True, verbose_name="Delivered At")
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -130,9 +175,21 @@ class SubOrder(models.Model):
         verbose_name = 'Vendor Sub-Order'
         verbose_name_plural = 'Vendor Sub-Orders'
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['shop', 'status'], name='orders_subo_shop_status_idx'),
+            models.Index(fields=['status'], name='orders_subo_status_idx'),
+        ]
 
     def __str__(self):
         return f"SubOrder {self.id} | Shop: {self.shop.name} | Part of Order {self.parent_order.id}"
+
+    @property
+    def is_delivery_overdue(self):
+        """True if the vendor's promised window has passed without a delivery being logged."""
+        if self.status in ('Delivered', 'Cancelled', 'Refunded') or not self.estimated_delivery_end:
+            return False
+        from django.utils import timezone
+        return timezone.now().date() > self.estimated_delivery_end
 
 
 class OrderItem(models.Model):

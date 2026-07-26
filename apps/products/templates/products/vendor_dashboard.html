@@ -11,6 +11,10 @@
             <p class="text-sm text-ink-900/50 mt-1">Manage inventory, monitor stock, and fulfill orders.</p>
         </div>
         <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            <a href="{% url 'shops:shop_settings' %}" class="btn-ghost !text-[11px] !py-2.5 !normal-case !font-semibold !tracking-normal">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+                Shop settings
+            </a>
             <a href="{% url 'products:export_orders_csv' %}" class="btn-ghost !text-[11px] !py-2.5 !normal-case !font-semibold !tracking-normal">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
                 Export orders
@@ -118,7 +122,13 @@
                                                 </div>
                                             {% endfor %}
                                         </div>
-                                        <span class="text-[10px] text-ink-900/40 block font-medium">Placed: {{ sub_order.parent_order.created_at|date:"M d, Y - H:i" }}</span>
+                                        <span class="text-[10px] text-ink-900/40 block font-medium">Placed: {{ sub_order.parent_order.order_date|date:"M d, Y - H:i" }}</span>
+                                        {% if sub_order.estimated_delivery_end %}
+                                            <span class="text-[10px] {% if sub_order.is_delivery_overdue %}text-papaya-600{% else %}text-ink-900/40{% endif %} block font-medium">
+                                                Est. delivery: {{ sub_order.estimated_delivery_start|date:"M d" }}–{{ sub_order.estimated_delivery_end|date:"M d" }}
+                                                {% if sub_order.is_delivery_overdue %}<span class="font-bold">· overdue</span>{% endif %}
+                                            </span>
+                                        {% endif %}
                                     </td>
 
                                     <td class="p-4">
@@ -203,15 +213,21 @@
                                     </td>
 
                                     <td class="p-4">
-                                        <span class="badge {% if sub_order.status == 'Pending' %}bg-marigold-50 text-marigold-700 border-marigold-100{% elif sub_order.status == 'Processing' %}bg-brand-50 text-brand-600 border-brand-100{% else %}bg-jade-50 text-jade-700 border-jade-100{% endif %} block text-center">
+                                        <span class="badge {% if sub_order.status == 'Pending' %}bg-marigold-50 text-marigold-700 border-marigold-100{% elif sub_order.status == 'Processing' %}bg-brand-50 text-brand-600 border-brand-100{% elif sub_order.status == 'Shipped' %}bg-indigo-50 text-indigo-600 border-indigo-100{% else %}bg-jade-50 text-jade-700 border-jade-100{% endif %} block text-center">
                                             {{ sub_order.status }}
                                         </span>
                                     </td>
 
                                     <td class="p-4 text-right">
-                                        <button type="submit" formaction="{% url 'products:update_order_status' sub_order.id %}" class="px-3 py-1.5 bg-ink-900 text-white text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-marigold-500 hover:text-ink-900 transition-colors cursor-pointer whitespace-nowrap shadow-card">
-                                            Mark shipped
-                                        </button>
+                                        {% if sub_order.status == 'Shipped' %}
+                                            <button type="submit" formaction="{% url 'products:mark_order_delivered' sub_order.id %}" class="px-3 py-1.5 bg-jade-600 text-white text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-jade-500 transition-colors cursor-pointer whitespace-nowrap shadow-card">
+                                                Mark delivered
+                                            </button>
+                                        {% else %}
+                                            <button type="submit" formaction="{% url 'products:update_order_status' sub_order.id %}" class="px-3 py-1.5 bg-ink-900 text-white text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-marigold-500 hover:text-ink-900 transition-colors cursor-pointer whitespace-nowrap shadow-card">
+                                                Mark shipped
+                                            </button>
+                                        {% endif %}
                                     </td>
                                 </tr>
                             {% endfor %}

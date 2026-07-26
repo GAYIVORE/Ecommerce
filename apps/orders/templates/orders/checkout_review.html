@@ -103,29 +103,32 @@
                 </svg>
                 <span>Order items</span>
             </h3>
+            <p class="text-[11px] font-medium text-ink-900/40 -mt-3 mb-4">
+                Your cart spans {{ cart.items.all|length }} item{{ cart.items.all|length|pluralize }} across multiple vendors — each shop packs and ships its own items on its own timeline, shown below.
+            </p>
 
-            <div class="overflow-x-auto border border-line rounded-xl">
-                <table class="min-w-full divide-y divide-line m-0 text-left">
-                    <thead class="bg-paper">
-                        <tr>
-                            <th scope="col" class="px-5 py-3 text-xs font-bold uppercase tracking-wider text-ink-900/50">Product</th>
-                            <th scope="col" class="px-5 py-3 text-xs font-bold uppercase tracking-wider text-ink-900/50 text-center">Qty</th>
-                            <th scope="col" class="px-5 py-3 text-xs font-bold uppercase tracking-wider text-ink-900/50 text-right">Unit price</th>
-                            <th scope="col" class="px-5 py-3 text-xs font-bold uppercase tracking-wider text-ink-900/50 text-right">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-line">
-                        {% for item in cart.items.all %}
-                            <tr class="hover:bg-paper/60 transition-colors">
-                                <td class="px-5 py-4 whitespace-nowrap text-sm font-semibold tracking-tight text-ink-900">{{ item.product.name }}</td>
-                                <td class="px-5 py-4 whitespace-nowrap text-sm font-medium text-center text-ink-900/60">{{ item.quantity }}</td>
-                                <td class="px-5 py-4 whitespace-nowrap text-sm font-medium text-right text-ink-900/60">GHS {{ item.product.price|floatformat:2 }}</td>
-                                <td class="px-5 py-4 whitespace-nowrap text-sm font-bold text-right text-ink-900">GHS {{ item.get_total_item_price|floatformat:2 }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            {% for shop, items in cart.get_items_grouped_by_shop.items %}
+                <div class="border border-line rounded-xl overflow-hidden">
+                    <div class="flex items-center justify-between gap-3 flex-wrap bg-paper px-5 py-3 border-b border-line">
+                        <span class="text-xs font-bold uppercase tracking-wider text-ink-900">{{ shop.name|default:"Unknown vendor" }}</span>
+                        {% if shop %}
+                            <span class="text-[11px] font-bold text-brand-500">Est. delivery: {{ shop.delivery_window_text }}</span>
+                        {% endif %}
+                    </div>
+                    <table class="min-w-full divide-y divide-line m-0 text-left">
+                        <tbody class="bg-white divide-y divide-line">
+                            {% for item in items %}
+                                <tr class="hover:bg-paper/60 transition-colors">
+                                    <td class="px-5 py-4 whitespace-nowrap text-sm font-semibold tracking-tight text-ink-900">{{ item.product.name }}</td>
+                                    <td class="px-5 py-4 whitespace-nowrap text-sm font-medium text-center text-ink-900/60">&times;{{ item.quantity }}</td>
+                                    <td class="px-5 py-4 whitespace-nowrap text-sm font-medium text-right text-ink-900/60">GHS {{ item.product.price|floatformat:2 }}</td>
+                                    <td class="px-5 py-4 whitespace-nowrap text-sm font-bold text-right text-ink-900">GHS {{ item.get_total_item_price|floatformat:2 }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endfor %}
         </div>
 
         <div class="mb-8 p-5 sm:p-6 border border-line bg-paper rounded-xl">

@@ -40,11 +40,18 @@
                                 <td class="px-6 py-5">
                                     <div class="flex flex-col gap-1.5 max-w-xs">
                                         {% for sub_order in order.sub_orders.all %}
-                                            <div class="flex items-center justify-between gap-4 text-xs bg-paper border border-line px-2.5 py-1 rounded-md">
-                                                <span class="font-bold text-ink-900/60 truncate">{{ sub_order.shop.name }}</span>
-                                                <span class="badge {% if sub_order.status == 'Delivered' %}bg-jade-50 text-jade-700 border-jade-100{% elif sub_order.status == 'Shipped' %}bg-brand-50 text-brand-600 border-brand-100{% elif sub_order.status == 'Processing' %}bg-marigold-50 text-marigold-700 border-marigold-100{% elif sub_order.status == 'Cancelled' or sub_order.status == 'Refunded' %}bg-papaya-50 text-papaya-700 border-papaya-100{% else %}bg-paper text-ink-900/60 border-line{% endif %}">
-                                                    {{ sub_order.get_status_display }}
-                                                </span>
+                                            <div class="flex flex-col gap-0.5 text-xs bg-paper border border-line px-2.5 py-1.5 rounded-md">
+                                                <div class="flex items-center justify-between gap-4">
+                                                    <span class="font-bold text-ink-900/60 truncate">{{ sub_order.shop.name }}</span>
+                                                    <span class="badge {% if sub_order.status == 'Delivered' %}bg-jade-50 text-jade-700 border-jade-100{% elif sub_order.status == 'Shipped' %}bg-brand-50 text-brand-600 border-brand-100{% elif sub_order.status == 'Processing' %}bg-marigold-50 text-marigold-700 border-marigold-100{% elif sub_order.status == 'Cancelled' or sub_order.status == 'Refunded' %}bg-papaya-50 text-papaya-700 border-papaya-100{% else %}bg-paper text-ink-900/60 border-line{% endif %}">
+                                                        {{ sub_order.get_status_display }}
+                                                    </span>
+                                                </div>
+                                                {% if sub_order.status != 'Delivered' and sub_order.status != 'Cancelled' and sub_order.status != 'Refunded' and sub_order.estimated_delivery_end %}
+                                                    <span class="text-[10px] font-semibold {% if sub_order.is_delivery_overdue %}text-papaya-600{% else %}text-ink-900/35{% endif %}">
+                                                        {% if sub_order.is_delivery_overdue %}Running late{% else %}Est. {{ sub_order.estimated_delivery_start|date:"M j" }}–{{ sub_order.estimated_delivery_end|date:"M j" }}{% endif %}
+                                                    </span>
+                                                {% endif %}
                                             </div>
                                         {% empty %}
                                             <span class="text-xs text-ink-900/35 font-medium">No sub-orders tracked</span>
@@ -93,11 +100,18 @@
                             <div class="flex flex-col gap-2 pt-1">
                                 <span class="text-[10px] font-bold uppercase tracking-wider text-ink-900/35">Fulfillment by shop</span>
                                 {% for sub_order in order.sub_orders.all %}
-                                    <div class="flex items-center justify-between text-xs py-1 px-1.5 bg-paper rounded border border-line">
-                                        <span class="font-bold text-ink-900/60 truncate max-w-[150px]">{{ sub_order.shop.name }}</span>
-                                        <span class="badge {% if sub_order.status == 'Delivered' %}bg-jade-50 text-jade-700 border-jade-100{% elif sub_order.status == 'Shipped' %}bg-brand-50 text-brand-600 border-brand-100{% elif sub_order.status == 'Processing' %}bg-marigold-50 text-marigold-700 border-marigold-100{% elif sub_order.status == 'Cancelled' or sub_order.status == 'Refunded' %}bg-papaya-50 text-papaya-700 border-papaya-100{% else %}bg-paper text-ink-900/60 border-line{% endif %}">
-                                            {{ sub_order.get_status_display }}
-                                        </span>
+                                    <div class="flex flex-col gap-0.5 text-xs py-1.5 px-1.5 bg-paper rounded border border-line">
+                                        <div class="flex items-center justify-between">
+                                            <span class="font-bold text-ink-900/60 truncate max-w-[150px]">{{ sub_order.shop.name }}</span>
+                                            <span class="badge {% if sub_order.status == 'Delivered' %}bg-jade-50 text-jade-700 border-jade-100{% elif sub_order.status == 'Shipped' %}bg-brand-50 text-brand-600 border-brand-100{% elif sub_order.status == 'Processing' %}bg-marigold-50 text-marigold-700 border-marigold-100{% elif sub_order.status == 'Cancelled' or sub_order.status == 'Refunded' %}bg-papaya-50 text-papaya-700 border-papaya-100{% else %}bg-paper text-ink-900/60 border-line{% endif %}">
+                                                {{ sub_order.get_status_display }}
+                                            </span>
+                                        </div>
+                                        {% if sub_order.status != 'Delivered' and sub_order.status != 'Cancelled' and sub_order.status != 'Refunded' and sub_order.estimated_delivery_end %}
+                                            <span class="text-[10px] font-semibold {% if sub_order.is_delivery_overdue %}text-papaya-600{% else %}text-ink-900/35{% endif %}">
+                                                {% if sub_order.is_delivery_overdue %}Running late{% else %}Est. {{ sub_order.estimated_delivery_start|date:"M j" }}–{{ sub_order.estimated_delivery_end|date:"M j" }}{% endif %}
+                                            </span>
+                                        {% endif %}
                                     </div>
                                 {% empty %}
                                     <span class="text-xs text-ink-900/35 font-medium">No tracking info yet</span>
