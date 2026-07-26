@@ -2,6 +2,7 @@
 
 from .base import *
 from decouple import config
+import dj_database_url
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -13,17 +14,25 @@ SECRET_KEY = config('SECRET_KEY')
 # Allowed hosts for production (your domain names)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',')
 
-# Database for production (e.g., PostgreSQL)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',  # Or 'mysql', 'oracle'
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT', default='5432'),
+# Database for production (e.g., Supabase/Postgres).
+# Preferred: a single DATABASE_URL connection string (this is what Supabase
+# gives you). Falls back to individual DB_* vars if DATABASE_URL isn't set,
+# for compatibility with other hosting providers.
+if config('DATABASE_URL', default=''):
+    DATABASES = {
+        'default': config('DATABASE_URL', cast=dj_database_url.parse)
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': config('DB_NAME'),
+            'USER': config('DB_USER'),
+            'PASSWORD': config('DB_PASSWORD'),
+            'HOST': config('DB_HOST'),
+            'PORT': config('DB_PORT', default='5432'),
+        }
+    }
 
 # Static files (CSS, JavaScript, Images) for production
 # These should be served by a web server (Nginx/Apache) or CDN
