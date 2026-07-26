@@ -100,8 +100,11 @@ ACCOUNT_EMAIL_VERIFICATION = "none"
 ACCOUNT_LOGIN_METHODS = {'email', 'username'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 
-GOOGLE_OAUTH_CLIENT_ID = config('GOOGLE_OAUTH_CLIENT_ID', default='')
-GOOGLE_OAUTH_CLIENT_SECRET = config('GOOGLE_OAUTH_CLIENT_SECRET', default='')
+# Accepts either GOOGLE_OAUTH_CLIENT_ID/SECRET (preferred) or the shorter
+# GOOGLE_CLIENT_ID/SECRET names, so this works regardless of which naming
+# was used when the env vars were set up on the host (e.g. Vercel).
+GOOGLE_OAUTH_CLIENT_ID = config('GOOGLE_OAUTH_CLIENT_ID', default=config('GOOGLE_CLIENT_ID', default=''))
+GOOGLE_OAUTH_CLIENT_SECRET = config('GOOGLE_OAUTH_CLIENT_SECRET', default=config('GOOGLE_CLIENT_SECRET', default=''))
 GOOGLE_OAUTH_ENABLED = bool(GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET)
 
 SOCIALACCOUNT_PROVIDERS = {

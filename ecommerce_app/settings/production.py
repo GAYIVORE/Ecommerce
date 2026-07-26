@@ -95,8 +95,11 @@ PAYSTACK_SECRET_KEY = config('PAYSTACK_SECRET_KEY', default='')
 PAYSTACK_PUBLIC_KEY = config('PAYSTACK_PUBLIC_KEY', default='')
 
 # Google OAuth (settings-based app config; no DB SocialApp row required).
-GOOGLE_OAUTH_CLIENT_ID = config('GOOGLE_OAUTH_CLIENT_ID', default='')
-GOOGLE_OAUTH_CLIENT_SECRET = config('GOOGLE_OAUTH_CLIENT_SECRET', default='')
+# Accepts either GOOGLE_OAUTH_CLIENT_ID/SECRET (preferred) or the shorter
+# GOOGLE_CLIENT_ID/SECRET names, so this works regardless of which naming
+# was used when the env vars were set up on the host (e.g. Vercel).
+GOOGLE_OAUTH_CLIENT_ID = config('GOOGLE_OAUTH_CLIENT_ID', default=config('GOOGLE_CLIENT_ID', default=''))
+GOOGLE_OAUTH_CLIENT_SECRET = config('GOOGLE_OAUTH_CLIENT_SECRET', default=config('GOOGLE_CLIENT_SECRET', default=''))
 GOOGLE_OAUTH_ENABLED = bool(GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET)
 
 SOCIALACCOUNT_PROVIDERS = {
