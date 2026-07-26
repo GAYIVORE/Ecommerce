@@ -58,7 +58,7 @@
 
                 {% if user.is_authenticated %}
                     <a href="{% url 'earn:dashboard' %}" class="btn-earn !py-2 !px-3.5">
-                        <i class="fa-solid fa-coins"></i> Earn
+                        <i class="fa-solid fa-handshake"></i> Services
                     </a>
                 {% endif %}
 
@@ -106,23 +106,35 @@
                 {% endif %}
             </div>
 
-            <div class="flex md:hidden items-center gap-3.5 shrink-0">
+            <div class="flex md:hidden items-center justify-end gap-2.5 xs:gap-3 shrink-0 flex-nowrap">
+                <a href="{% url 'products:product_list' %}" class="text-white/80 hover:text-white transition-colors" aria-label="Products">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
+                    </svg>
+                </a>
+
+                <a href="{% url 'shops:shop_directory' %}" class="text-white/80 hover:text-white transition-colors" aria-label="Shops">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349M3.75 9.349a3 3 0 0 0 3.634 0M20.25 9.349a3 3 0 0 1-3.634 0m0 0a3 3 0 0 1-3.634 0m0 0a3 3 0 0 1-3.634 0m0 0a3 3 0 0 1-3.634 0M3.75 9.349V6.375c0-.621.504-1.125 1.125-1.125h14.25c.621 0 1.125.504 1.125 1.125V9.349" />
+                    </svg>
+                </a>
+
                 <a href="{% url 'cart:cart_detail' %}" class="relative text-white/80 hover:text-white transition-colors" aria-label="Cart">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"></path>
                     </svg>
                     {% if cart_item_count > 0 %}
-                        <span class="absolute -top-2 -right-2 inline-flex items-center justify-center px-1.5 py-0.5 text-[9px] font-black leading-none text-ink-900 bg-marigold-500 rounded-full min-w-[16px]">{{ cart_item_count }}</span>
+                        <span class="absolute -top-2 -right-2.5 inline-flex items-center justify-center px-1.5 py-0.5 text-[9px] font-black leading-none text-ink-900 bg-marigold-500 rounded-full min-w-[16px]">{{ cart_item_count }}</span>
                     {% endif %}
                 </a>
 
                 {% if user.is_authenticated %}
                     <a href="{% url 'wishlist:wishlist_detail' %}" class="relative text-white/80 hover:text-white transition-colors" aria-label="Wishlist">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                         </svg>
                         {% if wishlist_count > 0 %}
-                            <span class="absolute -top-2 -right-2 inline-flex items-center justify-center px-1.5 py-0.5 text-[9px] font-black leading-none text-white bg-papaya-500 rounded-full min-w-[16px]">{{ wishlist_count }}</span>
+                            <span class="absolute -top-2 -right-2.5 inline-flex items-center justify-center px-1.5 py-0.5 text-[9px] font-black leading-none text-white bg-papaya-500 rounded-full min-w-[16px]">{{ wishlist_count }}</span>
                         {% endif %}
                     </a>
 
@@ -137,14 +149,20 @@
                             </div>
                         {% endif %}
                     </a>
+                {% else %}
+                    <a href="{% url 'users:login' %}" class="text-white/80 hover:text-white transition-colors" aria-label="Log in">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 -3H9m12 0-3-3m3 3-3 3" />
+                        </svg>
+                    </a>
                 {% endif %}
-            </div>
 
-            <button id="mobile-menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" class="md:hidden text-white p-2 -mr-2">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
-                </svg>
-            </button>
+                <button id="mobile-menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" class="text-white p-1 -mr-1 shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <div class="md:hidden w-full mt-3 relative" data-search-wrap>
@@ -166,7 +184,7 @@
             <a href="{% url 'products:product_list' %}" class="block px-3 py-2.5 rounded-lg text-sm font-bold text-white/85 hover:bg-white/5">Products</a>
             <a href="{% url 'shops:shop_directory' %}" class="block px-3 py-2.5 rounded-lg text-sm font-bold text-white/85 hover:bg-white/5">Shops</a>
             {% if user.is_authenticated %}
-                <a href="{% url 'earn:dashboard' %}" class="block px-3 py-2.5 rounded-lg text-sm font-bold text-jade-400 hover:bg-white/5"><i class="fa-solid fa-coins mr-1.5"></i>Earn</a>
+                <a href="{% url 'earn:dashboard' %}" class="block px-3 py-2.5 rounded-lg text-sm font-bold text-jade-400 hover:bg-white/5"><i class="fa-solid fa-handshake mr-1.5"></i>Services</a>
                 <form action="{% url 'users:logout' %}" method="post" class="m-0">
                     {% csrf_token %}
                     <button type="submit" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-bold text-papaya-400 hover:bg-white/5 cursor-pointer bg-transparent border-none">Log out</button>
@@ -202,7 +220,7 @@
                 <span class="w-8 h-8 rounded-lg bg-brand-500 ring-2 ring-marigold-500 flex items-center justify-center font-display font-bold text-white">E</span>
                 <span class="font-display font-bold text-white">SHOP</span>
             </div>
-            <p class="text-xs leading-relaxed text-white/50">A marketplace for local shops, and a place to earn — services, quick cash, and every cedi tracked.</p>
+            <p class="text-xs leading-relaxed text-white/50">A marketplace for local shops, plus local services and quick-cash gigs — every cedi tracked.</p>
         </div>
         <div>
             <h4 class="text-xs font-bold uppercase tracking-wider text-white/40 mb-3">Shop</h4>
@@ -213,7 +231,7 @@
             </ul>
         </div>
         <div>
-            <h4 class="text-xs font-bold uppercase tracking-wider text-white/40 mb-3">Earn</h4>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-white/40 mb-3">Services</h4>
             <ul class="space-y-2 text-sm">
                 <li><a href="{% url 'earn:marketplace' %}" class="text-white/70 hover:text-jade-400 transition-colors">Find services</a></li>
                 <li><a href="{% url 'earn:quickcash' %}" class="text-white/70 hover:text-jade-400 transition-colors">Quick cash offers</a></li>

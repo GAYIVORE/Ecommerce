@@ -8,25 +8,115 @@
 <section class="relative overflow-hidden bg-ink-900">
     <div class="absolute inset-0 opacity-[0.04] pointer-events-none bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px]"></div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-10 sm:pt-16 sm:pb-14 relative z-10 flex flex-col items-center text-center">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8 sm:pt-8 sm:pb-10 relative z-10">
 
         {% if user.is_authenticated %}
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 text-white/80 text-xs font-bold tracking-wide uppercase mb-5">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 text-white/80 text-xs font-bold tracking-wide uppercase mb-4">
                 <span class="w-2 h-2 rounded-full bg-jade-500 ping-dot"></span>
                 Welcome back, {{ user.username }}
             </div>
         {% endif %}
 
-        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-white tracking-tight leading-tight max-w-3xl mb-4">
-            Every stall in the market.
-            <span class="block sm:inline sm:ml-2 text-marigold-500">One address.</span>
-        </h1>
+        <!-- Ad carousel: rotates between a featured shop, a featured product, and a featured service -->
+        <div class="relative rounded-2xl overflow-hidden ring-1 ring-white/10 shadow-lift select-none" data-carousel>
+            <div class="flex" data-carousel-track style="width:300%; transition: transform .5s ease-out;">
 
-        <p class="text-sm sm:text-base text-white/60 max-w-2xl font-medium leading-relaxed mb-8">
-            Buy directly from verified local vendors with real-time stock, tracked delivery per shop, and secure checkout — or flip to the Earn side and turn your own time into income.
-        </p>
+                <!-- Slide 1 — Shop spotlight -->
+                <div class="relative w-1/3 shrink-0 h-56 sm:h-72 lg:h-80 flex items-end">
+                    {% if featured_shop and featured_shop.image %}
+                        <img src="{{ featured_shop.image.url }}" alt="{{ featured_shop.name }}" class="absolute inset-0 w-full h-full object-cover">
+                    {% else %}
+                        <div class="absolute inset-0 bg-gradient-to-br from-brand-600 to-ink-900"></div>
+                    {% endif %}
+                    <div class="absolute inset-0 bg-gradient-to-t from-ink-900 via-ink-900/50 to-transparent"></div>
+                    <div class="relative z-10 p-5 sm:p-8 w-full sm:max-w-lg">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/15 backdrop-blur text-[10px] font-black uppercase tracking-widest text-white mb-2.5">
+                            <i class="fa-solid fa-store"></i> Featured shop
+                        </span>
+                        <h2 class="text-xl sm:text-3xl lg:text-4xl font-display font-bold text-white tracking-tight leading-tight mb-1.5">
+                            {{ featured_shop.name|default:"Every stall in the market" }}
+                        </h2>
+                        <p class="text-xs sm:text-sm text-white/70 font-medium leading-relaxed mb-4 line-clamp-2">
+                            {% if featured_shop %}
+                                {{ featured_shop.description|default:"Verified local vendor with live stock and tracked delivery."|truncatewords:20 }}
+                            {% else %}
+                                Buy directly from verified local vendors, one address for every stall.
+                            {% endif %}
+                        </p>
+                        <a href="{% if featured_shop %}{{ featured_shop.get_absolute_url }}{% else %}{% url 'shops:shop_directory' %}{% endif %}" class="btn-accent !py-2.5 !px-5 inline-flex">
+                            {% if featured_shop %}Visit {{ featured_shop.name }}{% else %}Browse shops{% endif %} &rarr;
+                        </a>
+                    </div>
+                </div>
 
-        <div class="w-full max-w-md sm:max-w-xl flex flex-col sm:flex-row justify-center items-center gap-3">
+                <!-- Slide 2 — Product spotlight -->
+                <div class="relative w-1/3 shrink-0 h-56 sm:h-72 lg:h-80 flex items-end">
+                    {% if featured_product and featured_product.image %}
+                        <img src="{{ featured_product.image.url }}" alt="{{ featured_product.name }}" class="absolute inset-0 w-full h-full object-cover">
+                    {% else %}
+                        <div class="absolute inset-0 bg-gradient-to-br from-marigold-600 to-ink-900"></div>
+                    {% endif %}
+                    <div class="absolute inset-0 bg-gradient-to-t from-ink-900 via-ink-900/50 to-transparent"></div>
+                    <div class="relative z-10 p-5 sm:p-8 w-full sm:max-w-lg">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/15 backdrop-blur text-[10px] font-black uppercase tracking-widest text-white mb-2.5">
+                            <i class="fa-solid fa-tag"></i> Trending product
+                        </span>
+                        <h2 class="text-xl sm:text-3xl lg:text-4xl font-display font-bold text-white tracking-tight leading-tight mb-1.5">
+                            {{ featured_product.name|default:"Fresh finds, every day" }}
+                        </h2>
+                        <p class="text-xs sm:text-sm text-white/70 font-medium leading-relaxed mb-4 line-clamp-2">
+                            {% if featured_product %}
+                                From {{ featured_product.shop.name }} &middot; GHS {{ featured_product.price|floatformat:2 }}
+                            {% else %}
+                                Real-time stock from every vendor, updated as it happens.
+                            {% endif %}
+                        </p>
+                        <a href="{% if featured_product %}{{ featured_product.get_absolute_url }}{% else %}{% url 'products:product_list' %}{% endif %}" class="btn-accent !py-2.5 !px-5 inline-flex">
+                            {% if featured_product %}Shop this deal{% else %}Browse products{% endif %} &rarr;
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Slide 3 — Services spotlight -->
+                <div class="relative w-1/3 shrink-0 h-56 sm:h-72 lg:h-80 flex items-end">
+                    <div class="absolute inset-0 bg-gradient-to-br from-jade-600 to-ink-900"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-ink-900 via-ink-900/50 to-transparent"></div>
+                    <div class="relative z-10 p-5 sm:p-8 w-full sm:max-w-lg">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/15 backdrop-blur text-[10px] font-black uppercase tracking-widest text-white mb-2.5">
+                            <i class="fa-solid fa-handshake"></i> Services
+                        </span>
+                        <h2 class="text-xl sm:text-3xl lg:text-4xl font-display font-bold text-white tracking-tight leading-tight mb-1.5">
+                            {{ featured_service.title|default:"Need something done?" }}
+                        </h2>
+                        <p class="text-xs sm:text-sm text-white/70 font-medium leading-relaxed mb-4 line-clamp-2">
+                            {% if featured_service %}
+                                {{ featured_service.get_category_display }} &middot; from GHS {{ featured_service.price|floatformat:2 }}
+                            {% else %}
+                                Book trusted local services, or list your own and start earning.
+                            {% endif %}
+                        </p>
+                        <a href="{% if featured_service %}{{ featured_service.get_absolute_url }}{% else %}{% url 'earn:marketplace' %}{% endif %}" class="btn-accent !py-2.5 !px-5 inline-flex">
+                            {% if featured_service %}Book this service{% else %}Browse services{% endif %} &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" data-carousel-prev aria-label="Previous ad" class="hidden sm:flex absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-ink-900/50 hover:bg-ink-900/80 text-white items-center justify-center transition-colors cursor-pointer">
+                <i class="fa-solid fa-chevron-left text-xs"></i>
+            </button>
+            <button type="button" data-carousel-next aria-label="Next ad" class="hidden sm:flex absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-ink-900/50 hover:bg-ink-900/80 text-white items-center justify-center transition-colors cursor-pointer">
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+            </button>
+
+            <div class="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5" data-carousel-dots>
+                <button type="button" class="h-1.5 rounded-full bg-white w-6 transition-all duration-300 cursor-pointer" data-carousel-dot="0" aria-label="Shop ad"></button>
+                <button type="button" class="h-1.5 rounded-full bg-white/40 w-1.5 transition-all duration-300 cursor-pointer" data-carousel-dot="1" aria-label="Product ad"></button>
+                <button type="button" class="h-1.5 rounded-full bg-white/40 w-1.5 transition-all duration-300 cursor-pointer" data-carousel-dot="2" aria-label="Service ad"></button>
+            </div>
+        </div>
+
+        <div class="w-full flex flex-col sm:flex-row justify-center items-center gap-3 mt-6">
             <a href="{% url 'shops:shop_directory' %}" class="btn-accent w-full sm:w-auto !py-3.5 !px-7">
                 Start shopping
             </a>
@@ -41,6 +131,10 @@
                         Open your own shop &rarr;
                     </a>
                 {% endif %}
+            {% else %}
+                <a href="{% url 'shops:create_shop' %}" class="btn-ghost w-full sm:w-auto !py-3.5 !px-6 !bg-white/10 !text-white !border-white/15 hover:!bg-white/15">
+                    Sell on E Shop &rarr;
+                </a>
             {% endif %}
         </div>
     </div>
@@ -54,15 +148,15 @@
         <div class="flex flex-col lg:flex-row items-center justify-between gap-5 px-2">
             <div class="flex items-center gap-x-4 text-center lg:text-left flex-col lg:flex-row">
                 <div class="w-12 h-12 rounded-2xl bg-ink-900/15 flex items-center justify-center shrink-0">
-                    <i class="fa-solid fa-coins text-lg text-white"></i>
+                    <i class="fa-solid fa-handshake text-lg text-white"></i>
                 </div>
                 <div>
-                    <div class="font-display font-bold text-xl sm:text-2xl tracking-tight text-white">Earn money on E Shop</div>
-                    <p class="text-sm text-white/85">Post local services, browse quick cash offers, and track every cedi you make.</p>
+                    <div class="font-display font-bold text-xl sm:text-2xl tracking-tight text-white">Services on E Shop</div>
+                    <p class="text-sm text-white/85">Offer local services, pick up quick cash gigs, and track every cedi you make.</p>
                 </div>
             </div>
             <a href="{% url 'earn:dashboard' %}" class="shrink-0 inline-flex items-center gap-x-2 px-6 py-3 rounded-xl text-sm font-bold uppercase tracking-wider bg-ink-900 text-white hover:bg-ink-800 transition-all active:scale-[0.98]">
-                Open Earn <i class="fa-solid fa-arrow-right"></i>
+                Open Services <i class="fa-solid fa-arrow-right"></i>
             </a>
         </div>
     </div>
@@ -222,4 +316,76 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    var carousel = document.querySelector('[data-carousel]');
+    if (!carousel) return;
+
+    var track = carousel.querySelector('[data-carousel-track]');
+    var dots = carousel.querySelectorAll('[data-carousel-dot]');
+    var slideCount = track.children.length;
+    var index = 0;
+    var timer = null;
+    var AUTOPLAY_MS = 5500;
+
+    function goTo(i) {
+        index = (i + slideCount) % slideCount;
+        track.style.transform = 'translateX(-' + (index * (100 / slideCount)) + '%)';
+        dots.forEach(function (dot, di) {
+            if (di === index) {
+                dot.classList.remove('w-1.5', 'bg-white/40');
+                dot.classList.add('w-6', 'bg-white');
+            } else {
+                dot.classList.remove('w-6', 'bg-white');
+                dot.classList.add('w-1.5', 'bg-white/40');
+            }
+        });
+    }
+
+    function next() { goTo(index + 1); }
+    function prev() { goTo(index - 1); }
+
+    function restartAutoplay() {
+        clearInterval(timer);
+        timer = setInterval(next, AUTOPLAY_MS);
+    }
+
+    dots.forEach(function (dot) {
+        dot.addEventListener('click', function () {
+            goTo(parseInt(dot.getAttribute('data-carousel-dot'), 10));
+            restartAutoplay();
+        });
+    });
+
+    var prevBtn = carousel.querySelector('[data-carousel-prev]');
+    var nextBtn = carousel.querySelector('[data-carousel-next]');
+    if (prevBtn) prevBtn.addEventListener('click', function () { prev(); restartAutoplay(); });
+    if (nextBtn) nextBtn.addEventListener('click', function () { next(); restartAutoplay(); });
+
+    // Touch swipe support for mobile
+    var touchStartX = null;
+    track.addEventListener('touchstart', function (e) {
+        touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+    track.addEventListener('touchend', function (e) {
+        if (touchStartX === null) return;
+        var diff = e.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(diff) > 40) {
+            if (diff < 0) { next(); } else { prev(); }
+            restartAutoplay();
+        }
+        touchStartX = null;
+    });
+
+    // Pause autoplay while the user is interacting with the carousel
+    carousel.addEventListener('mouseenter', function () { clearInterval(timer); });
+    carousel.addEventListener('mouseleave', restartAutoplay);
+
+    goTo(0);
+    restartAutoplay();
+})();
+</script>
 {% endblock %}
