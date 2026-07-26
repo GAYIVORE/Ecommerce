@@ -7,7 +7,7 @@
 <div class="w-full max-w-5xl mx-auto px-4 py-8 sm:py-12 flex flex-col items-center">
     <h1 class="text-2xl sm:text-4xl font-display font-bold tracking-tight mb-8 text-center flex items-center justify-center gap-3 w-full">
         <span>Your orders</span>
-        <span class="badge-neutral !text-sm !px-3 !py-1">{{ orders.count|default:"0" }}</span>
+        <span class="badge-neutral !text-sm !px-3 !py-1">{{ orders|length|default:"0" }}</span>
     </h1>
 
     {% if orders %}

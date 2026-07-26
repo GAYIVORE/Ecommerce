@@ -12,15 +12,10 @@ def cart_detail(request):
     Displays the contents of the user's shopping cart.
     Optimized with deep prefetching to handle multi-vendor templates efficiently.
     """
+    # Eager loading of items/products/shops for the grouped-by-vendor template
+    # happens inside Cart.get_items_grouped_by_shop (select_related'd there),
+    # so there's nothing extra to prefetch here.
     cart = get_or_create_user_cart(request)
-    
-    # ⚡ Performance Optimization: Eager load items, products, and their parent shops 
-    # to kill N+1 query traps when grouping items by vendor on the frontend.
-    if cart:
-        optimized_items = cart.items.select_related('product__shop', 'product__category')
-        # Use a small trick to cache the optimized queryset into the object mapping
-        cart.cached_items = optimized_items
-        
     return render(request, 'cart/cart_detail.html', {'cart': cart})
 
 

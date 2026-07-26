@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.db import models
 from django.db.models import F, Count, Q
-from apps.products.models import Category, Product
+from apps.products.models import Product
 from apps.promotions.models import Coupon
 from apps.shops.models import Shop
 from apps.earn.models import Service
@@ -17,8 +17,7 @@ def home(request):
     (featured shop / product / service spotlights).
     """
     now = timezone.now()
-    categories = Category.objects.prefetch_related('products').all()
-    
+
     # Fetch a live, active global platform coupon matching your admin status badges
     active_coupon = (
         Coupon.objects.filter(
@@ -74,7 +73,6 @@ def home(request):
     )
 
     context = {
-        'categories': categories,
         'coupon': active_coupon,
         'featured_shop': featured_shop,
         'featured_product': featured_product,

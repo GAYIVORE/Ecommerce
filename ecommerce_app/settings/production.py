@@ -22,9 +22,16 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='.vercel.app').split(',')
 # Preferred: a single DATABASE_URL connection string (this is what Supabase
 # gives you). Falls back to individual DB_* vars if DATABASE_URL isn't set,
 # for compatibility with other hosting providers.
+# CONN_MAX_AGE keeps a DB connection alive and reused across requests within
+# the same worker instead of opening a brand-new Postgres connection (full
+# TCP handshake + auth) on every single request — a real per-request cost
+# that was previously paid on every page load. Configurable via env in case
+# a given host (e.g. short-lived serverless workers) needs it disabled (0).
+DB_CONN_MAX_AGE = config('DB_CONN_MAX_AGE', default=60, cast=int)
+
 if config('DATABASE_URL', default=''):
     DATABASES = {
-        'default': config('DATABASE_URL', cast=dj_database_url.parse)
+        'default': config('DATABASE_URL', cast=dj_database_url.parse, conn_max_age=DB_CONN_MAX_AGE)
     }
 else:
     DATABASES = {
@@ -35,6 +42,7 @@ else:
             'PASSWORD': config('DB_PASSWORD'),
             'HOST': config('DB_HOST'),
             'PORT': config('DB_PORT', default='5432'),
+            'CONN_MAX_AGE': DB_CONN_MAX_AGE,
         }
     }
 

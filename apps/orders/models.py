@@ -93,6 +93,7 @@ class Order(models.Model):
         indexes = [
             models.Index(fields=['-order_date']),
             models.Index(fields=['user']),
+            models.Index(fields=['user', '-order_date'], name='orders_user_orderdate_idx'),
         ]
 
     def __str__(self):

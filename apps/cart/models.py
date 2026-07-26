@@ -46,8 +46,15 @@ class Cart(models.Model):
 
     @property
     def get_total_quantity(self):
-        """Calculates the total quantity of all items in the cart."""
-        return sum(item.quantity for item in self.items.all())
+        """
+        Calculates the total quantity of all items in the cart.
+
+        Uses a DB-side SUM instead of fetching every CartItem row into Python —
+        this property is read on every single page load (nav cart badge), so
+        the lightweight aggregate query matters across the whole site, not
+        just the cart page.
+        """
+        return self.items.aggregate(total=models.Sum('quantity'))['total'] or 0
 
     # =========================================================================
     # MULTI-VENDOR ARCHITECTURE ENHANCEMENTS

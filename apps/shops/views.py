@@ -105,7 +105,7 @@ def vendor_dashboard(request):
 
 def recent_restocks_feed(request):
     """ Endpoint targeted by HTMX to pull the latest 4 in-stock items. """
-    recent_restocks = Product.objects.filter(available=True, is_deleted=False, stock__gt=0).order_by('-updated_at')[:4]
+    recent_restocks = Product.objects.filter(available=True, is_deleted=False, stock__gt=0).select_related('shop').order_by('-updated_at')[:4]
     return render(request, 'shops/partials/restock_feed.html', {'recent_restocks': recent_restocks})
 
 
