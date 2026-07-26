@@ -8,7 +8,7 @@ pip install --break-system-packages -r requirements.txt
 
 echo "Installing Node dependencies and building Tailwind CSS..."
 npm install
-npx tailwindcss -i ./static/css/input.css -o ./static/css/style.css --minify
+node ./node_modules/tailwindcss/lib/cli.js -i ./static/css/input.css -o ./static/css/style.css --minify
 
 echo "Running migrations..."
 python manage.py migrate --noinput
