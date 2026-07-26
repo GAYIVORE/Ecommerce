@@ -131,6 +131,14 @@ if config('CLOUDINARY_CLOUD_NAME', default=''):
     DEFAULT_FILE_STORAGE = STORAGES['default']['BACKEND']
 
 # Security settings
+# Vercel terminates TLS and forwards requests to the Python function over an
+# internal (non-TLS) connection, setting X-Forwarded-Proto: https. Without
+# this, Django's request.is_secure() always returns False behind the proxy,
+# which breaks SESSION_COOKIE_SECURE / CSRF_COOKIE_SECURE (secure cookies
+# never get set/sent) and the absolute callback URL allauth builds during
+# the Google OAuth token exchange — a common cause of the generic
+# "Third-Party Login Failure" page even when credentials are correct.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', cast=bool, default=True)
 SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', cast=bool, default=True)
 CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', cast=bool, default=True)
