@@ -11,8 +11,12 @@ DEBUG = False
 # Always get SECRET_KEY from environment variables in production.
 SECRET_KEY = config('SECRET_KEY')
 
-# Allowed hosts for production (your domain names)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',')
+# Allowed hosts for production (your domain names).
+# Defaults to allowing any *.vercel.app subdomain so the app isn't fully
+# locked out (every request gets Django's generic "Bad Request (400)") if
+# the ALLOWED_HOSTS env var isn't set yet. Still strongly recommended to set
+# ALLOWED_HOSTS explicitly to your real domain(s) once you have one.
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='.vercel.app').split(',')
 
 # Database for production (e.g., Supabase/Postgres).
 # Preferred: a single DATABASE_URL connection string (this is what Supabase
