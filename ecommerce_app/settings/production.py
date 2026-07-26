@@ -94,25 +94,19 @@ else:
 PAYSTACK_SECRET_KEY = config('PAYSTACK_SECRET_KEY', default='')
 PAYSTACK_PUBLIC_KEY = config('PAYSTACK_PUBLIC_KEY', default='')
 
-# Google OAuth (settings-based app config; no DB SocialApp row required).
-# Accepts either GOOGLE_OAUTH_CLIENT_ID/SECRET (preferred) or the shorter
-# GOOGLE_CLIENT_ID/SECRET names, so this works regardless of which naming
-# was used when the env vars were set up on the host (e.g. Vercel).
-GOOGLE_OAUTH_CLIENT_ID = config('GOOGLE_OAUTH_CLIENT_ID', default=config('GOOGLE_CLIENT_ID', default=''))
-GOOGLE_OAUTH_CLIENT_SECRET = config('GOOGLE_OAUTH_CLIENT_SECRET', default=config('GOOGLE_CLIENT_SECRET', default=''))
-GOOGLE_OAUTH_ENABLED = bool(GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET)
-
+# Google OAuth is configured via the admin panel (SocialApp row created at
+# /admin/socialaccount/socialapp/), not via env vars. Deliberately NOT
+# setting 'APPS' here: allauth always merges settings-based APPS with any
+# DB-backed SocialApp rows for the same provider, with no way to make one
+# take priority over the other. Defining both here and in the admin means
+# two matching app configs, and allauth's get_app() raises
+# MultipleObjectsReturned instead of picking one, on every page that calls
+# {% provider_login_url %}. Leaving SOCIALACCOUNT_PROVIDERS without 'APPS'
+# means allauth uses the DB-configured app exclusively.
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': ['profile', 'email'],
         'AUTH_PARAMS': {'access_type': 'online'},
-        'APPS': [
-            {
-                'client_id': GOOGLE_OAUTH_CLIENT_ID,
-                'secret': GOOGLE_OAUTH_CLIENT_SECRET,
-                'key': '',
-            }
-        ] if GOOGLE_OAUTH_ENABLED else [],
     }
 }
 
@@ -131,6 +125,14 @@ if config('CLOUDINARY_CLOUD_NAME', default=''):
     DEFAULT_FILE_STORAGE = STORAGES['default']['BACKEND']
 
 # Security settings
+# Vercel terminates TLS and forwards requests to the Python function over an
+# internal (non-TLS) connection, setting X-Forwarded-Proto: https. Without
+# this, Django's request.is_secure() always returns False behind the proxy,
+# which breaks SESSION_COOKIE_SECURE / CSRF_COOKIE_SECURE (secure cookies
+# never get set/sent) and the absolute callback URL allauth builds during
+# the Google OAuth token exchange — a common cause of the generic
+# "Third-Party Login Failure" page even when credentials are correct.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', cast=bool, default=True)
 SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', cast=bool, default=True)
 CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', cast=bool, default=True)

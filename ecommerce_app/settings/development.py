@@ -100,13 +100,15 @@ ACCOUNT_EMAIL_VERIFICATION = "none"
 ACCOUNT_LOGIN_METHODS = {'email', 'username'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 
-# Accepts either GOOGLE_OAUTH_CLIENT_ID/SECRET (preferred) or the shorter
-# GOOGLE_CLIENT_ID/SECRET names, so this works regardless of which naming
-# was used when the env vars were set up on the host (e.g. Vercel).
-GOOGLE_OAUTH_CLIENT_ID = config('GOOGLE_OAUTH_CLIENT_ID', default=config('GOOGLE_CLIENT_ID', default=''))
-GOOGLE_OAUTH_CLIENT_SECRET = config('GOOGLE_OAUTH_CLIENT_SECRET', default=config('GOOGLE_CLIENT_SECRET', default=''))
-GOOGLE_OAUTH_ENABLED = bool(GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET)
-
+# Google OAuth is configured via the admin panel (SocialApp row created at
+# /admin/socialaccount/socialapp/), not via env vars. Deliberately NOT
+# setting 'APPS' here: allauth always merges settings-based APPS with any
+# DB-backed SocialApp rows for the same provider, with no way to make one
+# take priority over the other. Defining both here and in the admin means
+# two matching app configs, and allauth's get_app() raises
+# MultipleObjectsReturned instead of picking one, on every page that calls
+# {% provider_login_url %}. Leaving SOCIALACCOUNT_PROVIDERS without 'APPS'
+# means allauth uses the DB-configured app exclusively.
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': [
@@ -116,16 +118,5 @@ SOCIALACCOUNT_PROVIDERS = {
         'AUTH_PARAMS': {
             'access_type': 'online',
         },
-        # Settings-based app config: avoids needing a SocialApp row in the DB.
-        # Only registered when real credentials are supplied via env vars, so
-        # the login/register pages never crash with SocialApp.DoesNotExist in
-        # environments (like local dev) that have no Google credentials.
-        'APPS': [
-            {
-                'client_id': GOOGLE_OAUTH_CLIENT_ID,
-                'secret': GOOGLE_OAUTH_CLIENT_SECRET,
-                'key': '',
-            }
-        ] if GOOGLE_OAUTH_ENABLED else [],
     }
 }
