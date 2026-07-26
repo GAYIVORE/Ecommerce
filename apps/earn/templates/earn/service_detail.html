@@ -1,6 +1,6 @@
 {% extends "earn/base_earn.html" %}
 
-{% block title %}{{ service.title }} — Earn{% endblock %}
+{% block title %}{{ service.title }} — Services{% endblock %}
 
 {% block earn_content %}
 <div class="earn-card p-6 sm:p-8 max-w-2xl mx-auto">
@@ -20,8 +20,23 @@
         {% if service.average_rating %}<span class="text-marigold-400">&#9733; {{ service.average_rating }} average rating</span>{% endif %}
     </div>
 
+    {% if not service.is_active %}
+        <p class="bg-papaya-500/10 border border-papaya-500/20 rounded-xl p-4 text-sm text-papaya-400 font-semibold mb-4">This listing is paused and hidden from the marketplace.</p>
+    {% endif %}
+
     {% if service.provider_id == request.user.id %}
-        <p class="bg-white/5 rounded-xl p-4 text-sm text-white/50">This is your own listing — customers who visit this page can book and message you here.</p>
+        <div class="bg-white/5 rounded-xl p-4">
+            <p class="text-sm text-white/50 mb-4">This is your own listing — customers who visit this page can book and message you here.</p>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <a href="{% url 'earn:service_edit' service.slug %}" class="flex-1 text-center py-3 rounded-2xl bg-white/10 hover:bg-white/15 text-xs font-bold uppercase tracking-wider text-white transition-colors">Edit listing</a>
+                <form method="post" action="{% url 'earn:service_toggle_active' service.slug %}" class="flex-1 m-0">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full py-3 rounded-2xl border border-white/10 hover:bg-white/5 text-xs font-bold uppercase tracking-wider text-white/70 transition-colors">
+                        {% if service.is_active %}Pause listing{% else %}Reactivate listing{% endif %}
+                    </button>
+                </form>
+            </div>
+        </div>
     {% else %}
         <form method="post" action="{% url 'earn:book_service' service.pk %}" class="space-y-3">
             {% csrf_token %}

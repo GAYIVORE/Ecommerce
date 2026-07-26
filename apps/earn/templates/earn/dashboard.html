@@ -1,6 +1,6 @@
 {% extends "earn/base_earn.html" %}
 
-{% block title %}Earn dashboard — E Shop{% endblock %}
+{% block title %}Services dashboard — E Shop{% endblock %}
 
 {% block earn_content %}
 <div class="earn-card p-6 sm:p-8 mb-8">
@@ -31,6 +31,27 @@
         <div class="text-[10px] sm:text-xs uppercase tracking-widest text-white/40 font-bold">Avg / booking</div>
         <div class="font-display font-bold text-2xl sm:text-3xl text-white mt-1 font-mono">GHS {{ avg_earning_per_booking|floatformat:2 }}</div>
     </div>
+</div>
+
+<div class="earn-card p-5 sm:p-6 mb-8">
+    <div class="flex items-center justify-between mb-4">
+        <div class="font-bold text-white text-sm uppercase tracking-wider">Your services</div>
+        <a href="{% url 'earn:marketplace' %}?mine=1" class="text-xs font-bold text-jade-400 hover:text-jade-300 transition-colors">Manage all &rarr;</a>
+    </div>
+    {% for service in my_services %}
+        <div class="flex justify-between items-center px-3 sm:px-4 py-3 bg-white/5 rounded-2xl mb-2">
+            <div>
+                <div class="font-medium text-sm text-white flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span>{{ service.title }}</span>
+                    {% if not service.is_active %}<span class="px-2 py-px bg-papaya-500/15 text-papaya-400 rounded-xl text-[10px] font-bold uppercase tracking-wider">Paused</span>{% endif %}
+                </div>
+                <div class="text-xs text-white/40">{{ service.get_category_display }} &middot; GHS {{ service.price }}</div>
+            </div>
+            <a href="{% url 'earn:service_edit' service.slug %}" class="px-3 py-1.5 bg-white/10 hover:bg-white/15 text-xs font-bold rounded-xl text-white transition-colors shrink-0 ml-2">Manage</a>
+        </div>
+    {% empty %}
+        <p class="text-white/40 text-sm">You haven't posted a service yet. <a href="{% url 'earn:service_create' %}" class="text-jade-400 hover:text-jade-300 font-semibold">Post one</a> to start earning.</p>
+    {% endfor %}
 </div>
 
 <div class="earn-card p-5 sm:p-6">

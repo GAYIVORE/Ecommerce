@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count, Q, Sum
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
@@ -43,6 +44,7 @@ def dashboard(request):
         'balance': get_user_balance(user),
         'avg_earning_per_booking': avg_earning_per_booking,
         'recent_transactions': EarningTransaction.objects.filter(user=user)[:6],
+        'my_services': Service.objects.filter(provider=user)[:6],
     }
     return render(request, 'earn/dashboard.html', context)
 
@@ -54,11 +56,17 @@ def dashboard(request):
 
 @login_required
 def marketplace(request):
-    services = (
-        Service.objects.filter(is_active=True)
-        .select_related('provider')
-        .exclude(provider=request.user)
-    )
+    show_mine = request.GET.get('mine') == '1'
+
+    if show_mine:
+        # "My services": every listing the user has posted, active or paused,
+        # so they can actually see and manage what they published.
+        services = Service.objects.filter(provider=request.user).select_related('provider')
+    else:
+        # Browse all live listings, including the user's own — a provider should
+        # be able to see their own posted service in the marketplace like anyone
+        # else would, just with a "Your listing" badge instead of a book button.
+        services = Service.objects.filter(is_active=True).select_related('provider')
 
     query = request.GET.get('q', '').strip()
     category = request.GET.get('category', '')
@@ -92,13 +100,18 @@ def marketplace(request):
         'query': query,
         'selected_category': category,
         'sort': sort,
+        'show_mine': show_mine,
+        'my_services_total': Service.objects.filter(provider=request.user).count(),
     }
     return render(request, 'earn/marketplace.html', context)
 
 
 @login_required
 def service_detail(request, slug):
-    service = get_object_or_404(Service, slug=slug, is_active=True)
+    service = get_object_or_404(Service, slug=slug)
+    # Only the owner can preview a paused/inactive listing; everyone else gets a 404.
+    if not service.is_active and service.provider_id != request.user.id:
+        raise Http404('Service not found')
     return render(
         request, 'earn/service_detail.html', {'active_tab': 'marketplace', 'service': service}
     )
@@ -117,6 +130,50 @@ def service_create(request):
     else:
         form = ServiceForm()
     return render(request, 'earn/service_form.html', {'active_tab': 'marketplace', 'form': form})
+
+
+@login_required
+def service_edit(request, slug):
+    service = get_object_or_404(Service, slug=slug, provider=request.user)
+    if request.method == 'POST':
+        form = ServiceForm(request.POST, instance=service)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your service has been updated.')
+            return redirect('earn:service_detail', slug=service.slug)
+    else:
+        form = ServiceForm(instance=service)
+    return render(
+        request,
+        'earn/service_form.html',
+        {'active_tab': 'marketplace', 'form': form, 'service': service},
+    )
+
+
+@require_POST
+@login_required
+def service_toggle_active(request, slug):
+    service = get_object_or_404(Service, slug=slug, provider=request.user)
+    service.is_active = not service.is_active
+    service.save(update_fields=['is_active', 'updated_at'])
+    if service.is_active:
+        messages.success(request, f"'{service.title}' is live again.")
+    else:
+        messages.info(request, f"'{service.title}' is paused and hidden from the marketplace.")
+    next_url = request.POST.get('next')
+    if next_url:
+        return redirect(next_url)
+    return redirect('earn:service_detail', slug=service.slug)
+
+
+@require_POST
+@login_required
+def service_delete(request, slug):
+    service = get_object_or_404(Service, slug=slug, provider=request.user)
+    title = service.title
+    service.delete()
+    messages.info(request, f"'{title}' has been deleted.")
+    return redirect('earn:marketplace')
 
 
 @require_POST

@@ -13,6 +13,9 @@ urlpatterns = [
     path('marketplace/', views.marketplace, name='marketplace'),
     path('marketplace/post/', views.service_create, name='service_create'),
     path('marketplace/<slug:slug>/', views.service_detail, name='service_detail'),
+    path('marketplace/<slug:slug>/edit/', views.service_edit, name='service_edit'),
+    path('marketplace/<slug:slug>/toggle/', views.service_toggle_active, name='service_toggle_active'),
+    path('marketplace/<slug:slug>/delete/', views.service_delete, name='service_delete'),
     path('marketplace/<int:pk>/book/', views.book_service, name='book_service'),
 
     # Bookings

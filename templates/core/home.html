@@ -144,20 +144,49 @@
 
 {% if user.is_authenticated %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-px">
-    <div class="bg-jade-500 py-5 sm:py-6">
-        <div class="flex flex-col lg:flex-row items-center justify-between gap-5 px-2">
-            <div class="flex items-center gap-x-4 text-center lg:text-left flex-col lg:flex-row">
-                <div class="w-12 h-12 rounded-2xl bg-ink-900/15 flex items-center justify-center shrink-0">
-                    <i class="fa-solid fa-handshake text-lg text-white"></i>
+    <div class="relative overflow-hidden rounded-3xl bg-ink-900 ring-1 ring-white/10">
+        <div class="absolute inset-0 opacity-[0.05] pointer-events-none bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:18px_18px]"></div>
+        <div class="absolute -top-20 -right-16 w-64 h-64 rounded-full bg-jade-500/20 blur-3xl pointer-events-none"></div>
+
+        <div class="relative z-10 p-5 sm:p-8">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5 mb-6">
+                <div class="flex items-center gap-x-4">
+                    <div class="w-12 h-12 rounded-2xl bg-jade-500 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-handshake text-ink-900 text-lg"></i>
+                    </div>
+                    <div>
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-jade-500/15 text-jade-400 text-[10px] font-black uppercase tracking-widest mb-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-jade-400 ping-dot"></span> Live on the marketplace
+                        </span>
+                        <div class="font-display font-bold text-xl sm:text-2xl tracking-tight text-white">Services on E Shop</div>
+                        <p class="text-sm text-white/50">Offer local services, pick up quick cash gigs, and track every cedi you make.</p>
+                    </div>
                 </div>
-                <div>
-                    <div class="font-display font-bold text-xl sm:text-2xl tracking-tight text-white">Services on E Shop</div>
-                    <p class="text-sm text-white/85">Offer local services, pick up quick cash gigs, and track every cedi you make.</p>
-                </div>
+                <a href="{% url 'earn:dashboard' %}" class="shrink-0 inline-flex items-center justify-center gap-x-2 px-6 py-3 rounded-2xl text-sm font-bold uppercase tracking-wider bg-jade-500 text-ink-900 hover:bg-jade-400 transition-all active:scale-[0.98]">
+                    Open Services <i class="fa-solid fa-arrow-right"></i>
+                </a>
             </div>
-            <a href="{% url 'earn:dashboard' %}" class="shrink-0 inline-flex items-center gap-x-2 px-6 py-3 rounded-xl text-sm font-bold uppercase tracking-wider bg-ink-900 text-white hover:bg-ink-800 transition-all active:scale-[0.98]">
-                Open Services <i class="fa-solid fa-arrow-right"></i>
-            </a>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {% for service in recent_services %}
+                <a href="{{ service.get_absolute_url }}" class="group relative bg-ink-800 border border-white/10 hover:border-jade-500/40 rounded-2xl p-4 transition-colors">
+                    <div class="flex items-start justify-between gap-2 mb-2.5">
+                        <span class="px-2 py-px bg-jade-500/15 text-jade-400 rounded-lg text-[10px] font-bold uppercase tracking-wider">{{ service.get_category_display }}</span>
+                        <span class="font-mono font-bold text-white text-sm shrink-0">GHS {{ service.price|floatformat:0 }}</span>
+                    </div>
+                    <div class="font-semibold text-white text-sm leading-snug group-hover:text-jade-400 transition-colors line-clamp-2">{{ service.title }}</div>
+                    <div class="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
+                        <span class="text-xs text-white/40">by {{ service.provider.username }}</span>
+                        {% if service.average_rating %}<span class="text-xs text-marigold-400 font-semibold">&#9733; {{ service.average_rating }}</span>{% endif %}
+                    </div>
+                </a>
+                {% empty %}
+                <div class="sm:col-span-3 flex flex-col sm:flex-row items-center justify-between gap-4 bg-ink-800 border border-dashed border-white/15 rounded-2xl p-5">
+                    <p class="text-sm text-white/50">No services listed yet &mdash; be the first stall on the board.</p>
+                    <a href="{% url 'earn:service_create' %}" class="shrink-0 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white/10 hover:bg-white/15 text-white transition-colors">Post a service</a>
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </div>

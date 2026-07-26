@@ -66,11 +66,19 @@ def home(request):
         .first()
     )
 
+    # A handful of the newest live listings for the homepage services showcase strip.
+    recent_services = (
+        Service.objects.filter(is_active=True)
+        .select_related('provider')
+        .order_by('-created_at')[:3]
+    )
+
     context = {
         'categories': categories,
         'coupon': active_coupon,
         'featured_shop': featured_shop,
         'featured_product': featured_product,
         'featured_service': featured_service,
+        'recent_services': recent_services,
     }
     return render(request, 'core/home.html', context)
