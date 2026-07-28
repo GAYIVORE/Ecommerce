@@ -68,12 +68,15 @@ class WishlistItem(models.Model):
     def clean(self):
         """
         Validates that a vendor cannot add their own listed products to their wishlist.
-        Defensively handles variations in the Shop model relationship attribute naming.
         """
+        # 🛠️ Fixed: this used to look for a `user` or `vendor` attribute on Shop via
+        # getattr(..., 'user', getattr(..., 'vendor', None)) — but Shop's owner field
+        # is actually named `owner`. Neither guessed name ever matched, so shop_owner
+        # was always None and this check silently never fired: vendors could freely
+        # wishlist their own products. Reading the real field name fixes that.
         if hasattr(self.product, 'shop') and self.product.shop:
-            # Safely look for 'user' or 'vendor' attributes on your Shop instance
-            shop_owner = getattr(self.product.shop, 'user', getattr(self.product.shop, 'vendor', None))
-            
+            shop_owner = self.product.shop.owner
+
             if shop_owner == self.wishlist.user:
                 raise ValidationError("You cannot add your own shop's products to your wishlist.")
         super().clean()

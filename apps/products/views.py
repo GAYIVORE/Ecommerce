@@ -323,13 +323,23 @@ class VendorProductDeleteView(VendorRequiredMixin, DeleteView):
     def get_queryset(self):
          return Product.objects.filter(shop__owner=self.request.user, is_deleted=False)
 
-    def delete(self, request, *map_args, **map_kwargs):
-        self.object = self.get_object()
+    def form_valid(self, form):
+        # 🔒 CRITICAL FIX: this soft-delete logic used to live in an overridden
+        # delete() method, which worked on older Django but is dead code here.
+        # Since Django 4.0, DeleteView's POST flow goes through
+        # BaseDeleteView.post() -> self.form_valid(form) -> self.object.delete(),
+        # and never calls delete() at all. That meant every "Remove product"
+        # click was silently doing a REAL, permanent hard delete (whatever
+        # on_delete behavior the Product FK has for existing OrderItems, etc.)
+        # instead of the intended soft-delete/archive. Overriding form_valid()
+        # is the correct interception point on the Django version this project
+        # actually runs.
+        success_url = self.get_success_url()
         self.object.is_deleted = True
         self.object.available = False
         self.object.save()
-        messages.warning(request, f'Product "{self.object.name}" removed from marketplace listings.')
-        return redirect(self.get_success_url())
+        messages.warning(self.request, f'Product "{self.object.name}" removed from marketplace listings.')
+        return redirect(success_url)
 
 
 # apps/products/views.py

@@ -288,3 +288,65 @@ class ExpireStaleOrdersCommandTests(CheckoutTestBase):
 
         order.refresh_from_db()
         self.assertNotEqual(order.status, 'Cancelled')
+
+
+class CouponCheckoutIntegrationTests(CheckoutTestBase):
+    """End-to-end coverage of coupon application through the real checkout_review
+    view + session flow, on top of the pure form/model unit tests in
+    apps/promotions/tests.py."""
+
+    def _apply_coupon(self, code):
+        self.prime_checkout_session()
+        return self.client.post(reverse('orders:checkout_review'), {
+            'submit_coupon': '1', 'code': code,
+        }, follow=True)
+
+    def test_valid_global_coupon_discounts_order_total(self):
+        Coupon.objects.create(
+            code='TAKE10', discount=10, active=True,
+            valid_from=timezone.now() - datetime.timedelta(days=1),
+            valid_to=timezone.now() + datetime.timedelta(days=1),
+        )
+        self.add_to_cart(quantity=2)  # 2 x 20.00 = 40.00
+        response = self._apply_coupon('TAKE10')
+        self.assertEqual(self.client.session.get('coupon_code'), 'TAKE10')
+        self.assertEqual(response.context['discount_amount'], Decimal('4.00'))
+        self.assertEqual(response.context['final_total'], Decimal('36.00'))
+
+    def test_shop_scoped_coupon_rejected_if_cart_has_no_matching_items(self):
+        other_vendor = User.objects.create_user(username='v2', email='v2@example.com', password='pass12345')
+        other_shop = Shop.objects.create(owner=other_vendor, name='Other Shop', status='ACTIVE', is_active=True)
+        Coupon.objects.create(
+            code='SHOPONLY', discount=20, active=True, shop=other_shop,
+            valid_from=timezone.now() - datetime.timedelta(days=1),
+            valid_to=timezone.now() + datetime.timedelta(days=1),
+        )
+        self.add_to_cart(quantity=1)  # only has a product from self.shop, not other_shop
+        response = self._apply_coupon('SHOPONLY')
+        self.assertIsNone(self.client.session.get('coupon_code'))
+        self.assertContains(response, 'only applies to products')
+
+    def test_expired_coupon_is_rejected_at_checkout(self):
+        Coupon.objects.create(
+            code='OLD5', discount=5, active=True,
+            valid_from=timezone.now() - datetime.timedelta(days=10),
+            valid_to=timezone.now() - datetime.timedelta(days=1),
+        )
+        self.add_to_cart(quantity=1)
+        response = self._apply_coupon('OLD5')
+        self.assertIsNone(self.client.session.get('coupon_code'))
+        self.assertContains(response, 'Invalid, expired, or fully depleted')
+
+    def test_coupon_usage_counter_increments_on_successful_order(self):
+        coupon = Coupon.objects.create(
+            code='COUNT1', discount=10, active=True, usage_limit=5, times_used=0,
+            valid_from=timezone.now() - datetime.timedelta(days=1),
+            valid_to=timezone.now() + datetime.timedelta(days=1),
+        )
+        self.add_to_cart(quantity=1)
+        self._apply_coupon('COUNT1')
+        self.prime_checkout_session(payment_method='cod')
+        self.client.post(reverse('orders:place_order'))
+
+        coupon.refresh_from_db()
+        self.assertEqual(coupon.times_used, 1)

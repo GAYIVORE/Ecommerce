@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Activation link invalid — E Shop{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-md mx-auto px-4 py-16 flex items-center justify-center">
+    <div class="w-full card p-8 sm:p-10 text-center">
+        <div class="mx-auto h-16 w-16 rounded-2xl flex items-center justify-center mb-6 text-red-500 bg-red-50 border border-red-100">
+            <svg class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0 3.75h.007v.008H12v-.008ZM21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-display font-bold tracking-tight mb-2">This link isn't valid</h2>
+        <p class="text-sm font-medium text-ink-900/50 mb-1">Your activation link is invalid or has already expired.</p>
+        <p class="text-sm font-medium text-ink-900/50 mb-6">Try registering again to get a fresh verification email.</p>
+        <a href="{% url 'users:register' %}" class="btn-primary inline-flex">Create an account</a>
+    </div>
+</div>
+{% endblock %}

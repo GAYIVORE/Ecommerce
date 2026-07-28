@@ -7,6 +7,7 @@ from django.db.models import Avg, Count, Q, Sum
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from .forms import LogEarningForm, QuickCashOfferForm, ServiceForm, WithdrawForm
@@ -160,8 +161,12 @@ def service_toggle_active(request, slug):
         messages.success(request, f"'{service.title}' is live again.")
     else:
         messages.info(request, f"'{service.title}' is paused and hidden from the marketplace.")
+    # 🔒 Security fix: validate "next" is a same-host URL before redirecting to it,
+    # to close off an open-redirect vector (e.g. next=https://evil.example.com).
     next_url = request.POST.get('next')
-    if next_url:
+    if next_url and url_has_allowed_host_and_scheme(
+        url=next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+    ):
         return redirect(next_url)
     return redirect('earn:service_detail', slug=service.slug)
 

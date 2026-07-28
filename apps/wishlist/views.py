@@ -1,5 +1,7 @@
 # apps/wishlist/views.py
 
+import logging
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -9,6 +11,8 @@ from django.views.decorators.http import require_POST
 
 from apps.products.models import Product
 from .models import Wishlist, WishlistItem
+
+logger = logging.getLogger(__name__)
 
 
 @login_required
@@ -44,9 +48,15 @@ def add_to_wishlist(request, product_id):
     except IntegrityError:
         messages.info(request, f"{product.name} is already in your wishlist.")
     except ValidationError as e:
-        messages.warning(request, e.message if hasattr(e, 'message') else str(e))
-    except Exception as e:
-        messages.error(request, f"An error occurred while adding to wishlist: {e}")
+        # full_clean() (called from WishlistItem.save()) wraps clean() errors into an
+        # error_dict-style ValidationError, which has no plain `.message` attribute —
+        # only `.messages`, a flat list of the actual text. Falling back to str(e) (as
+        # this used to) rendered the raw Python dict repr to the user instead of a
+        # readable sentence.
+        messages.warning(request, " ".join(e.messages))
+    except Exception:
+        logger.error("Failed to add product %s to wishlist for user %s", product_id, request.user.pk, exc_info=True)
+        messages.error(request, "Something went wrong adding this item to your wishlist. Please try again.")
 
     return redirect(request.META.get('HTTP_REFERER', 'products:product_list'))
 
@@ -87,11 +97,15 @@ def move_to_cart(request, item_id):
         try:
             #  FIXED: Pass product.id instead of the product object
             add_item_to_cart(request, product.id, quantity=1)
-            
+
             wishlist_item.delete()  # Drop from wishlist container on successful cart transfer
             messages.success(request, f"{product.name} has been moved to your cart!")
-        except Exception as e:
-            messages.error(request, f"Could not move {product.name} to cart: {e}")
+        except Exception:
+            logger.error(
+                "Failed to move wishlist item %s (product %s) to cart for user %s",
+                item_id, product.id, request.user.pk, exc_info=True
+            )
+            messages.error(request, f"Could not move {product.name} to your cart right now. Please try again.")
     else:
         messages.warning(
             request, 

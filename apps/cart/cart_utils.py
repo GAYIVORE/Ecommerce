@@ -39,10 +39,19 @@ def get_or_create_user_cart(request):
     user = getattr(request, 'user', None)
     if user is not None and user.is_authenticated:
         user_cart = _get_or_create_cart_for_user(request.user)
-        
+
+        # Prefer the session key captured *before* login() ran (see
+        # apps.cart.middleware.CaptureAnonymousSessionKeyMiddleware) — by the
+        # time we get here, request.session.session_key may already be a
+        # brand-new post-rotation key that was never associated with any
+        # guest cart. Falling back to the current key keeps this working for
+        # calls that happen outside of a login request (e.g. a normal
+        # authenticated page view, where no rotation occurred this request).
+        anon_session_key = getattr(request, '_pre_login_session_key', None) or request.session.session_key
+
         # Check for an anonymous cart and merge if it exists
-        if request.session.session_key:
-            anonymous_cart = Cart.objects.filter(session_key=request.session.session_key).first()
+        if anon_session_key:
+            anonymous_cart = Cart.objects.filter(session_key=anon_session_key).first()
             if anonymous_cart and anonymous_cart.pk != user_cart.pk:
                 with transaction.atomic():
                     # Optimization: Eager load products during the merge loop

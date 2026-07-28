@@ -44,6 +44,10 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # Must run before anything that might call auth.login() (our login view,
+    # allauth's, the admin's) so it can snapshot the still-anonymous session
+    # key. See apps/cart/middleware.py for why this matters for cart merging.
+    'apps.cart.middleware.CaptureAnonymousSessionKeyMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',

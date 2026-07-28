@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -7,6 +8,7 @@ from django.db import models
 from django.db.models import Count, Sum
 from django.db.models.functions import TruncDate
 from django.contrib import messages
+from django.db import IntegrityError
 from django.utils import timezone
 
 # Fixed model import typos securely
@@ -15,6 +17,8 @@ from .forms import VendorShopSettingsForm
 from apps.products.models import Category, Product
 # Import your OrderItem model here (adjust the app name 'orders' if yours is different)
 from apps.orders.models import OrderItem, SubOrder
+
+logger = logging.getLogger(__name__)
 
 
 def shop_directory(request):
@@ -84,8 +88,19 @@ def create_shop(request):
             )
             messages.success(request, f"Application for '{new_shop.name}' submitted successfully and is awaiting review!")
             return redirect('/')  
+        except IntegrityError:
+            # The pre-check above (filter(name__iexact=name).exists()) can't fully
+            # close the race where two people submit the same name at almost the
+            # same instant — Shop.name is unique=True at the DB level, so this is
+            # the real backstop. Give the same friendly message as the pre-check
+            # instead of falling through to the generic error below.
+            messages.error(request, f"The name '{name}' is already taken. Please choose another.")
         except Exception as e:
-            messages.error(request, f"Error submitting application: {e}")
+            # 🔒 Fixed: previously showed the raw exception message (f"...{e}") straight
+            # to the user, which can leak internal details (DB error text, field names,
+            # etc). Log the real error for admins and show a generic, safe message.
+            logger.error("Shop application failed for user %s: %s", request.user.pk, e, exc_info=True)
+            messages.error(request, "Something went wrong submitting your application. Please try again.")
 
     return render(request, 'shops/create_shop.html')
 
